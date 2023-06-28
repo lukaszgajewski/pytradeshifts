@@ -34,7 +34,7 @@ digraph G {
     I -> C [label="Remove Re-exports"];
     I -> D [label="Remove Minor Food Traders"];
     J -> E [label="Introduce Yield Reduction"];
-    J -> F [label="Reduce nodes or isolate subnetworks"];
+    J -> F [label="Reduce nodes\nIsolate subnetworks\nIntroduce distance weights"];
     J -> G [label="Louvain Community Detection"];
     K -> H [label="Plot Networks"];
 }
