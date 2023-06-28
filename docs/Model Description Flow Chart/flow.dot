@@ -1,20 +1,24 @@
-
 digraph G {
     rankdir=LR;
-    // A Graphviz dot digraph that shows the main flow of the model
-    A [label="Raw FAO\nData"];
-    B [label="Formatted"];
-    C [label="Without\nRe-exports"];
-    D [label="Without minor\nfood traders"];
-    E [label="Reduced\nTrade"];
-    F [label="Prepared\nData\nfor Analysis"];
-    G [label="Trade\nNetworks"];
-    H [label="Plots"];
-
- 	node [shape=rectangle];
-    I [label="Preprocessing"];
-    J [label="Model"]
-    K [label="Plotting"]
+    subgraph rank_same1 {
+    rank=same;
+        // A Graphviz dot digraph that shows the main flow of the model
+        A [label="Raw FAO Data"];
+        B [label="Formatted"];
+        C [label="Without Re-exports"];
+        D [label="Without minor food traders"];
+        E [label="Reduced Trade"];
+        F [label="Prepared Data for Analysis"];
+        G [label="Trade Networks"];
+        H [label="Plots"];
+    }
+    subgraph rank_same2 {
+        rank=same;
+        node [shape=rectangle];
+        I [label="Preprocessing"];
+        J [label="Model"];
+        K [label="Plotting"];
+    }
 
     // Data Flow
     A -> B;
@@ -27,11 +31,10 @@ digraph G {
     
     // Model Flow
     I -> B [label="Reformat"];
-    I -> C [label="Remove\nRe-exports"];
-    I -> D [label="Remove\nMinor\nFood\nTraders"];
-    J -> E [label="Introduce\nYield\nReduction"];
-    J -> F [label="Reduce nodes\nor isolate subnetworks"];
-    J -> G [label="Louvain\nCommunity\nDetection"];
-    K -> H [label="Plot\nNetworks"];
-
+    I -> C [label="Remove Re-exports"];
+    I -> D [label="Remove Minor Food Traders"];
+    J -> E [label="Introduce Yield Reduction"];
+    J -> F [label="Reduce nodes or isolate subnetworks"];
+    J -> G [label="Louvain Community Detection"];
+    K -> H [label="Plot Networks"];
 }
