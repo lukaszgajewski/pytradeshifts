@@ -71,6 +71,9 @@ def extract_relevant_data(
     # drop all the are nan in the given year
     trade_matrix = trade_matrix.dropna(subset=["Y" + str(year)])
 
+    # Rename the columns to be more readable.
+    trade_matrix["Item"] = rename_column_entries(trade_matrix["Item"])
+
     # Save the trade matrix to a csv file to the data folder.
     trade_matrix.to_csv(
         "." + os.sep +
@@ -81,8 +84,23 @@ def extract_relevant_data(
     return trade_matrix
 
 
+def rename_column_entries(item_column):
+    """
+    Renames entries in the item column to be more readable.
+
+    Arguments:
+        item_column (pd.Series): The item column of the trade matrix.
+
+    Returns:
+        item_column (pd.Series): The renamed item column.
+    """
+    item_column = item_column.str.replace("Maize (corn)", "Maize")
+    item_column = item_column.str.replace("Rice, paddy (rice milled equivalent)", "Rice")
+    return item_column
+
+
 if __name__ == "__main__":
-    trade_matrix = read_in_raw_trade_matrix(testing=False)
+    trade_matrix = read_in_raw_trade_matrix(testing=True)
     trade_matrix = extract_relevant_data(trade_matrix)
 
     print(trade_matrix.head())
