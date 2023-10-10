@@ -161,18 +161,19 @@ def rename_item(item):
 if __name__ == "__main__":
     # Define values
     year = 2018
-    items = ["Maize (corn)", "Wheat", "Rice, paddy (rice milled equivalent)"]
+    items_trade = ["Maize (corn)", "Wheat", "Rice, paddy (rice milled equivalent)"]
+    items_production = ["Maize (corn)", "Wheat", "Rice"]
 
     # Read in raw trade data
     trade_data = read_in_raw_trade_data(testing=False)
-    trade_data = extract_relevant_trade_data(trade_data, items, year=year)
+    trade_data = extract_relevant_trade_data(trade_data, items_trade, year=year)
 
     print(trade_data.head())
     print(trade_data.columns)
 
     # Read in raw production data
     production_data = read_in_raw_production_data()
-    production_data = extract_relevant_production_data(production_data, items, year=year)
+    production_data = extract_relevant_production_data(production_data, items_production, year=year)
 
     print(production_data.head())
     print(production_data.columns)
