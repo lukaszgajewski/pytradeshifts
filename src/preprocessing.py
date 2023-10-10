@@ -14,11 +14,12 @@ def read_in_raw_trade_data(testing=False):
     Returns:
         trade_data (pd.DataFrame): The raw trade matrix as a pandas dataframe.
     """
+    # Only use subset for testing purposes
     if testing:
         trade_data = pd.read_csv(
             "." + os.sep +
             "data" + os.sep +
-            "oceania_only_for_testing" +
+            "Trade_DetailedTradeMatrix_E_Oceania" +
             os.sep +
             "Trade_DetailedTradeMatrix_E_Oceania.csv",
             encoding="latin-1",
@@ -35,8 +36,27 @@ def read_in_raw_trade_data(testing=False):
     return trade_data
 
 
+def read_in_raw_production_data():
+    """
+    Reads in the raw food production to be used later for the
+    re-export algorithm.
 
-def extract_relevant_data(trade_data, year=2021, items=["Maize (corn)", "Wheat", "Rice, paddy (rice milled equivalent)"]):
+    Returns:
+        pd.DataFrame: The raw food production data.
+    """
+    production_data = pd.read_csv(
+        "." + os.sep +
+        "data" + os.sep +
+        "Production_Crops_Livestock_E_All_Data" +
+        os.sep +
+        "Production_Crops_Livestock_E_All_Data_NOFLAG.csv",
+        encoding="latin-1",
+        low_memory=False)
+    return production_data
+
+
+
+def extract_relevant_trade_data(trade_data, items, year=2021):
     """
     Extracts only the relevant data needed for building the trade model.
 
@@ -57,26 +77,69 @@ def extract_relevant_data(trade_data, year=2021, items=["Maize (corn)", "Wheat",
         "Unit",
         f"Y{year}"
     ]
-    
+
     trade_data = trade_data[relevant_columns]
-    
+
     # Filter items of interest
     trade_data = trade_data[trade_data["Item"].isin(items)]
-    
+
     # Filter for export quantities only
     trade_data = trade_data[trade_data["Element"] == "Export Quantity"]
-    
+
     # Drop rows with NaN values for the given year
     trade_data = trade_data.dropna(subset=[f"Y{year}"])
-    
+
     # Rename specific items for readability
     trade_data["Item"] = trade_data["Item"].apply(rename_item)
-    
+
     # Save the trade matrix to a CSV file in the data folder
     file_name = f"data{os.sep}trade_data_only_relevant_{year}.csv"
     trade_data.to_csv(file_name, index=False)
-    
+
     return trade_data
+
+
+def extract_relevant_production_data(production_data, items, year=2021):
+    """
+    Extracts only the relevant data for the re-export algorithm.
+
+    Args:
+        production_data (pd.DataFrame): The raw production data.
+        items (list): The items of interest, i.e., trade goods.
+        year (int): The year to extract data for.
+
+    Returns:
+        pd.DataFrame: The cleaned production data.
+    """
+    # Select only relevant columns
+    relevant_columns = [
+        "Area",
+        "Item",
+        "Element",
+        "Unit",
+        f"Y{year}"
+    ]
+
+    production_data = production_data[relevant_columns]
+
+    # Filter items of interest
+    production_data = production_data[production_data["Item"].isin(items)]
+
+    # Filter for quantities only
+    production_data = production_data[production_data["Element"] == "Production"]
+
+    # Drop rows with NaN values for the given year
+    production_data = production_data.dropna(subset=[f"Y{year}"])
+
+    # Rename specific items for readability
+    production_data["Item"] = production_data["Item"].apply(rename_item)
+
+    # Save the production data to a CSV file in the data folder
+    file_name = f"data{os.sep}production_data_only_relevant_{year}.csv"
+    production_data.to_csv(file_name, index=False)
+
+    return production_data
+
 
 def rename_item(item):
     """
@@ -96,8 +159,20 @@ def rename_item(item):
 
 
 if __name__ == "__main__":
+    # Define values
+    year = 2018
+    items = ["Maize (corn)", "Wheat", "Rice, paddy (rice milled equivalent)"]
+
+    # Read in raw trade data
     trade_data = read_in_raw_trade_data(testing=False)
-    trade_data = extract_relevant_data(trade_data, year=2018)
+    trade_data = extract_relevant_trade_data(trade_data, items, year=year)
 
     print(trade_data.head())
     print(trade_data.columns)
+
+    # Read in raw production data
+    production_data = read_in_raw_production_data()
+    production_data = extract_relevant_production_data(production_data, items, year=year)
+
+    print(production_data.head())
+    print(production_data.columns)
