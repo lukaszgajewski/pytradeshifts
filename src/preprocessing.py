@@ -92,6 +92,9 @@ def extract_relevant_trade_data(trade_data, items, year=2021):
     # Rename specific items for readability
     trade_data["Item"] = trade_data["Item"].apply(rename_item)
 
+    # Rename year column to "Quantity"
+    trade_data = trade_data.rename(columns={f"Y{year}": "Quantity"})
+
     # Save the trade matrix to a CSV file in the data folder
     file_name = f"data{os.sep}trade_data_only_relevant_{year}.csv"
     trade_data.to_csv(file_name, index=False)
@@ -133,6 +136,9 @@ def extract_relevant_production_data(production_data, items, year=2021):
 
     # Rename specific items for readability
     production_data["Item"] = production_data["Item"].apply(rename_item)
+
+    # Rename year column to "Production"
+    production_data = production_data.rename(columns={f"Y{year}": "Production"})
 
     # Save the production data to a CSV file in the data folder
     file_name = f"data{os.sep}production_data_only_relevant_{year}.csv"
