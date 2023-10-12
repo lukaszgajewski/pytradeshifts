@@ -1,6 +1,11 @@
 # ALLFED-Repository-Template
+
+**If this is the first time you want to use this template, please go through the [Github training](https://github.com/allfed/Github-Training-Repository/blob/main/README.md) first. This will give you the neccesary background knowledge to understand what is happening here. 
+
+## How to use this template
 Use this as template when you start a new project by clicking "Use this template" in the top right.
 
+Then follow all the descriptions below. 
 
 ## ALLFED Python Style Guide
 All code written for ALLFED should follow the [PEP 8 Style Guide for Python](https://peps.python.org/pep-0008/). Especially important are:
@@ -55,12 +60,16 @@ Documenting your code is only one part of the documentation we want to create. E
 ## Documenting in big projects
 All the things for the small projects, but also:
 * An automated documentation via Gitub Actions. This is already set up in this repository. Is uses the code from [this post](https://towardsdatascience.com/easily-automate-and-never-touch-your-documentation-again-a98c91ce1b95) and combines it with [this one](https://blog.elmah.io/deploying-a-mkdocs-documentation-site-with-github-actions/). It also is setup that it will only look for python files in the src folder. So, make sure that everything is in there (you can changes this behavior in the main function of `automate_mkdocs.py`). To get it running do the following
+    * Change the names in `mkgendocs.yml` and `mkdocs.yml` so they fit your repository
     * go to Settings --> Pages 
     * select deploy from a branch as source
-    * select gh-pages as branch at root (for this option to pop up the `docs.yml` file has to have run succesfully at least once)
+    * select gh-pages as branch at root (for this option to pop up the `docs.yml` file has to have run succesfully at least once, this should happen when you push anything in your repository)
     * The end result will look something [like this](https://florianjehn.github.io/Seaweed-Growth-Model/)
     * The automated documentation part is still a bit wip, if you run into problems contact florian@allfed.info
 * Create a [visual representation](https://goodresearch.dev/_images/pcbi.1007358.g002.PNG_L.png) of how the different files interact with each other
+
+## Issues
+Every time you come across a problem that you do not plan to fix in the next day, please open an issue in the repository to make sure that it does not get lost. This also allows you to assign tasks to other coders on the team. For a short intro to issues, see [here](https://www.youtube.com/watch?v=TKJ4RdhyB5Y).
 
 ## Making the repository citable
 All ALLFED repositories should be citable by release. For this we use [Zenodo](https://zenodo.org/). This has to be activated by an Admin (so either Florian or Morgan). Once you have a manuscript where you need to cite the repository let them know and they will activate it. This will also create a doi badge, which should be included in the readme, like this:
@@ -72,12 +81,19 @@ All ALLFED repositories should be citable by release. For this we use [Zenodo](h
 
 
 ---
+
+## ALLFED Plotting Style
+All plots created for ALLFED should look and feel the same. You can activate the ALLFED style by simply starting your code with:
+
+`plt.style.use("https://raw.githubusercontent.com/allfed/ALLFED-matplotlib-style-sheet/main/ALLFED.mplstyle")`
+
+If you need to create your plots in ALLFED style, while being offline just download the file and change the path to local. 
    
 ## Project Skeleton
-This repository already has the folder structure we use for repositories. Every folder has an additional readme, to tell you what needs to go in there. 
+This repository already has the folder structure we use for repositories. Every folder has an additional readme, to tell you what needs to go in there.
 
 ## Making the repository a pip installable Python package
-For some repositories it makes sense to make them installable via pip (e.g. a model we want to share easily). In this case you can use the explanation [here](https://goodresearch.dev/setup.html). This repository already contains a setup.py that can be used for that. 
+For some repositories it makes sense to make them installable via pip (e.g. a model we want to share easily). In this case you can use the explanation [here](https://goodresearch.dev/setup.html). This repository already contains a setup.py that can be used for that. If you want to install it to your local environment just run `pip install -e .` while being in the folder that contains setup.py.
 
 ## Environment
 Every ALLFED project is run in its own virtual environment. Therefore, every project needs an `environment.yml` file. The one in this repository is only an example and should not be used for any actual project. To create and organize virtual environments we use [conda](https://docs.conda.io/en/latest/miniconda.html). 
