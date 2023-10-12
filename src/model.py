@@ -139,105 +139,55 @@ class PyTradeShifts:
         production_data = self.production_data.loc[countries]
 
         # Remove re-exports
-        trade_corrected = self.correct_for_reexports(trade_matrix, production_data)
-        # Estimate trade-related matrices
-        trade_matrix = self.estimate_trade_matrices(trade_corrected, production_data)
+        # Convert the trade matrix to a numpy array
+        trade_matrix = trade_matrix.to_numpy()
+        # Convert the production data to a numpy array
+        production_data = production_data.to_numpy()
+        # Balance the trade data
+        trade_matrix_balanced = self.balance_trade_data(trade_matrix, production_data)
+        self.trade_matrix = pd.DataFrame(trade_matrix_balanced, index=countries, columns=countries)
 
-        # Set the corrected trade matrix as the trade matrix
-        self.trade_matrix = trade_matrix
-    
-    def correct_for_reexports(self, trade_matrix, production_data, max_iter=10000):
+    def balance_trade_data(self, trade_matrix, production_data, tolerance=1e-3, max_iterations=10000):
         """
-        Correct for re-exports in the wheat trade data.
+        Balance the trade data using an iterative approach.
 
         Args:
-            trade_matrix (pd.DataFrame): Pivot table of wheat exports data.
-            production_data (pd.DataFrame): Crop production data.
-            max_iter (int): Maximum number of iterations for prebalancing.
+            trade_matrix (numpy.ndarray): The bilateral trade matrix.
+            production_data (numpy.ndarray): A vector of production values for each country.
+            tolerance (float, optional): A tolerance threshold for trade imbalances. Defaults to 0.001.
+            max_iterations (int, optional): The maximum number of iterations. Defaults to 100.
 
         Returns:
-            pd.DataFrame: Corrected wheat trade data.
+            numpy.ndarray: The balanced bilateral trade matrix.
         """
-        # Prebalancing
-        loop = 0
+
+        iteration = 0  # Initialize the iteration counter
+
         while True:
-            # The variable 'trade_imbalance' is an indicator to assess the balance of the trade.
-            # It quantifies the discrepancies in trade flows and production values for each country
-            # More specifically:
-            # - For each country, 'trade_imbalance' computes the difference between total production
-            #  and total wheat exports.
-            # - It also calculates the difference between the total wheat imports and total
-            # wheat exports for the same country.
-            # - The 'trade_imbalance' array is constructed by subtracting these two differences,
-            # which effectively measures the mismatch between production, exports, and imports.
-            # - In the context of prebalancing, the 'while' loop iterates as long as any element
-            # in 'trade_imbalance' is less than or equal to -1e-3, indicating an unbalanced trade.
-            # - During each iteration, the code adjusts the matrix based on scaling factors until
-            # 'trade_imbalance' values are sufficiently close to zero, signifying a balanced trade.
-            trade_imbalance = (
-                production_data +
-                trade_matrix.sum(axis=1) -
-                trade_matrix.sum(axis=0)
-            )
+            # Print every 1000 iterations
+            if iteration % 1000 == 0:
+                print(f"Iteration {iteration}")
+            # Calculate row sums of the bilateral trade matrix
+            row_sums = trade_matrix.sum(axis=1)
 
-            if not any(trade_imbalance <= -1e-3) or loop > max_iter:
-                break
+            # Calculate column sums of the bilateral trade matrix
+            col_sums = trade_matrix.sum(axis=0)
 
-            # Calculate scaling factors for prebalancing
-            scaling_factors = (
-                production_data +
-                trade_matrix.sum(axis=1)
-            ) / trade_matrix.sum(axis=0)
+            # Calculate the trade imbalances
+            trade_imbalances = production_data + col_sums - row_sums
 
-            # Determine the multiplier to adjust the matrix
-            multiplier = np.where(trade_imbalance < 0, scaling_factors, 1)
+            # Check if all trade imbalances are below the tolerance
+            if iteration > max_iterations:
+                if all(trade_imbalances <= -tolerance):
+                    # Calculate scaling factors to balance the trade
+                    scaling_factors = (production_data + col_sums) / row_sums
+                    # Replace negative scaling factors with 1
+                    scaling_factors[scaling_factors < 0] = 1
+                    # Update the bilateral trade matrix with scaled values
+                    trade_matrix = trade_matrix.mul(scaling_factors, axis=0)
+                else:
+                    break
 
-            # Apply the multiplier to the wheat trade matrix
-            trade_matrix = np.diag(multiplier) @ trade_matrix
-
-            loop += 1
+            iteration += 1  # Increment the iteration counter
 
         return trade_matrix
-    
-    def estimate_trade_matrices(self, trade_matrix, production_data):
-        """
-        Estimate trade-related matrices from trade data.
-
-        Args:
-            trade_matrix (pd.DataFrame): Trade data.
-            production_data (pd.DataFrame): Crop production data.
-
-        Returns:
-            pd.DataFrame: Trade without re-exports.
-        """
-        # Calculate the total production and trade values for balancing
-        domestic_supply = (
-            production_data +
-            trade_matrix.sum(axis=0)
-        )
-
-        # Create a diagonal matrix using crop production values
-        production_diag = np.diag(production_data)
-
-        # Calculate matrix A representing trade relationships
-        trade_relationships = trade_matrix @ np.linalg.inv(np.diag(domestic_supply))
-
-        # Calculate trade flows
-        trade_flows = np.linalg.inv(
-            np.identity(trade_relationships.shape[0]) -
-            trade_relationships
-        ) @ production_diag
-
-        # Calculate consumption shares
-        consumption_share = np.linalg.inv(
-            np.diag(domestic_supply)
-        ) @ (domestic_supply - trade_matrix.sum(axis=1))
-
-        # Calculate consumption from each country to country
-        trade_without_re_exports = np.diag(consumption_share) @ trade_flows
-
-        # Data cleaning
-        trade_without_re_exports[np.isnan(trade_without_re_exports)] = 0
-        trade_without_re_exports[trade_without_re_exports < 0.001] = 0
-
-        return trade_without_re_exports
