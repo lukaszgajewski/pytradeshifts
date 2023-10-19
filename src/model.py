@@ -23,14 +23,15 @@ class PyTradeShifts:
         self.base_year = base_year
         self.crop = crop
         self.percentile = percentile
+        # Read in the data
         self.trade_data, self.production_data = self.load_data(
             self.crop,
             self.base_year,
-            self.percentile
         )
         self.trade_matrix = self.build_trade_matrix()
 
-    def load_data(self, crop, base_year, percentile):
+
+    def load_data(self, crop, base_year):
         """
         Loads the data into a pandas dataframe and cleans it
         of countries with trade below a certain percentile.
@@ -38,8 +39,6 @@ class PyTradeShifts:
         Arguments:
             crop (str): The crop to build the trade matrix for.
             base_year (int): The base_year to extract data for.
-            percentile (float): The percentile to use for removing countries with
-                low trade.
 
         Returns:
             pd.DataFrame: The trade data with countries with low trade removed
@@ -62,17 +61,13 @@ class PyTradeShifts:
         crop_trade_data = trade_data[trade_data["Item"] == crop]
         production_data_data = production_data[production_data["Item"] == crop]
 
-        # Remove countries with trade which is below the percentile
-        # of the total trade of all countries for this crop
-        crop_trade_data = self.remove_above_percentile(crop_trade_data, percentile)
-
         # Reshape the production data to a vector
         production_data_data.index = production_data_data["Area"]
         production_data_data = production_data_data["Production"]
 
         return crop_trade_data, production_data_data
 
-    def remove_above_percentile(self, crop_trade_data, percentile):
+    def remove_above_percentile(self, trade_matrix, percentile):
         """
         Removes countries with trade below a certain percentile.
 
@@ -86,9 +81,15 @@ class PyTradeShifts:
             pd.DataFrame: The trade data with countries with low trade removed
                 and only the relevant crop.
         """
-        return crop_trade_data[
-                    crop_trade_data["Quantity"] > crop_trade_data["Quantity"].quantile(percentile)
-                ]
+        # Calculate the percentile out of all values in the trade matrix
+        threshold = np.percentile(trade_matrix.values, percentile*100)
+        # Set all values to 0 which are below the threshold
+        trade_matrix[trade_matrix < threshold] = 0
+        # Remove all countries which have no trade
+        trade_matrix = trade_matrix.loc[trade_matrix.sum(axis=1) > 0, :]
+        trade_matrix = trade_matrix.loc[:, trade_matrix.sum(axis=0) > 0]
+
+        return trade_matrix
 
     def build_trade_matrix(self):
         """
@@ -115,7 +116,7 @@ class PyTradeShifts:
 
         return trade_matrix
 
-    def remove_re_exports(self):
+    def remove_re_exports(self, percentile=0.75):
         """
         Removes re-exports from the trade matrix.
         This is a Python implementation of the Matlab code from:
@@ -147,15 +148,19 @@ class PyTradeShifts:
         trade_matrix_balanced = self.balance_trade_data(trade_matrix, production_data)
         self.trade_matrix = pd.DataFrame(trade_matrix_balanced, index=countries, columns=countries)
 
+        # Remove countries with trade which is below the percentile
+        # of the total trade of all countries for this crop
+        self.trade_matrix = self.remove_above_percentile(self.trade_matrix, percentile)
+
     def balance_trade_data(self, trade_matrix, production_data, tolerance=1e-3, max_iterations=10000):
         """
         Balance the trade data using an iterative approach.
 
-        Args:
+        Arguments:
             trade_matrix (numpy.ndarray): The bilateral trade matrix.
             production_data (numpy.ndarray): A vector of production values for each country.
             tolerance (float, optional): A tolerance threshold for trade imbalances. Defaults to 0.001.
-            max_iterations (int, optional): The maximum number of iterations. Defaults to 100.
+            max_iterations (int, optional): The maximum number of iterations. Defaults to 10000.
 
         Returns:
             numpy.ndarray: The balanced bilateral trade matrix.
