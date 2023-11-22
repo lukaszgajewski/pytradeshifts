@@ -1,4 +1,6 @@
-# pytradeshifts: Simulating how trade communities are affected by catastrophic yield reductions
+# pytradeshifts
+
+Simulating how trade communities are affected by catastrophic yield reductions
 
 WIP
 
