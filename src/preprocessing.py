@@ -170,7 +170,7 @@ if __name__ == "__main__":
     items_production = ["Maize (corn)", "Wheat", "Rice"]
 
     # Read in raw trade data
-    trade_data = read_in_raw_trade_data(testing=False)
+    trade_data = read_in_raw_trade_data(testing=True)
     trade_data = extract_relevant_trade_data(trade_data, items_trade, year=year)
 
     print(trade_data.head())
