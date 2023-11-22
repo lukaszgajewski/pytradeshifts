@@ -30,7 +30,6 @@ class PyTradeShifts:
         )
         self.trade_matrix = self.build_trade_matrix()
 
-
     def load_data(self, crop, base_year):
         """
         Loads the data into a pandas dataframe and cleans it
