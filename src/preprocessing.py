@@ -55,7 +55,6 @@ def read_in_raw_production_data():
     return production_data
 
 
-
 def extract_relevant_trade_data(trade_data, items, year=2021):
     """
     Extracts only the relevant data needed for building the trade model.
