@@ -9,3 +9,17 @@ copyright: ALLFED
 
 #This specifies the autogeneration portion
 pages:
+  - page: "modules/src/model.md"
+    source: "src/model.py"
+    classes:
+      - PyTradeShifts
+
+  - page: "modules/src/preprocessing.md"
+    source: "src/preprocessing.py"
+    functions:
+      - read_in_raw_trade_data
+      - read_in_raw_production_data
+      - extract_relevant_trade_data
+      - extract_relevant_production_data
+      - rename_item
+
