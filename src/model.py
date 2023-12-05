@@ -133,5 +133,43 @@ class PyTradeShifts:
         Returns:
             pd.DataFrame: The trade matrix without re-exports.
         """
+        pass
 
+
+    def prebalance(self, vec_prod, mat_trad, precision=10**-3):
+        test = vec_prod + mat_trad.sum(axis=0) - mat_trad.sum(axis=1)
+        while (test <= -precision).any():
+            sf = (vec_prod + mat_trad.sum(axis=0)) / mat_trad.sum(axis=1)
+            multiplier = ((test < 0) * sf).replace(0, 1)
+            mat_trad = pd.DataFrame(
+                np.diag(multiplier) @ mat_trad.values,
+                index=mat_trad.index,
+                columns=mat_trad.columns,
+            )
+            test = vec_prod + mat_trad.sum(axis=0) - mat_trad.sum(axis=1)
+        return mat_trad
+
+
+    def remove_net_zero_countries(self, vec_prod, mat_trad):
+        b_zero_prod = vec_prod == 0
+        b_zero_colsum = mat_trad.sum(axis=0) == 0
+        b_zero_rowsum = mat_trad.sum(axis=1) == 0
+        b_filter = ~(b_zero_prod & b_zero_rowsum & b_zero_colsum)
+        return vec_prod[b_filter], mat_trad.loc[b_filter, b_filter]
+
+
+    def correct_reexports(self, vec_prod, mat_trad):
+        mat_trad = mat_trad.T
+        vec_prod = vec_prod.fillna(0)
+
+        x = vec_prod + mat_trad.sum(axis=1)
+        y = np.linalg.inv(np.diag(x))
+        A = mat_trad @ y
+        R = np.linalg.inv(np.identity(len(A)) - A) @ np.diag(vec_prod)
+        c = np.diag(y @ (x - mat_trad.sum(axis=0)))
+        R = (c @ R).T
+        R[~np.isfinite(R)] = 0
+        R[R < 0.001] = 0
+
+        return pd.DataFrame(R, index=mat_trad.index, columns=mat_trad.columns)
 
