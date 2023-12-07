@@ -263,10 +263,4 @@ if __name__ == "__main__":
     items_trade = ["Maize (corn)", "Wheat", "Rice, paddy (rice milled equivalent)"]
     items_production = ["Maize (corn)", "Wheat", "Rice"]
 
-    # Read in raw trade data
-    trade_data = read_in_raw_trade_data(testing=False)
-    trade_data = extract_relevant_trade_data(trade_data, items_trade, year=year)
 
-    # Read in raw production data
-    production_data = read_in_raw_production_data()
-    production_data = extract_relevant_production_data(production_data, items_production, year=year)
