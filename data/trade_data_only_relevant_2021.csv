@@ -1,0 +1,154 @@
+Reporter Countries,Partner Countries,Element,Item,Unit,Quantity
+Australia,Argentina,Export Quantity,Maize,tonnes,0.12
+Australia,Argentina,Export Quantity,Rice,tonnes,2.0
+Australia,Bahrain,Export Quantity,Wheat,tonnes,82500.0
+Australia,Bangladesh,Export Quantity,Maize,tonnes,4.0
+Australia,Bangladesh,Export Quantity,Wheat,tonnes,451240.6
+Australia,Brunei Darussalam,Export Quantity,Maize,tonnes,0.32
+Australia,Burundi,Export Quantity,Wheat,tonnes,23541.0
+Australia,"China, Hong Kong SAR",Export Quantity,Maize,tonnes,30.65
+Australia,"China, Hong Kong SAR",Export Quantity,Rice,tonnes,0.0
+Australia,"China, Hong Kong SAR",Export Quantity,Wheat,tonnes,1074.83
+Australia,"China, mainland",Export Quantity,Maize,tonnes,12.44
+Australia,"China, mainland",Export Quantity,Wheat,tonnes,2943393.26
+Australia,"China, Taiwan Province of",Export Quantity,Maize,tonnes,237.32
+Australia,"China, Taiwan Province of",Export Quantity,Wheat,tonnes,282394.26
+Australia,Egypt,Export Quantity,Wheat,tonnes,320570.4
+Australia,Fiji,Export Quantity,Maize,tonnes,14.99
+Australia,Fiji,Export Quantity,Wheat,tonnes,169735.78
+Australia,French Polynesia,Export Quantity,Maize,tonnes,247.77
+Australia,French Polynesia,Export Quantity,Wheat,tonnes,625.28
+Australia,Germany,Export Quantity,Maize,tonnes,4.26
+Australia,Indonesia,Export Quantity,Maize,tonnes,300.0
+Australia,Indonesia,Export Quantity,Wheat,tonnes,4938500.11
+Australia,Israel,Export Quantity,Maize,tonnes,0.05
+Australia,Italy,Export Quantity,Wheat,tonnes,464616.4
+Australia,Japan,Export Quantity,Maize,tonnes,3049.32
+Australia,Japan,Export Quantity,Wheat,tonnes,1216260.6
+Australia,Kenya,Export Quantity,Wheat,tonnes,508219.6
+Australia,Kuwait,Export Quantity,Wheat,tonnes,440514.6
+Australia,Lao People's Democratic Republic,Export Quantity,Wheat,tonnes,2010.02
+Australia,Madagascar,Export Quantity,Wheat,tonnes,32307.0
+Australia,Malawi,Export Quantity,Wheat,tonnes,113250.0
+Australia,Malaysia,Export Quantity,Maize,tonnes,5805.47
+Australia,Malaysia,Export Quantity,Wheat,tonnes,1151033.46
+Australia,Mauritius,Export Quantity,Wheat,tonnes,63.17
+Australia,Mozambique,Export Quantity,Wheat,tonnes,284279.6
+Australia,Myanmar,Export Quantity,Maize,tonnes,0.65
+Australia,Myanmar,Export Quantity,Wheat,tonnes,373348.5
+Australia,Nauru,Export Quantity,Maize,tonnes,0.13
+Australia,New Caledonia,Export Quantity,Maize,tonnes,28.42
+Australia,New Caledonia,Export Quantity,Wheat,tonnes,29851.56
+Australia,New Zealand,Export Quantity,Maize,tonnes,90.02
+Australia,New Zealand,Export Quantity,Wheat,tonnes,546278.82
+Australia,Nigeria,Export Quantity,Wheat,tonnes,115280.0
+Australia,Oman,Export Quantity,Wheat,tonnes,75584.58
+Australia,Pakistan,Export Quantity,Maize,tonnes,0.4
+Australia,Papua New Guinea,Export Quantity,Maize,tonnes,62.42
+Australia,Papua New Guinea,Export Quantity,Rice,tonnes,7.0
+Australia,Papua New Guinea,Export Quantity,Wheat,tonnes,252645.9
+Australia,Philippines,Export Quantity,Maize,tonnes,649.31
+Australia,Philippines,Export Quantity,Wheat,tonnes,1969593.52
+Australia,Qatar,Export Quantity,Wheat,tonnes,62783.2
+Australia,Republic of Korea,Export Quantity,Maize,tonnes,75632.76
+Australia,Republic of Korea,Export Quantity,Wheat,tonnes,1133738.28
+Australia,Rwanda,Export Quantity,Wheat,tonnes,42526.2
+Australia,Samoa,Export Quantity,Maize,tonnes,0.01
+Australia,Saudi Arabia,Export Quantity,Wheat,tonnes,481946.6
+Australia,Singapore,Export Quantity,Maize,tonnes,709.3
+Australia,Singapore,Export Quantity,Wheat,tonnes,108995.27
+Australia,Solomon Islands,Export Quantity,Wheat,tonnes,13167.68
+Australia,South Africa,Export Quantity,Maize,tonnes,8.46
+Australia,South Africa,Export Quantity,Wheat,tonnes,589422.1
+Australia,Sri Lanka,Export Quantity,Wheat,tonnes,577683.1
+Australia,Sudan,Export Quantity,Wheat,tonnes,226075.6
+Australia,Thailand,Export Quantity,Maize,tonnes,2.75
+Australia,Thailand,Export Quantity,Wheat,tonnes,1053869.28
+Australia,Timor-Leste,Export Quantity,Maize,tonnes,0.01
+Australia,Timor-Leste,Export Quantity,Wheat,tonnes,0.01
+Australia,Türkiye,Export Quantity,Maize,tonnes,7.5
+Australia,Uganda,Export Quantity,Wheat,tonnes,123014.4
+Australia,United Arab Emirates,Export Quantity,Maize,tonnes,0.2
+Australia,United Arab Emirates,Export Quantity,Wheat,tonnes,250157.3
+Australia,United Kingdom of Great Britain and Northern Ireland,Export Quantity,Wheat,tonnes,6719.8
+Australia,United Republic of Tanzania,Export Quantity,Wheat,tonnes,200866.82
+Australia,Uruguay,Export Quantity,Rice,tonnes,12.0
+Australia,Vanuatu,Export Quantity,Maize,tonnes,3.05
+Australia,Viet Nam,Export Quantity,Wheat,tonnes,3028631.0
+Australia,Yemen,Export Quantity,Wheat,tonnes,856726.0
+Australia,Zambia,Export Quantity,Wheat,tonnes,18000.0
+Cook Islands,France,Export Quantity,Maize,tonnes,0.03
+Fiji,Australia,Export Quantity,Rice,tonnes,12.0
+Fiji,Cook Islands,Export Quantity,Maize,tonnes,0.01
+Fiji,Cook Islands,Export Quantity,Rice,tonnes,85.0
+Fiji,French Polynesia,Export Quantity,Rice,tonnes,216.0
+Fiji,Kiribati,Export Quantity,Maize,tonnes,3.64
+Fiji,Kiribati,Export Quantity,Rice,tonnes,541.0
+Fiji,Marshall Islands,Export Quantity,Rice,tonnes,1.0
+Fiji,Nauru,Export Quantity,Rice,tonnes,120.0
+Fiji,New Zealand,Export Quantity,Rice,tonnes,77.0
+Fiji,Niue,Export Quantity,Rice,tonnes,0.0
+Fiji,Samoa,Export Quantity,Rice,tonnes,6.0
+Fiji,Tonga,Export Quantity,Rice,tonnes,44.0
+Fiji,Tuvalu,Export Quantity,Rice,tonnes,167.0
+Fiji,United States of America,Export Quantity,Maize,tonnes,0.01
+Fiji,Vanuatu,Export Quantity,Maize,tonnes,0.55
+Fiji,Vanuatu,Export Quantity,Rice,tonnes,373.0
+New Zealand,Argentina,Export Quantity,Maize,tonnes,0.7
+New Zealand,Australia,Export Quantity,Maize,tonnes,1629.52
+New Zealand,Australia,Export Quantity,Rice,tonnes,81.0
+New Zealand,Australia,Export Quantity,Wheat,tonnes,0.05
+New Zealand,Bahrain,Export Quantity,Rice,tonnes,0.0
+New Zealand,Canada,Export Quantity,Wheat,tonnes,10.62
+New Zealand,"China, Hong Kong SAR",Export Quantity,Maize,tonnes,0.3
+New Zealand,"China, Macao SAR",Export Quantity,Rice,tonnes,0.0
+New Zealand,Cook Islands,Export Quantity,Maize,tonnes,3.67
+New Zealand,Cook Islands,Export Quantity,Rice,tonnes,30.0
+New Zealand,Fiji,Export Quantity,Maize,tonnes,74.29
+New Zealand,Fiji,Export Quantity,Rice,tonnes,15.0
+New Zealand,Fiji,Export Quantity,Wheat,tonnes,0.23
+New Zealand,Finland,Export Quantity,Wheat,tonnes,40.5
+New Zealand,France,Export Quantity,Maize,tonnes,58.61
+New Zealand,French Polynesia,Export Quantity,Maize,tonnes,0.31
+New Zealand,French Polynesia,Export Quantity,Rice,tonnes,26.0
+New Zealand,French Polynesia,Export Quantity,Wheat,tonnes,0.02
+New Zealand,Germany,Export Quantity,Maize,tonnes,52.72
+New Zealand,Germany,Export Quantity,Wheat,tonnes,1.08
+New Zealand,India,Export Quantity,Rice,tonnes,31.0
+New Zealand,Japan,Export Quantity,Maize,tonnes,182.0
+New Zealand,Kiribati,Export Quantity,Maize,tonnes,0.01
+New Zealand,Kiribati,Export Quantity,Rice,tonnes,0.0
+New Zealand,Malaysia,Export Quantity,Wheat,tonnes,950.58
+New Zealand,Marshall Islands,Export Quantity,Maize,tonnes,0.14
+New Zealand,Marshall Islands,Export Quantity,Rice,tonnes,0.0
+New Zealand,Micronesia (Federated States of),Export Quantity,Rice,tonnes,0.0
+New Zealand,Nauru,Export Quantity,Rice,tonnes,1.0
+New Zealand,New Caledonia,Export Quantity,Maize,tonnes,388.93
+New Zealand,New Caledonia,Export Quantity,Rice,tonnes,3.0
+New Zealand,Niue,Export Quantity,Maize,tonnes,0.23
+New Zealand,Niue,Export Quantity,Rice,tonnes,11.0
+New Zealand,Papua New Guinea,Export Quantity,Maize,tonnes,0.59
+New Zealand,Republic of Korea,Export Quantity,Maize,tonnes,227.8
+New Zealand,Samoa,Export Quantity,Maize,tonnes,0.86
+New Zealand,Samoa,Export Quantity,Rice,tonnes,3.0
+New Zealand,Singapore,Export Quantity,Maize,tonnes,0.54
+New Zealand,Singapore,Export Quantity,Rice,tonnes,0.0
+New Zealand,Singapore,Export Quantity,Wheat,tonnes,36.17
+New Zealand,Solomon Islands,Export Quantity,Maize,tonnes,0.1
+New Zealand,Solomon Islands,Export Quantity,Rice,tonnes,12.0
+New Zealand,Tonga,Export Quantity,Maize,tonnes,0.52
+New Zealand,Tonga,Export Quantity,Rice,tonnes,53.0
+New Zealand,Tuvalu,Export Quantity,Rice,tonnes,8.0
+New Zealand,United Kingdom of Great Britain and Northern Ireland,Export Quantity,Maize,tonnes,1.15
+New Zealand,United Kingdom of Great Britain and Northern Ireland,Export Quantity,Rice,tonnes,32.0
+New Zealand,United States of America,Export Quantity,Maize,tonnes,0.17
+New Zealand,United States of America,Export Quantity,Wheat,tonnes,3.03
+New Zealand,Vanuatu,Export Quantity,Maize,tonnes,0.05
+New Zealand,Vanuatu,Export Quantity,Rice,tonnes,4.0
+New Zealand,Vanuatu,Export Quantity,Wheat,tonnes,0.03
+New Zealand,Viet Nam,Export Quantity,Rice,tonnes,18.0
+Papua New Guinea,Fiji,Export Quantity,Wheat,tonnes,1001.02
+Papua New Guinea,Singapore,Export Quantity,Rice,tonnes,0.0
+Samoa,New Zealand,Export Quantity,Rice,tonnes,5238.0
+Samoa,Tokelau,Export Quantity,Rice,tonnes,10200.0
+Tonga,New Zealand,Export Quantity,Maize,tonnes,0.12

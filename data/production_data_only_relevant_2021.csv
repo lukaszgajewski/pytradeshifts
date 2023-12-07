@@ -1,0 +1,541 @@
+Area,Item,Element,Unit,Production
+Afghanistan,Maize,Production,tonnes,180000.0
+Afghanistan,Rice,Production,tonnes,458571.64
+Afghanistan,Wheat,Production,tonnes,3900000.0
+Albania,Maize,Production,tonnes,414270.8
+Albania,Rice,Production,tonnes,0.0
+Albania,Wheat,Production,tonnes,225170.9
+Algeria,Maize,Production,tonnes,18491.0
+Algeria,Rice,Production,tonnes,314.29
+Algeria,Wheat,Production,tonnes,2168386.0
+Angola,Maize,Production,tonnes,2970208.0
+Angola,Rice,Production,tonnes,10514.0
+Angola,Wheat,Production,tonnes,2945.7
+Antigua and Barbuda,Maize,Production,tonnes,10.68
+Argentina,Maize,Production,tonnes,60525805.0
+Argentina,Rice,Production,tonnes,1453187.0
+Argentina,Wheat,Production,tonnes,17644277.0
+Armenia,Maize,Production,tonnes,6000.0
+Armenia,Rice,Production,tonnes,0.0
+Armenia,Wheat,Production,tonnes,97000.0
+Australia,Maize,Production,tonnes,305655.87
+Australia,Rice,Production,tonnes,422977.54
+Australia,Wheat,Production,tonnes,31922554.7
+Austria,Maize,Production,tonnes,2434900.0
+Austria,Wheat,Production,tonnes,1547600.0
+Azerbaijan,Maize,Production,tonnes,279248.3
+Azerbaijan,Rice,Production,tonnes,10062.3
+Azerbaijan,Wheat,Production,tonnes,1837188.4
+Bahamas,Maize,Production,tonnes,668.49
+Bangladesh,Maize,Production,tonnes,4116438.0
+Bangladesh,Rice,Production,tonnes,56944553.97
+Bangladesh,Wheat,Production,tonnes,1085368.0
+Barbados,Maize,Production,tonnes,49.9
+Belarus,Maize,Production,tonnes,1148000.0
+Belarus,Wheat,Production,tonnes,2441000.0
+Belgium,Maize,Production,tonnes,449890.0
+Belgium,Rice,Production,tonnes,0.0
+Belgium,Wheat,Production,tonnes,1629180.0
+Belize,Maize,Production,tonnes,108743.0
+Belize,Rice,Production,tonnes,14990.0
+Benin,Maize,Production,tonnes,1628148.88
+Benin,Rice,Production,tonnes,519666.84
+Bhutan,Maize,Production,tonnes,30938.64
+Bhutan,Rice,Production,tonnes,40507.9
+Bhutan,Wheat,Production,tonnes,1168.94
+Bolivia (Plurinational State of),Maize,Production,tonnes,1224719.66
+Bolivia (Plurinational State of),Rice,Production,tonnes,550181.52
+Bolivia (Plurinational State of),Wheat,Production,tonnes,336222.5
+Bosnia and Herzegovina,Maize,Production,tonnes,893124.0
+Bosnia and Herzegovina,Wheat,Production,tonnes,314382.0
+Botswana,Maize,Production,tonnes,67436.11
+Botswana,Wheat,Production,tonnes,1280.0
+Brazil,Maize,Production,tonnes,88461943.0
+Brazil,Rice,Production,tonnes,11660603.0
+Brazil,Wheat,Production,tonnes,7874525.0
+Brunei Darussalam,Rice,Production,tonnes,2675.0
+Bulgaria,Maize,Production,tonnes,3427310.0
+Bulgaria,Rice,Production,tonnes,58120.0
+Bulgaria,Wheat,Production,tonnes,7342990.0
+Burkina Faso,Maize,Production,tonnes,1913000.0
+Burkina Faso,Rice,Production,tonnes,451000.0
+Burundi,Maize,Production,tonnes,280000.0
+Burundi,Rice,Production,tonnes,120000.0
+Burundi,Wheat,Production,tonnes,8806.53
+Cabo Verde,Maize,Production,tonnes,449.0
+Cambodia,Maize,Production,tonnes,920000.0
+Cambodia,Rice,Production,tonnes,11410000.0
+Cameroon,Maize,Production,tonnes,2100146.82
+Cameroon,Rice,Production,tonnes,362294.45
+Cameroon,Wheat,Production,tonnes,633.02
+Canada,Maize,Production,tonnes,13983859.0
+Canada,Wheat,Production,tonnes,22296100.0
+Central African Republic,Maize,Production,tonnes,90000.0
+Central African Republic,Rice,Production,tonnes,12808.96
+Chad,Maize,Production,tonnes,364630.68
+Chad,Rice,Production,tonnes,242646.7
+Chad,Wheat,Production,tonnes,1539.53
+Chile,Maize,Production,tonnes,793821.78
+Chile,Rice,Production,tonnes,146085.1
+Chile,Wheat,Production,tonnes,1353607.94
+China,Maize,Production,tonnes,272762124.0
+China,Rice,Production,tonnes,214403870.05
+China,Wheat,Production,tonnes,136952000.0
+"China, Hong Kong SAR",Rice,Production,tonnes,0.05
+"China, mainland",Maize,Production,tonnes,272552000.0
+"China, mainland",Rice,Production,tonnes,212843000.0
+"China, mainland",Wheat,Production,tonnes,136946000.0
+"China, Taiwan Province of",Maize,Production,tonnes,210124.0
+"China, Taiwan Province of",Rice,Production,tonnes,1560870.0
+"China, Taiwan Province of",Wheat,Production,tonnes,6000.0
+Colombia,Maize,Production,tonnes,1591400.0
+Colombia,Rice,Production,tonnes,3326528.95
+Colombia,Wheat,Production,tonnes,6965.0
+Comoros,Maize,Production,tonnes,6288.7
+Comoros,Rice,Production,tonnes,31135.06
+Congo,Maize,Production,tonnes,13000.0
+Congo,Rice,Production,tonnes,1000.0
+Costa Rica,Maize,Production,tonnes,6246.0
+Costa Rica,Rice,Production,tonnes,151018.0
+Côte d'Ivoire,Maize,Production,tonnes,1140000.0
+Côte d'Ivoire,Rice,Production,tonnes,1659000.0
+Croatia,Maize,Production,tonnes,2242120.0
+Croatia,Rice,Production,tonnes,0.0
+Croatia,Wheat,Production,tonnes,986930.0
+Cuba,Maize,Production,tonnes,238721.0
+Cuba,Rice,Production,tonnes,225786.0
+Cyprus,Rice,Production,tonnes,0.0
+Cyprus,Wheat,Production,tonnes,25580.0
+Czechia,Maize,Production,tonnes,988040.0
+Czechia,Rice,Production,tonnes,0.0
+Czechia,Wheat,Production,tonnes,4960930.0
+Democratic People's Republic of Korea,Maize,Production,tonnes,2300000.0
+Democratic People's Republic of Korea,Rice,Production,tonnes,1854841.42
+Democratic People's Republic of Korea,Wheat,Production,tonnes,86603.65
+Democratic Republic of the Congo,Maize,Production,tonnes,2243379.0
+Democratic Republic of the Congo,Rice,Production,tonnes,1580620.0
+Democratic Republic of the Congo,Wheat,Production,tonnes,9000.0
+Denmark,Maize,Production,tonnes,45270.0
+Denmark,Rice,Production,tonnes,0.0
+Denmark,Wheat,Production,tonnes,4047090.0
+Djibouti,Maize,Production,tonnes,16.99
+Dominica,Maize,Production,tonnes,193.43
+Dominican Republic,Maize,Production,tonnes,54725.12
+Dominican Republic,Rice,Production,tonnes,1006394.0
+Ecuador,Maize,Production,tonnes,1699369.61
+Ecuador,Rice,Production,tonnes,1504213.62
+Ecuador,Wheat,Production,tonnes,10898.38
+Egypt,Maize,Production,tonnes,7500000.0
+Egypt,Rice,Production,tonnes,4841327.1
+Egypt,Wheat,Production,tonnes,9000000.0
+El Salvador,Maize,Production,tonnes,881000.0
+El Salvador,Rice,Production,tonnes,24000.0
+Eritrea,Maize,Production,tonnes,20000.0
+Eritrea,Wheat,Production,tonnes,25000.0
+Estonia,Maize,Production,tonnes,0.0
+Estonia,Rice,Production,tonnes,0.0
+Estonia,Wheat,Production,tonnes,736270.0
+Eswatini,Maize,Production,tonnes,100000.0
+Eswatini,Rice,Production,tonnes,1000.0
+Eswatini,Wheat,Production,tonnes,709.46
+Ethiopia,Maize,Production,tonnes,10722000.0
+Ethiopia,Rice,Production,tonnes,200000.0
+Ethiopia,Wheat,Production,tonnes,5214000.0
+Fiji,Maize,Production,tonnes,1438.0
+Fiji,Rice,Production,tonnes,10367.75
+Finland,Maize,Production,tonnes,0.0
+Finland,Rice,Production,tonnes,0.0
+Finland,Wheat,Production,tonnes,687160.0
+France,Maize,Production,tonnes,15358300.0
+France,Rice,Production,tonnes,62340.0
+France,Wheat,Production,tonnes,36559450.0
+Gabon,Maize,Production,tonnes,45172.92
+Gabon,Rice,Production,tonnes,1702.77
+Gambia,Maize,Production,tonnes,20000.0
+Gambia,Rice,Production,tonnes,41900.0
+Georgia,Maize,Production,tonnes,233000.0
+Georgia,Wheat,Production,tonnes,135900.0
+Germany,Maize,Production,tonnes,4462400.0
+Germany,Rice,Production,tonnes,0.0
+Germany,Wheat,Production,tonnes,21459200.0
+Ghana,Maize,Production,tonnes,3500000.0
+Ghana,Rice,Production,tonnes,1231200.0
+Greece,Maize,Production,tonnes,1322940.0
+Greece,Rice,Production,tonnes,241650.0
+Greece,Wheat,Production,tonnes,1058360.0
+Grenada,Maize,Production,tonnes,382.66
+Guatemala,Maize,Production,tonnes,1960000.0
+Guatemala,Rice,Production,tonnes,33000.0
+Guatemala,Wheat,Production,tonnes,291.97
+Guinea,Maize,Production,tonnes,798327.0
+Guinea,Rice,Production,tonnes,2475325.0
+Guinea-Bissau,Maize,Production,tonnes,16971.0
+Guinea-Bissau,Rice,Production,tonnes,213918.0
+Guyana,Maize,Production,tonnes,4000.0
+Guyana,Rice,Production,tonnes,559113.0
+Haiti,Maize,Production,tonnes,200000.0
+Haiti,Rice,Production,tonnes,155000.0
+Honduras,Maize,Production,tonnes,673592.27
+Honduras,Rice,Production,tonnes,53820.14
+Honduras,Wheat,Production,tonnes,1255.58
+Hungary,Maize,Production,tonnes,6424630.0
+Hungary,Rice,Production,tonnes,9520.0
+Hungary,Wheat,Production,tonnes,5290140.0
+India,Maize,Production,tonnes,31650000.0
+India,Rice,Production,tonnes,195425000.0
+India,Wheat,Production,tonnes,109590000.0
+Indonesia,Maize,Production,tonnes,20010000.0
+Indonesia,Rice,Production,tonnes,54415294.0
+Iran (Islamic Republic of),Maize,Production,tonnes,320169.71
+Iran (Islamic Republic of),Rice,Production,tonnes,1595344.62
+Iran (Islamic Republic of),Wheat,Production,tonnes,10093578.64
+Iraq,Maize,Production,tonnes,374400.0
+Iraq,Rice,Production,tonnes,422463.0
+Iraq,Wheat,Production,tonnes,4233714.0
+Ireland,Maize,Production,tonnes,0.0
+Ireland,Rice,Production,tonnes,0.0
+Ireland,Wheat,Production,tonnes,628080.0
+Israel,Maize,Production,tonnes,68224.0
+Israel,Wheat,Production,tonnes,150000.0
+Italy,Maize,Production,tonnes,6079960.0
+Italy,Rice,Production,tonnes,1459310.0
+Italy,Wheat,Production,tonnes,7294570.0
+Jamaica,Maize,Production,tonnes,2122.0
+Jamaica,Rice,Production,tonnes,0.0
+Japan,Maize,Production,tonnes,166.5
+Japan,Rice,Production,tonnes,10525400.0
+Japan,Wheat,Production,tonnes,1097000.0
+Jordan,Maize,Production,tonnes,25000.0
+Jordan,Wheat,Production,tonnes,30000.0
+Kazakhstan,Maize,Production,tonnes,1129508.48
+Kazakhstan,Rice,Production,tonnes,503771.3
+Kazakhstan,Wheat,Production,tonnes,11814123.97
+Kenya,Maize,Production,tonnes,3303000.0
+Kenya,Rice,Production,tonnes,186000.0
+Kenya,Wheat,Production,tonnes,245300.0
+Kuwait,Maize,Production,tonnes,12833.0
+Kuwait,Wheat,Production,tonnes,36.74
+Kyrgyzstan,Maize,Production,tonnes,691139.0
+Kyrgyzstan,Rice,Production,tonnes,46338.0
+Kyrgyzstan,Wheat,Production,tonnes,362711.0
+Lao People's Democratic Republic,Maize,Production,tonnes,1050000.0
+Lao People's Democratic Republic,Rice,Production,tonnes,3870000.0
+Latvia,Maize,Production,tonnes,0.0
+Latvia,Rice,Production,tonnes,0.0
+Latvia,Wheat,Production,tonnes,2407700.0
+Lebanon,Maize,Production,tonnes,3000.0
+Lebanon,Wheat,Production,tonnes,100000.0
+Lesotho,Maize,Production,tonnes,90000.0
+Lesotho,Wheat,Production,tonnes,6000.0
+Liberia,Rice,Production,tonnes,255600.0
+Libya,Maize,Production,tonnes,3452.03
+Libya,Wheat,Production,tonnes,130000.0
+Lithuania,Maize,Production,tonnes,104680.0
+Lithuania,Rice,Production,tonnes,0.0
+Lithuania,Wheat,Production,tonnes,4248850.0
+Luxembourg,Maize,Production,tonnes,460.0
+Luxembourg,Rice,Production,tonnes,0.0
+Luxembourg,Wheat,Production,tonnes,76140.0
+Madagascar,Maize,Production,tonnes,232026.0
+Madagascar,Rice,Production,tonnes,4391386.0
+Madagascar,Wheat,Production,tonnes,2000.0
+Malawi,Maize,Production,tonnes,4581000.0
+Malawi,Rice,Production,tonnes,147100.0
+Malawi,Wheat,Production,tonnes,1000.0
+Malaysia,Maize,Production,tonnes,74718.65
+Malaysia,Rice,Production,tonnes,2418148.0
+Maldives,Maize,Production,tonnes,143.75
+Mali,Maize,Production,tonnes,3603000.0
+Mali,Rice,Production,tonnes,2420245.0
+Mali,Wheat,Production,tonnes,21000.0
+Malta,Maize,Production,tonnes,0.0
+Malta,Rice,Production,tonnes,0.0
+Malta,Wheat,Production,tonnes,0.0
+Mauritania,Maize,Production,tonnes,12000.0
+Mauritania,Rice,Production,tonnes,428400.0
+Mauritania,Wheat,Production,tonnes,7000.0
+Mauritius,Maize,Production,tonnes,1106.0
+Mauritius,Rice,Production,tonnes,0.0
+Mexico,Maize,Production,tonnes,27503477.82
+Mexico,Rice,Production,tonnes,257041.44
+Mexico,Wheat,Production,tonnes,3283613.73
+Micronesia (Federated States of),Maize,Production,tonnes,91.81
+Micronesia (Federated States of),Rice,Production,tonnes,174.67
+Mongolia,Wheat,Production,tonnes,566273.03
+Montenegro,Maize,Production,tonnes,2584.03
+Montenegro,Wheat,Production,tonnes,2391.58
+Morocco,Maize,Production,tonnes,48637.3
+Morocco,Rice,Production,tonnes,50900.7
+Morocco,Wheat,Production,tonnes,7543847.9
+Mozambique,Maize,Production,tonnes,2100000.0
+Mozambique,Rice,Production,tonnes,189000.0
+Mozambique,Wheat,Production,tonnes,15000.0
+Myanmar,Maize,Production,tonnes,2300000.0
+Myanmar,Rice,Production,tonnes,24910000.0
+Myanmar,Wheat,Production,tonnes,100000.0
+Namibia,Maize,Production,tonnes,91869.0
+Namibia,Wheat,Production,tonnes,18337.0
+Nepal,Maize,Production,tonnes,2997733.0
+Nepal,Rice,Production,tonnes,5621710.0
+Nepal,Wheat,Production,tonnes,2127276.0
+Netherlands,Maize,Production,tonnes,171420.0
+Netherlands,Rice,Production,tonnes,0.0
+Netherlands,Wheat,Production,tonnes,947250.0
+New Caledonia,Maize,Production,tonnes,7417.0
+New Caledonia,Wheat,Production,tonnes,84.5
+New Zealand,Maize,Production,tonnes,209281.0
+New Zealand,Rice,Production,tonnes,0.0
+New Zealand,Wheat,Production,tonnes,422831.0
+Nicaragua,Maize,Production,tonnes,375726.0
+Nicaragua,Rice,Production,tonnes,491815.0
+Niger,Maize,Production,tonnes,5681.0
+Niger,Rice,Production,tonnes,22397.0
+Niger,Wheat,Production,tonnes,4628.94
+Nigeria,Maize,Production,tonnes,12745000.0
+Nigeria,Rice,Production,tonnes,8342000.0
+Nigeria,Wheat,Production,tonnes,90000.0
+North Macedonia,Maize,Production,tonnes,134036.0
+North Macedonia,Rice,Production,tonnes,18962.0
+North Macedonia,Wheat,Production,tonnes,243676.0
+Norway,Wheat,Production,tonnes,266600.0
+Oman,Maize,Production,tonnes,15545.0
+Oman,Wheat,Production,tonnes,3542.0
+Pakistan,Maize,Production,tonnes,10634831.0
+Pakistan,Rice,Production,tonnes,13984009.0
+Pakistan,Wheat,Production,tonnes,27464081.0
+Palestine,Wheat,Production,tonnes,34396.47
+Panama,Maize,Production,tonnes,135425.0
+Panama,Rice,Production,tonnes,406370.0
+Papua New Guinea,Maize,Production,tonnes,12622.34
+Papua New Guinea,Rice,Production,tonnes,879.64
+Paraguay,Maize,Production,tonnes,4088093.0
+Paraguay,Rice,Production,tonnes,1180600.0
+Paraguay,Wheat,Production,tonnes,927776.0
+Peru,Maize,Production,tonnes,1582135.0
+Peru,Rice,Production,tonnes,3474307.0
+Peru,Wheat,Production,tonnes,202725.0
+Philippines,Maize,Production,tonnes,8300321.8
+Philippines,Rice,Production,tonnes,19960170.2
+Poland,Maize,Production,tonnes,7321910.0
+Poland,Rice,Production,tonnes,0.0
+Poland,Wheat,Production,tonnes,11893550.0
+Portugal,Maize,Production,tonnes,752490.0
+Portugal,Rice,Production,tonnes,175900.0
+Portugal,Wheat,Production,tonnes,69440.0
+Puerto Rico,Maize,Production,tonnes,24.02
+Puerto Rico,Rice,Production,tonnes,166.54
+Qatar,Maize,Production,tonnes,2809.0
+Qatar,Wheat,Production,tonnes,252.0
+Republic of Korea,Maize,Production,tonnes,78000.0
+Republic of Korea,Rice,Production,tonnes,5211037.0
+Republic of Korea,Wheat,Production,tonnes,30000.0
+Republic of Moldova,Maize,Production,tonnes,2792700.0
+Republic of Moldova,Rice,Production,tonnes,0.0
+Republic of Moldova,Wheat,Production,tonnes,1565200.0
+Romania,Maize,Production,tonnes,14820690.0
+Romania,Rice,Production,tonnes,14980.0
+Romania,Wheat,Production,tonnes,10433750.0
+Russian Federation,Maize,Production,tonnes,15239865.1
+Russian Federation,Rice,Production,tonnes,1076411.5
+Russian Federation,Wheat,Production,tonnes,76057258.0
+Rwanda,Maize,Production,tonnes,482682.0
+Rwanda,Rice,Production,tonnes,131758.0
+Rwanda,Wheat,Production,tonnes,13684.0
+Saint Lucia,Maize,Production,tonnes,0.0
+Saint Vincent and the Grenadines,Maize,Production,tonnes,801.78
+Saint Vincent and the Grenadines,Rice,Production,tonnes,0.0
+Sao Tome and Principe,Maize,Production,tonnes,598.43
+Saudi Arabia,Maize,Production,tonnes,59000.0
+Saudi Arabia,Rice,Production,tonnes,814.0
+Saudi Arabia,Wheat,Production,tonnes,612582.0
+Senegal,Maize,Production,tonnes,754620.83
+Senegal,Rice,Production,tonnes,1382119.93
+Serbia,Maize,Production,tonnes,6027130.66
+Serbia,Wheat,Production,tonnes,3442308.0
+Sierra Leone,Maize,Production,tonnes,22544.65
+Sierra Leone,Rice,Production,tonnes,1978905.17
+Slovakia,Maize,Production,tonnes,1579120.0
+Slovakia,Rice,Production,tonnes,0.0
+Slovakia,Wheat,Production,tonnes,2002240.0
+Slovenia,Maize,Production,tonnes,388830.0
+Slovenia,Rice,Production,tonnes,0.0
+Slovenia,Wheat,Production,tonnes,154450.0
+Solomon Islands,Rice,Production,tonnes,2747.68
+Somalia,Maize,Production,tonnes,75000.0
+Somalia,Rice,Production,tonnes,1632.35
+Somalia,Wheat,Production,tonnes,1050.82
+South Africa,Maize,Production,tonnes,16870705.0
+South Africa,Rice,Production,tonnes,3080.32
+South Africa,Wheat,Production,tonnes,2257205.0
+South Sudan,Maize,Production,tonnes,175454.0
+South Sudan,Rice,Production,tonnes,26024.0
+South Sudan,Wheat,Production,tonnes,0.0
+Spain,Maize,Production,tonnes,4597660.0
+Spain,Rice,Production,tonnes,617180.0
+Spain,Wheat,Production,tonnes,8564630.0
+Sri Lanka,Maize,Production,tonnes,472443.9
+Sri Lanka,Rice,Production,tonnes,5149596.0
+Sudan,Maize,Production,tonnes,23363.99
+Sudan,Rice,Production,tonnes,25000.0
+Sudan,Wheat,Production,tonnes,600000.0
+Suriname,Maize,Production,tonnes,27.0
+Suriname,Rice,Production,tonnes,263749.0
+Sweden,Maize,Production,tonnes,14900.0
+Sweden,Rice,Production,tonnes,0.0
+Sweden,Wheat,Production,tonnes,3027800.0
+Switzerland,Maize,Production,tonnes,98216.0
+Switzerland,Wheat,Production,tonnes,401202.0
+Syrian Arab Republic,Maize,Production,tonnes,309841.4
+Syrian Arab Republic,Rice,Production,tonnes,0.0
+Syrian Arab Republic,Wheat,Production,tonnes,1951805.93
+Tajikistan,Maize,Production,tonnes,240000.0
+Tajikistan,Rice,Production,tonnes,67000.0
+Tajikistan,Wheat,Production,tonnes,852000.0
+Thailand,Maize,Production,tonnes,5300000.0
+Thailand,Rice,Production,tonnes,33582000.0
+Thailand,Wheat,Production,tonnes,1317.53
+Timor-Leste,Maize,Production,tonnes,56058.0
+Timor-Leste,Rice,Production,tonnes,45455.0
+Togo,Maize,Production,tonnes,929000.0
+Togo,Rice,Production,tonnes,150000.0
+Trinidad and Tobago,Maize,Production,tonnes,5000.0
+Trinidad and Tobago,Rice,Production,tonnes,351.1
+Tunisia,Wheat,Production,tonnes,1193000.0
+Türkiye,Maize,Production,tonnes,6750000.0
+Türkiye,Rice,Production,tonnes,1000000.0
+Türkiye,Wheat,Production,tonnes,17650000.0
+Turkmenistan,Maize,Production,tonnes,7699.22
+Turkmenistan,Rice,Production,tonnes,82827.98
+Turkmenistan,Wheat,Production,tonnes,1367092.11
+Uganda,Maize,Production,tonnes,2800000.0
+Uganda,Rice,Production,tonnes,303283.18
+Uganda,Wheat,Production,tonnes,25000.0
+Ukraine,Maize,Production,tonnes,42109850.0
+Ukraine,Rice,Production,tonnes,49480.0
+Ukraine,Wheat,Production,tonnes,32183300.0
+United Arab Emirates,Maize,Production,tonnes,23638.73
+United Arab Emirates,Wheat,Production,tonnes,0.0
+United Kingdom of Great Britain and Northern Ireland,Wheat,Production,tonnes,13988000.0
+United Republic of Tanzania,Maize,Production,tonnes,7039000.0
+United Republic of Tanzania,Rice,Production,tonnes,2688000.0
+United Republic of Tanzania,Wheat,Production,tonnes,70000.0
+United States of America,Maize,Production,tonnes,383943000.0
+United States of America,Rice,Production,tonnes,8699720.0
+United States of America,Wheat,Production,tonnes,44790360.0
+Uruguay,Maize,Production,tonnes,769600.0
+Uruguay,Rice,Production,tonnes,1309000.0
+Uruguay,Wheat,Production,tonnes,936400.0
+Uzbekistan,Maize,Production,tonnes,590016.0
+Uzbekistan,Rice,Production,tonnes,334226.0
+Uzbekistan,Wheat,Production,tonnes,5984756.0
+Vanuatu,Maize,Production,tonnes,915.96
+Venezuela (Bolivarian Republic of),Maize,Production,tonnes,1541647.87
+Venezuela (Bolivarian Republic of),Rice,Production,tonnes,788422.5
+Venezuela (Bolivarian Republic of),Wheat,Production,tonnes,550.84
+Viet Nam,Maize,Production,tonnes,4446383.17
+Viet Nam,Rice,Production,tonnes,43852728.69
+Yemen,Maize,Production,tonnes,35000.0
+Yemen,Wheat,Production,tonnes,125000.0
+Zambia,Maize,Production,tonnes,3620243.9
+Zambia,Rice,Production,tonnes,65875.83
+Zambia,Wheat,Production,tonnes,205881.95
+Zimbabwe,Maize,Production,tonnes,1469664.0
+Zimbabwe,Rice,Production,tonnes,2908.0
+Zimbabwe,Wheat,Production,tonnes,337212.0
+World,Maize,Production,tonnes,1210235135.14
+World,Rice,Production,tonnes,787293867.41
+World,Wheat,Production,tonnes,770877072.89
+Africa,Maize,Production,tonnes,96637314.23
+Africa,Rice,Production,tonnes,37188988.64
+Africa,Wheat,Production,tonnes,29219447.85
+Eastern Africa,Maize,Production,tonnes,36907481.59
+Eastern Africa,Rice,Production,tonnes,8484102.41
+Eastern Africa,Wheat,Production,tonnes,6163935.3
+Middle Africa,Maize,Production,tonnes,7827135.86
+Middle Africa,Rice,Production,tonnes,2211586.88
+Middle Africa,Wheat,Production,tonnes,14118.25
+Northern Africa,Maize,Production,tonnes,7593944.32
+Northern Africa,Rice,Production,tonnes,4917542.09
+Northern Africa,Wheat,Production,tonnes,20635233.9
+Southern Africa,Maize,Production,tonnes,17220010.11
+Southern Africa,Rice,Production,tonnes,4080.32
+Southern Africa,Wheat,Production,tonnes,2283531.46
+Western Africa,Maize,Production,tonnes,27088742.36
+Western Africa,Rice,Production,tonnes,21571676.94
+Western Africa,Wheat,Production,tonnes,122628.94
+Americas,Maize,Production,tonnes,592356330.09
+Americas,Rice,Production,tonnes,37735462.91
+Americas,Wheat,Production,tonnes,99665568.95
+Northern America,Maize,Production,tonnes,397926859.0
+Northern America,Rice,Production,tonnes,8699720.0
+Northern America,Wheat,Production,tonnes,67086460.0
+Central America,Maize,Production,tonnes,31644210.09
+Central America,Rice,Production,tonnes,1432054.58
+Central America,Wheat,Production,tonnes,3285161.28
+Caribbean,Maize,Production,tonnes,502699.09
+Caribbean,Rice,Production,tonnes,1387697.64
+South America,Maize,Production,tonnes,162282561.91
+South America,Rice,Production,tonnes,26215990.69
+South America,Wheat,Production,tonnes,29293947.67
+Asia,Maize,Production,tonnes,378856372.24
+Asia,Rice,Production,tonnes,708148415.08
+Asia,Wheat,Production,tonnes,340462347.41
+Central Asia,Maize,Production,tonnes,2658362.7
+Central Asia,Rice,Production,tonnes,1034163.28
+Central Asia,Wheat,Production,tonnes,20380683.08
+Eastern Asia,Maize,Production,tonnes,275140290.5
+Eastern Asia,Rice,Production,tonnes,231995148.47
+Eastern Asia,Wheat,Production,tonnes,138731876.68
+Southern Asia,Maize,Production,tonnes,50402698.0
+Southern Asia,Rice,Production,tonnes,279219293.14
+Southern Asia,Wheat,Production,tonnes,154261472.58
+South-eastern Asia,Maize,Production,tonnes,42457481.61
+South-eastern Asia,Rice,Production,tonnes,194466470.89
+South-eastern Asia,Wheat,Production,tonnes,101317.53
+Western Asia,Maize,Production,tonnes,8197539.43
+Western Asia,Rice,Production,tonnes,1433339.3
+Western Asia,Wheat,Production,tonnes,26986997.54
+Europe,Maize,Production,tonnes,141847696.59
+Europe,Rice,Production,tonnes,3783853.5
+Europe,Wheat,Production,tonnes,269184238.48
+Eastern Europe,Maize,Production,tonnes,95852115.1
+Eastern Europe,Rice,Production,tonnes,1208511.5
+Eastern Europe,Wheat,Production,tonnes,154170358.0
+Northern Europe,Maize,Production,tonnes,164850.0
+Northern Europe,Rice,Production,tonnes,0.0
+Northern Europe,Wheat,Production,tonnes,30037550.0
+Southern Europe,Maize,Production,tonnes,22855145.49
+Southern Europe,Rice,Production,tonnes,2513002.0
+Southern Europe,Wheat,Production,tonnes,22356308.48
+Western Europe,Maize,Production,tonnes,22975586.0
+Western Europe,Rice,Production,tonnes,62340.0
+Western Europe,Wheat,Production,tonnes,62620022.0
+Oceania,Maize,Production,tonnes,537421.99
+Oceania,Rice,Production,tonnes,437147.28
+Oceania,Wheat,Production,tonnes,32345470.2
+Australia and New Zealand,Maize,Production,tonnes,514936.87
+Australia and New Zealand,Rice,Production,tonnes,422977.54
+Australia and New Zealand,Wheat,Production,tonnes,32345385.7
+Melanesia,Maize,Production,tonnes,22393.3
+Melanesia,Rice,Production,tonnes,13995.07
+Melanesia,Wheat,Production,tonnes,84.5
+Micronesia,Maize,Production,tonnes,91.81
+Micronesia,Rice,Production,tonnes,174.67
+European Union (27),Maize,Production,tonnes,72987920.0
+European Union (27),Rice,Production,tonnes,2639000.0
+European Union (27),Wheat,Production,tonnes,138079330.0
+Least Developed Countries,Maize,Production,tonnes,59506268.66
+Least Developed Countries,Rice,Production,tonnes,123964807.21
+Least Developed Countries,Wheat,Production,tonnes,13572350.42
+Land Locked Developing Countries,Maize,Production,tonnes,45806622.99
+Land Locked Developing Countries,Rice,Production,tonnes,16931805.31
+Land Locked Developing Countries,Wheat,Production,tonnes,37823206.36
+Small Island Developing States,Maize,Production,tonnes,719569.09
+Small Island Developing States,Rice,Production,tonnes,2530227.44
+Small Island Developing States,Wheat,Production,tonnes,84.5
+Low Income Food Deficit Countries,Maize,Production,tonnes,100686820.54
+Low Income Food Deficit Countries,Rice,Production,tonnes,329126806.04
+Low Income Food Deficit Countries,Wheat,Production,tonnes,132673375.42
+Net Food Importing Developing Countries,Maize,Production,tonnes,87916290.36
+Net Food Importing Developing Countries,Rice,Production,tonnes,155411423.52
+Net Food Importing Developing Countries,Wheat,Production,tonnes,59839710.22
