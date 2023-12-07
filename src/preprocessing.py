@@ -33,6 +33,9 @@ def read_in_raw_trade_data(testing=False):
             "Trade_DetailedTradeMatrix_E_All_Data.csv",
             encoding="latin-1",
             low_memory=False)
+        
+    print("In test mode.= " + str(testing))
+    print("Finished reading in raw trade data.")
     return trade_data
 
 
@@ -52,6 +55,8 @@ def read_in_raw_production_data():
         "Production_Crops_Livestock_E_All_Data_NOFLAG.csv",
         encoding="latin-1",
         low_memory=False)
+
+    print("Finished reading in raw production data.")
     return production_data
 
 
@@ -98,6 +103,8 @@ def extract_relevant_trade_data(trade_data, items, year=2021):
     file_name = f"data{os.sep}trade_data_only_relevant_{year}.csv"
     trade_data.to_csv(file_name, index=False)
 
+    print("Finished extracting relevant trade data.")
+
     return trade_data
 
 
@@ -143,6 +150,8 @@ def extract_relevant_production_data(production_data, items, year=2021):
     file_name = f"data{os.sep}production_data_only_relevant_{year}.csv"
     production_data.to_csv(file_name, index=False)
 
+    print("Finished extracting relevant production data.")
+
     return production_data
 
 
@@ -170,15 +179,9 @@ if __name__ == "__main__":
     items_production = ["Maize (corn)", "Wheat", "Rice"]
 
     # Read in raw trade data
-    trade_data = read_in_raw_trade_data(testing=True)
+    trade_data = read_in_raw_trade_data(testing=False)
     trade_data = extract_relevant_trade_data(trade_data, items_trade, year=year)
-
-    print(trade_data.head())
-    print(trade_data.columns)
 
     # Read in raw production data
     production_data = read_in_raw_production_data()
     production_data = extract_relevant_production_data(production_data, items_production, year=year)
-
-    print(production_data.head())
-    print(production_data.columns)
