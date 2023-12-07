@@ -172,6 +172,91 @@ def rename_item(item):
     return item_renames.get(item, item)
 
 
+def read_faostat_bulk(faostat_zip: str) -> pd.DataFrame:
+    """https://rdrr.io/cran/FAOSTAT/src/R/faostat_bulk_download.R#sym-read_faostat_bulk"""
+    zip_file = ZipFile(faostat_zip)
+    return pd.read_csv(
+        zip_file.open(faostat_zip[faostat_zip.rfind("/") + 1 :].replace("zip", "csv")),
+        encoding="latin1",
+        low_memory=False,
+    )
+
+
+def serialise_faostat_bulk(faostat_zip: str) -> None:
+    data = read_faostat_bulk(faostat_zip)
+    data.to_pickle(faostat_zip.replace("zip", "pkl"))
+    return None
+
+
+def _melt_year_cols(data: pd.Series | pd.DataFrame) -> pd.Series | pd.DataFrame:
+    data = data[
+        [c for c in data.columns if c[0] != "Y" or (c[-1] != "F" and c[-1] != "N")]
+    ]
+    return data.melt(
+        id_vars=[c for c in data.columns if c[0] != "Y"],
+        var_name="Year",
+        value_name="Value",
+    ).dropna(subset="Value")
+
+
+def _prep_trad_mat(
+    trad_pkl: str, item="Wheat", unit="tonnes", element="Export Quantity", year="Y2021"
+) -> pd.DataFrame:
+    trad = pd.read_pickle(trad_pkl)
+    trad = _melt_year_cols(trad)
+    trad = trad[
+        (
+            (trad["Item"] == item)
+            & (trad["Unit"] == unit)
+            & (trad["Element"] == element)
+            & (trad["Year"] == year)
+        )
+    ]
+    trad = trad[["Reporter Country Code", "Partner Country Code", "Value"]]
+    trad = trad.pivot(
+        columns="Partner Country Code", index="Reporter Country Code", values="Value"
+    )
+    return trad
+
+
+def _prep_prod_vec(prod_pkl: str, item="Wheat", unit="t", year="Y2021") -> pd.DataFrame:
+    prod = pd.read_pickle(prod_pkl)
+    prod = _melt_year_cols(prod)
+    prod = prod[
+        ((prod["Item"] == item) & (prod["Unit"] == unit) & (prod["Year"] == year))
+    ]
+    prod = prod[["Area Code", "Value"]]
+    prod = prod.set_index("Area Code")
+    return prod
+
+
+def _unify_indices(
+    prod_vec: pd.DataFrame, trad_mat: pd.DataFrame
+) -> tuple[pd.Series, pd.DataFrame]:
+    index = trad_mat.index.union(trad_mat.columns).union(prod_vec.index)
+    index = index.sort_values()
+    trad_mat = trad_mat.reindex(index=index, columns=index).fillna(0)
+    prod_vec = prod_vec.reindex(index=index).fillna(0)
+    prod_vec = prod_vec.squeeze()
+    return prod_vec, trad_mat
+
+
+def format_prod_trad_data(
+    prod_pkl: str,
+    trad_pkl: str,
+    item="Wheat",
+    prod_unit="t",
+    trad_unit="tonnes",
+    element="Export Quantity",
+    year="Y2021",
+) -> tuple[pd.Series, pd.DataFrame]:
+    prod_vec = _prep_prod_vec(prod_pkl, item, prod_unit, year)
+    trad_mat = _prep_trad_mat(trad_pkl, item, trad_unit, element, year)
+    return _unify_indices(prod_vec, trad_mat)
+
+
+
+
 if __name__ == "__main__":
     # Define values
     year = 2018
