@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+from zipfile import ZipFile
 
 
 def read_in_raw_trade_data(testing=False):
@@ -255,6 +256,40 @@ def format_prod_trad_data(
     return _unify_indices(prod_vec, trad_mat)
 
 
+def main(
+    prod_pkl: str,
+    trad_pkl: str,
+    item: str,
+    prod_unit="t",
+    trad_unit="tonnes",
+    element="Export Quantity",
+    year="Y2021",
+) -> pd.DataFrame:
+    try:
+        production, trade_matrix = format_prod_trad_data(
+            prod_pkl,
+            trad_pkl,
+            item,
+            prod_unit,
+            trad_unit,
+            element,
+            year,
+        )
+    except FileNotFoundError:
+        serialise_faostat_bulk(prod_pkl.replace("pkl", "zip"))
+        serialise_faostat_bulk(trad_pkl.replace("pkl", "zip"))
+        production, trade_matrix = format_prod_trad_data(
+            prod_pkl,
+            trad_pkl,
+            item,
+            prod_unit,
+            trad_unit,
+            element,
+            year,
+        )
+    # Save to CSV
+    production.to_csv(f"data{os.sep}preprocessed_data{os.sep}production.csv")
+    trade_matrix.to_csv(f"data{os.sep}preprocessed_data{os.sep}trade_matrix.csv")
 
 
 if __name__ == "__main__":
@@ -263,4 +298,9 @@ if __name__ == "__main__":
     items_trade = ["Maize (corn)", "Wheat", "Rice, paddy (rice milled equivalent)"]
     items_production = ["Maize (corn)", "Wheat", "Rice"]
 
-
+    for item in items_trade:
+        main(
+            "data_raw/Production_Crops_Livestock_E_Oceania.pkl",
+            "data_raw/Trade_DetailedTradeMatrix_E_Oceania.pkl",
+            item,
+        )
