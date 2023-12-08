@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+from zipfile import ZipFile
 
 
 def read_in_raw_trade_data(testing=False):
@@ -33,6 +34,9 @@ def read_in_raw_trade_data(testing=False):
             "Trade_DetailedTradeMatrix_E_All_Data.csv",
             encoding="latin-1",
             low_memory=False)
+        
+    print("In test mode.= " + str(testing))
+    print("Finished reading in raw trade data.")
     return trade_data
 
 
@@ -52,8 +56,9 @@ def read_in_raw_production_data():
         "Production_Crops_Livestock_E_All_Data_NOFLAG.csv",
         encoding="latin-1",
         low_memory=False)
-    return production_data
 
+    print("Finished reading in raw production data.")
+    return production_data
 
 
 def extract_relevant_trade_data(trade_data, items, year=2021):
@@ -98,6 +103,8 @@ def extract_relevant_trade_data(trade_data, items, year=2021):
     # Save the trade matrix to a CSV file in the data folder
     file_name = f"data{os.sep}trade_data_only_relevant_{year}.csv"
     trade_data.to_csv(file_name, index=False)
+
+    print("Finished extracting relevant trade data.")
 
     return trade_data
 
@@ -144,6 +151,8 @@ def extract_relevant_production_data(production_data, items, year=2021):
     file_name = f"data{os.sep}production_data_only_relevant_{year}.csv"
     production_data.to_csv(file_name, index=False)
 
+    print("Finished extracting relevant production data.")
+
     return production_data
 
 
@@ -164,22 +173,239 @@ def rename_item(item):
     return item_renames.get(item, item)
 
 
+def read_faostat_bulk(faostat_zip: str) -> pd.DataFrame:
+    """
+    Return pandas.DataFrame containing FAOSTAT data extracted from a bulk
+    download zip file.
+    This is based on the following R implementation:
+    https://rdrr.io/cran/FAOSTAT/src/R/faostat_bulk_download.R#sym-read_faostat_bulk
+
+    Arguments:
+        faostat_zip (str): Path to the FAOSTAT zip file.
+
+    Returns:
+        pd.DataFrame: The FAOSTAT data.
+    """
+    zip_file = ZipFile(faostat_zip)
+    return pd.read_csv(
+        zip_file.open(faostat_zip[faostat_zip.rfind("/") + 1 :].replace("zip", "csv")),
+        encoding="latin1",
+        low_memory=False,
+    )
+
+
+def serialise_faostat_bulk(faostat_zip: str) -> None:
+    """
+    Read FAOSTAT data from a bulk download zip file as a pandas.DataFrame,
+    and save it as a pickle to allow for faster loading in the future.
+
+    Arguments:
+        faostat_zip (str): Path to the FAOSTAT zip file.
+
+    Returns:
+        None
+    """
+    data = read_faostat_bulk(faostat_zip)
+    data.to_pickle(faostat_zip.replace("zip", "pkl"))
+    return None
+
+
+def _melt_year_cols(data: pd.Series | pd.DataFrame) -> pd.Series | pd.DataFrame:
+    """
+    Filter out unnecessary columns from the data and melt the year columns.
+
+    Arguments:
+        data (pd.Series | pd.DataFrame): The data to be melted.
+
+    Returns:
+        pd.Series | pd.DataFrame: The melted data.    
+    """
+    # there are columns of format: Y2021N, Y2021F, Y2021
+    # where 2021 can be any year. We only want to keep of format Y2021
+    data = data[
+        [c for c in data.columns if c[0] != "Y" or (c[-1] != "F" and c[-1] != "N")]
+    ]
+    # and then we want to melt all those year columns (Y2019, Y2020, Y2021 etc.)
+    # so that we have a "Year" and "Value" columns
+    # there are other ways of handling this but this is consistent with Croft et al.
+    return data.melt(
+        id_vars=[c for c in data.columns if c[0] != "Y"],
+        var_name="Year",
+        value_name="Value",
+    ).dropna(subset="Value")
+
+
+def _prep_trad_mat(
+    trad_pkl: str, item: str, unit="tonnes", element="Export Quantity", year="Y2021"
+) -> pd.DataFrame:
+    """
+    Return properly formatted trade matrix.
+
+    Arguments:
+        trad_pkl (str): Path to the trade matrix pickle file.
+        item (str): Item to filter for.
+        unit (str): Unit to filter for.
+        element (str): Element to filter for.
+        year (str): Year to filter for.
+
+    Returns:
+        pd.DataFrame: The trade matrix.
+
+    Notes:
+        The optional arguments must be determined semi-manually as their allowed values
+        depend on particular datasets. E.g., unit can be "tonnes" in one file and "t"
+        in another.
+    """
+    trad = pd.read_pickle(trad_pkl)
+    trad = _melt_year_cols(trad)
+    trad = trad[
+        (
+            (trad["Item"] == item)
+            & (trad["Unit"] == unit)
+            & (trad["Element"] == element)
+            & (trad["Year"] == year)
+        )
+    ]
+    trad = trad[["Reporter Country Code", "Partner Country Code", "Value"]]
+    trad = trad.pivot(
+        columns="Partner Country Code", index="Reporter Country Code", values="Value"
+    )
+    return trad
+
+
+def _prep_prod_vec(prod_pkl: str, item="Wheat", unit="t", year="Y2021") -> pd.DataFrame:
+    """
+    Return properly formatted production vector.
+
+    Arguments:
+        prod_pkl (str): Path to the production vector pickle file.
+        item (str): Item to filter for.
+        unit (str): Unit to filter for.
+        year (str): Year to filter for.
+
+    Returns:
+        pd.DataFrame: The production vector.
+
+    Notes:
+        The optional arguments must be determined semi-manually as their allowed values
+        depend on particular datasets. E.g., unit can be "tonnes" in one file and "t"
+        in another.
+    """
+    prod = pd.read_pickle(prod_pkl)
+    prod = _melt_year_cols(prod)
+    prod = prod[
+        ((prod["Item"] == item) & (prod["Unit"] == unit) & (prod["Year"] == year))
+    ]
+    prod = prod[["Area Code", "Value"]]
+    prod = prod.set_index("Area Code")
+    return prod
+
+
+def _unify_indices(
+    prod_vec: pd.DataFrame, trad_mat: pd.DataFrame
+) -> tuple[pd.Series, pd.DataFrame]:
+    """
+    Return the production (as a Series) and trade matrix (DataFrame) with
+    unified (i.e., such that they match each other),
+    and sorted indices/columns.
+    Missing values are replaced by 0.
+
+    Arguments:
+        prod_vec (pd.DataFrame): The production vector.
+        trad_mat (pd.DataFrame): The trade matrix.
+
+    Returns:
+        tuple[pd.Series, pd.DataFrame]: The production vector and trade matrix
+            with unified indices/columns.
+    """
+    index = trad_mat.index.union(trad_mat.columns).union(prod_vec.index)
+    index = index.sort_values()
+    trad_mat = trad_mat.reindex(index=index, columns=index).fillna(0)
+    prod_vec = prod_vec.reindex(index=index).fillna(0)
+    prod_vec = prod_vec.squeeze()
+    return (prod_vec, trad_mat)
+
+
+def format_prod_trad_data(
+    prod_pkl: str,
+    trad_pkl: str,
+    item: str,
+    prod_unit="t",
+    trad_unit="tonnes",
+    element="Export Quantity",
+    year="Y2021",
+) -> tuple[pd.Series, pd.DataFrame]:
+    """
+    Return properly formatted production vector (as a Series),
+    and trade matrix (DataFrame).
+
+    Arguments:
+        prod_pkl (str): Path to the production vector pickle file.
+        trad_pkl (str): Path to the trade matrix pickle file.
+        item (str): Item to filter for.
+        prod_unit (str): Unit to filter for in the production vector.
+        trad_unit (str): Unit to filter for in the trade matrix.
+        element (str): Element to filter for in the trade matrix.
+        year (str): Year to filter for.
+
+    Returns:
+        tuple[pd.Series, pd.DataFrame]: The production vector and trade matrix.
+
+    Notes:
+        The optional arguments must be determined semi-manually as their allowed values
+        depend on particular datasets. E.g., unit can be "tonnes" in one file and "t"
+        in another.
+    """
+    prod_vec = _prep_prod_vec(prod_pkl, item, prod_unit, year)
+    trad_mat = _prep_trad_mat(trad_pkl, item, trad_unit, element, year)
+    return _unify_indices(prod_vec, trad_mat)
+
+
+def main(
+    prod_pkl: str,
+    trad_pkl: str,
+    item: str,
+    prod_unit="t",
+    trad_unit="tonnes",
+    element="Export Quantity",
+    year="Y2021",
+) -> pd.DataFrame:
+    try:
+        production, trade_matrix = format_prod_trad_data(
+            prod_pkl,
+            trad_pkl,
+            item,
+            prod_unit,
+            trad_unit,
+            element,
+            year,
+        )
+    except FileNotFoundError:
+        serialise_faostat_bulk(prod_pkl.replace("pkl", "zip"))
+        serialise_faostat_bulk(trad_pkl.replace("pkl", "zip"))
+        production, trade_matrix = format_prod_trad_data(
+            prod_pkl,
+            trad_pkl,
+            item,
+            prod_unit,
+            trad_unit,
+            element,
+            year,
+        )
+    # Save to CSV
+    production.to_csv(f"data{os.sep}preprocessed_data{os.sep}production.csv")
+    trade_matrix.to_csv(f"data{os.sep}preprocessed_data{os.sep}trade_matrix.csv")
+
+
 if __name__ == "__main__":
     # Define values
     year = 2018
     items_trade = ["Maize (corn)", "Wheat", "Rice, paddy (rice milled equivalent)"]
     items_production = ["Maize (corn)", "Wheat", "Rice"]
 
-    # Read in raw trade data
-    trade_data = read_in_raw_trade_data(testing=False)
-    trade_data = extract_relevant_trade_data(trade_data, items_trade, year=year)
-
-    print(trade_data.head())
-    print(trade_data.columns)
-
-    # Read in raw production data
-    production_data = read_in_raw_production_data()
-    production_data = extract_relevant_production_data(production_data, items_production, year=year)
-
-    print(production_data.head())
-    print(production_data.columns)
+    for item in items_trade:
+        main(
+            "data_raw/Production_Crops_Livestock_E_Oceania.pkl",
+            "data_raw/Trade_DetailedTradeMatrix_E_Oceania.pkl",
+            item,
+        )
