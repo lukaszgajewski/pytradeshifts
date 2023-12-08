@@ -43,7 +43,7 @@ def read_faostat_bulk(faostat_zip: str) -> pd.DataFrame:
     """
     zip_file = ZipFile(faostat_zip)
     return pd.read_csv(
-        zip_file.open(faostat_zip[faostat_zip.rfind("/") + 1 :].replace("zip", "csv")),
+        zip_file.open(faostat_zip[faostat_zip.rfind("/") + 1:].replace("zip", "csv")),
         encoding="latin1",
         low_memory=False,
     )
@@ -136,7 +136,9 @@ def _prep_trade_matrix(
     return trad
 
 
-def _prep_production_vector(production_pkl: str, item="Wheat", unit="t", year="Y2021") -> pd.DataFrame:
+def _prep_production_vector(
+        production_pkl: str, item="Wheat", unit="t", year="Y2021"
+) -> pd.DataFrame:
     """
     Return properly formatted production vector.
 
@@ -282,7 +284,7 @@ def main(
     codes_dict = {
         str(code).zfill(3): country_name
         for code, country_name in zip(codes["m49"], codes["country_name_en"])
-    }    
+    }
 
     # Go through the index of production and index/columns of trade matrix
     # and replace the codes with country names
