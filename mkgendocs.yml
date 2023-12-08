@@ -17,9 +17,12 @@ pages:
   - page: "modules/src/preprocessing.md"
     source: "src/preprocessing.py"
     functions:
-      - read_in_raw_trade_data
-      - read_in_raw_production_data
-      - extract_relevant_trade_data
-      - extract_relevant_production_data
       - rename_item
+      - read_faostat_bulk
+      - serialise_faostat_bulk
+      - _melt_year_cols
+      - _prep_trade_matrix
+      - _prep_production_vector
+      - _unify_indices
+      - format_prod_trad_data
 

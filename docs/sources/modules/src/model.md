@@ -37,7 +37,7 @@ None
 [source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L33)
 ```python
 .load_data(
-   crop, base_year, percentile
+   crop: str, base_year: int
 )
 ```
 
@@ -50,8 +50,6 @@ of countries with trade below a certain percentile.
 
 * **crop** (str) : The crop to build the trade matrix for.
 * **base_year** (int) : The base_year to extract data for.
-* **percentile** (float) : The percentile to use for removing countries with
-    low trade.
 
 
 **Returns**
@@ -64,7 +62,7 @@ of countries with trade below a certain percentile.
 [source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L75)
 ```python
 .remove_above_percentile(
-   crop_trade_data, percentile
+   trade_matrix: pd.DataFrame, percentile: float = 0.75
 )
 ```
 
@@ -86,35 +84,15 @@ Removes countries with trade below a certain percentile.
     and only the relevant crop.
 
 
-### .build_trade_matrix
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L93)
-```python
-.build_trade_matrix()
-```
-
----
-Builds the trade matrix for the given crop and base_year.
-
-
-**Arguments**
-
-None
-
-
-**Returns**
-
-* **DataFrame**  : The trade matrix.
-
-
 ### .remove_re_exports
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L118)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L105)
 ```python
 .remove_re_exports()
 ```
 
 ---
 Removes re-exports from the trade matrix.
-This is a Python implementation of the Matlab code from:
+This is a Python implementation of the R/Matlab code from:
 Croft, S. A., West, C. D., & Green, J. M. H. (2018).
 "Capturing the heterogeneity of sub-national production
 in global trade flows."
@@ -122,6 +100,9 @@ in global trade flows."
 Journal of Cleaner Production, 203, 1106–1118.
 
 https://doi.org/10.1016/j.jclepro.2018.08.267
+
+This implementation also includes pre-balancing to ensure that countries don't
+export more than they produce and import.
 
 
 **Arguments**
@@ -134,27 +115,77 @@ None
 * **DataFrame**  : The trade matrix without re-exports.
 
 
-### .balance_trade_data
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L150)
+### .prebalance
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L147)
 ```python
-.balance_trade_data(
-   trade_matrix, production_data, tolerance = 0.001, max_iterations = 10000
+.prebalance(
+   production_data: pd.Series, trade_matrix: pd.DataFrame, precision = 10**-3
 )
 ```
 
 ---
-Balance the trade data using an iterative approach.
+Return prebalaced trading data.
 
 
-**Args**
+**Arguments**
 
-* **trade_matrix** (numpy.ndarray) : The bilateral trade matrix.
-* **production_data** (numpy.ndarray) : A vector of production values for each country.
-* **tolerance** (float, optional) : A tolerance threshold for trade imbalances. Defaults to 0.001.
-* **max_iterations** (int, optional) : The maximum number of iterations. Defaults to 100.
+* **production_data** (pd.Series) : Vector of production data.
+* **trade_matrix** (pd.DataFrame) : Trade matrix of the crop specified
+* **precision** (float, optional) : Specifies precision of the prebalancing.
 
 
 **Returns**
 
-* **ndarray**  : The balanced bilateral trade matrix.
+* **DataFrame**  : Prebalanced trade matrix.
+
+
+### .remove_net_zero_countries
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L177)
+```python
+.remove_net_zero_countries(
+   production_data: pd.Series, trade_matrix: pd.DataFrame
+)
+```
+
+---
+Return production and trading data with "all zero" countries removed.
+"All zero" countries are such states that has production = 0 and sum of rows
+in trade matrix = 0, and sum of columns = 0.
+
+
+**Arguments**
+
+* **production_data** (pd.Series) : Vector of production data.
+* **trade_matrix** (pd.DataFrame) : Trade matrix of the crop specified
+
+
+**Returns**
+
+* Production data and trade matrix
+without "all zero" countries.
+
+### .correct_reexports
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L202)
+```python
+.correct_reexports(
+   production_data: pd.Series, trade_matrix: pd.DataFrame
+)
+```
+
+---
+Return trading data after correcting for re-exports.
+
+Input to this function should be prebalanced and have countries with all zeroes
+removed.
+
+
+**Arguments**
+
+* **production_data** (pd.Series) : Vector of production data.
+* **trade_matrix** (pd.DataFrame) : Trade matrix of the crop specified
+
+
+**Returns**
+
+* **DataFrame**  : Trade matrix without re-exports.
 
