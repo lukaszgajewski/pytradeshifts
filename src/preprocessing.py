@@ -2,158 +2,13 @@ import pandas as pd
 import os
 from zipfile import ZipFile
 
-
-def read_in_raw_trade_data(testing=False):
-    """
-    Reads in the raw trade matrix from the data folder and returns it as a pandas dataframe.
-    The raw trade matrix can be found at: https://www.fao.org/faostat/en/#data/TM
-    Select "All Data" for download.
-
-    Arguments:
-        testing (bool): Checks to only use a subset of the data for testing purposes.
-
-    Returns:
-        trade_data (pd.DataFrame): The raw trade matrix as a pandas dataframe.
-    """
-    # Only use subset for testing purposes
-    if testing:
-        trade_data = pd.read_csv(
-            "." + os.sep +
-            "data" + os.sep +
-            "Trade_DetailedTradeMatrix_E_Oceania" +
-            os.sep +
-            "Trade_DetailedTradeMatrix_E_Oceania.csv",
-            encoding="latin-1",
-            low_memory=False)
-    else:
-        trade_data = pd.read_csv(
-            "." + os.sep +
-            "data" + os.sep +
-            "Trade_DetailedTradeMatrix_E_All_Data" +
-            os.sep +
-            "Trade_DetailedTradeMatrix_E_All_Data.csv",
-            encoding="latin-1",
-            low_memory=False)
-        
-    print("In test mode.= " + str(testing))
-    print("Finished reading in raw trade data.")
-    return trade_data
-
-
-def read_in_raw_production_data():
-    """
-    Reads in the raw food production to be used later for the
-    re-export algorithm.
-
-    Returns:
-        pd.DataFrame: The raw food production data.
-    """
-    production_data = pd.read_csv(
-        "." + os.sep +
-        "data" + os.sep +
-        "Production_Crops_Livestock_E_All_Data" +
-        os.sep +
-        "Production_Crops_Livestock_E_All_Data_NOFLAG.csv",
-        encoding="latin-1",
-        low_memory=False)
-
-    print("Finished reading in raw production data.")
-    return production_data
-
-
-def extract_relevant_trade_data(trade_data, items, year=2021):
-    """
-    Extracts only the relevant data needed for building the trade model.
-
-    Args:
-        trade_data (pd.DataFrame): The raw trade matrix.
-        year (int): The year to extract data for.
-        items (list): The items of interest, i.e., trade goods.
-
-    Returns:
-        pd.DataFrame: The cleaned trade matrix.
-    """
-    # Select only relevant columns
-    relevant_columns = [
-        "Reporter Countries",
-        "Partner Countries",
-        "Element",
-        "Item",
-        "Unit",
-        f"Y{year}"
-    ]
-
-    trade_data = trade_data[relevant_columns]
-
-    # Filter items of interest
-    trade_data = trade_data[trade_data["Item"].isin(items)]
-
-    # Filter for export quantities only
-    trade_data = trade_data[trade_data["Element"] == "Export Quantity"]
-
-    # Drop rows with NaN values for the given year
-    trade_data = trade_data.dropna(subset=[f"Y{year}"])
-
-    # Rename specific items for readability
-    trade_data["Item"] = trade_data["Item"].apply(rename_item)
-
-    # Rename year column to "Quantity"
-    trade_data = trade_data.rename(columns={f"Y{year}": "Quantity"})
-
-    # Save the trade matrix to a CSV file in the data folder
-    file_name = f"data{os.sep}trade_data_only_relevant_{year}.csv"
-    trade_data.to_csv(file_name, index=False)
-
-    print("Finished extracting relevant trade data.")
-
-    return trade_data
-
-
-def extract_relevant_production_data(production_data, items, year=2021):
-    """
-    Extracts only the relevant data for the re-export algorithm.
-
-    Args:
-        production_data (pd.DataFrame): The raw production data.
-        items (list): The items of interest, i.e., trade goods.
-        year (int): The year to extract data for.
-
-    Returns:
-        pd.DataFrame: The cleaned production data.
-    """
-    # Select only relevant columns
-    relevant_columns = [
-        "Area",
-        "Item",
-        "Element",
-        "Unit",
-        f"Y{year}"
-    ]
-
-    production_data = production_data[relevant_columns]
-
-    # Filter items of interest
-    production_data = production_data[production_data["Item"].isin(items)]
-
-    # Filter for quantities only
-    production_data = production_data[production_data["Element"] == "Production"]
-
-    # Drop rows with NaN values for the given year
-    production_data = production_data.dropna(subset=[f"Y{year}"])
-
-    # Rename specific items for readability
-    production_data["Item"] = production_data["Item"].apply(rename_item)
-
-    # Rename year column to "Production"
-    production_data = production_data.rename(columns={f"Y{year}": "Production"})
-
-    # Save the production data to a CSV file in the data folder
-    file_name = f"data{os.sep}production_data_only_relevant_{year}.csv"
-    production_data.to_csv(file_name, index=False)
-
-    print("Finished extracting relevant production data.")
-
-    return production_data
+"""
+Data for this project is downloaded from FAOSTAT.
+Trade data is downloaded from:
+http://www.fao.org/faostat/en/#data/TM
+Production data is downloaded from:
+http://www.fao.org/faostat/en/#data/QC
+"""
 
 
 def rename_item(item):
@@ -206,7 +61,11 @@ def serialise_faostat_bulk(faostat_zip: str) -> None:
         None
     """
     data = read_faostat_bulk(faostat_zip)
-    data.to_pickle(faostat_zip.replace("zip", "pkl"))
+    data.to_pickle(
+        f"data{os.sep}temp_files{os.sep}{faostat_zip[faostat_zip.rfind('/') + 1:].replace(
+            'zip', 'pkl'
+        )}"
+    )
     return None
 
 
@@ -218,7 +77,7 @@ def _melt_year_cols(data: pd.Series | pd.DataFrame) -> pd.Series | pd.DataFrame:
         data (pd.Series | pd.DataFrame): The data to be melted.
 
     Returns:
-        pd.Series | pd.DataFrame: The melted data.    
+        pd.Series | pd.DataFrame: The melted data.
     """
     # there are columns of format: Y2021N, Y2021F, Y2021
     # where 2021 can be any year. We only want to keep of format Y2021
@@ -235,14 +94,14 @@ def _melt_year_cols(data: pd.Series | pd.DataFrame) -> pd.Series | pd.DataFrame:
     ).dropna(subset="Value")
 
 
-def _prep_trad_mat(
-    trad_pkl: str, item: str, unit="tonnes", element="Export Quantity", year="Y2021"
+def _prep_trade_matrix(
+    trade_pkl: str, item: str, unit="tonnes", element="Export Quantity", year="Y2021"
 ) -> pd.DataFrame:
     """
     Return properly formatted trade matrix.
 
     Arguments:
-        trad_pkl (str): Path to the trade matrix pickle file.
+        trade_pkl (str): Path to the trade matrix pickle file.
         item (str): Item to filter for.
         unit (str): Unit to filter for.
         element (str): Element to filter for.
@@ -256,7 +115,7 @@ def _prep_trad_mat(
         depend on particular datasets. E.g., unit can be "tonnes" in one file and "t"
         in another.
     """
-    trad = pd.read_pickle(trad_pkl)
+    trad = pd.read_pickle(trade_pkl)
     trad = _melt_year_cols(trad)
     trad = trad[
         (
@@ -266,19 +125,23 @@ def _prep_trad_mat(
             & (trad["Year"] == year)
         )
     ]
-    trad = trad[["Reporter Country Code", "Partner Country Code", "Value"]]
+    trad = trad[["Reporter Country Code (M49)", "Partner Country Code (M49)", "Value"]]
     trad = trad.pivot(
-        columns="Partner Country Code", index="Reporter Country Code", values="Value"
+        columns="Partner Country Code (M49)", index="Reporter Country Code (M49)", values="Value"
     )
+    # Remoev the ' from the index and columns
+    trad.index = trad.index.str.replace("'", "")
+    trad.columns = trad.columns.str.replace("'", "")
+
     return trad
 
 
-def _prep_prod_vec(prod_pkl: str, item="Wheat", unit="t", year="Y2021") -> pd.DataFrame:
+def _prep_production_vector(production_pkl: str, item="Wheat", unit="t", year="Y2021") -> pd.DataFrame:
     """
     Return properly formatted production vector.
 
     Arguments:
-        prod_pkl (str): Path to the production vector pickle file.
+        production_pkl (str): Path to the production vector pickle file.
         item (str): Item to filter for.
         unit (str): Unit to filter for.
         year (str): Year to filter for.
@@ -291,18 +154,20 @@ def _prep_prod_vec(prod_pkl: str, item="Wheat", unit="t", year="Y2021") -> pd.Da
         depend on particular datasets. E.g., unit can be "tonnes" in one file and "t"
         in another.
     """
-    prod = pd.read_pickle(prod_pkl)
+    prod = pd.read_pickle(production_pkl)
     prod = _melt_year_cols(prod)
     prod = prod[
         ((prod["Item"] == item) & (prod["Unit"] == unit) & (prod["Year"] == year))
     ]
-    prod = prod[["Area Code", "Value"]]
-    prod = prod.set_index("Area Code")
+    prod = prod[["Area Code (M49)", "Value"]]
+    prod = prod.set_index("Area Code (M49)")
+    # Remoev the ' from the index
+    prod.index = prod.index.str.replace("'", "")
     return prod
 
 
 def _unify_indices(
-    prod_vec: pd.DataFrame, trad_mat: pd.DataFrame
+    production_vector: pd.DataFrame, trade_matrix: pd.DataFrame
 ) -> tuple[pd.Series, pd.DataFrame]:
     """
     Return the production (as a Series) and trade matrix (DataFrame) with
@@ -311,27 +176,27 @@ def _unify_indices(
     Missing values are replaced by 0.
 
     Arguments:
-        prod_vec (pd.DataFrame): The production vector.
-        trad_mat (pd.DataFrame): The trade matrix.
+        production_vector (pd.DataFrame): The production vector.
+        trade_matrix (pd.DataFrame): The trade matrix.
 
     Returns:
         tuple[pd.Series, pd.DataFrame]: The production vector and trade matrix
             with unified indices/columns.
     """
-    index = trad_mat.index.union(trad_mat.columns).union(prod_vec.index)
+    index = trade_matrix.index.union(trade_matrix.columns).union(production_vector.index)
     index = index.sort_values()
-    trad_mat = trad_mat.reindex(index=index, columns=index).fillna(0)
-    prod_vec = prod_vec.reindex(index=index).fillna(0)
-    prod_vec = prod_vec.squeeze()
-    return (prod_vec, trad_mat)
+    trade_matrix = trade_matrix.reindex(index=index, columns=index).fillna(0)
+    production_vector = production_vector.reindex(index=index).fillna(0)
+    production_vector = production_vector.squeeze()
+    return (production_vector, trade_matrix)
 
 
 def format_prod_trad_data(
-    prod_pkl: str,
-    trad_pkl: str,
+    production_pkl: str,
+    trade_pkl: str,
     item: str,
-    prod_unit="t",
-    trad_unit="tonnes",
+    production_unit="t",
+    trade_unit="tonnes",
     element="Export Quantity",
     year="Y2021",
 ) -> tuple[pd.Series, pd.DataFrame]:
@@ -340,11 +205,11 @@ def format_prod_trad_data(
     and trade matrix (DataFrame).
 
     Arguments:
-        prod_pkl (str): Path to the production vector pickle file.
-        trad_pkl (str): Path to the trade matrix pickle file.
+        production_pkl (str): Path to the production vector pickle file.
+        trade_pkl (str): Path to the trade matrix pickle file.
         item (str): Item to filter for.
-        prod_unit (str): Unit to filter for in the production vector.
-        trad_unit (str): Unit to filter for in the trade matrix.
+        production_unit (str): Unit to filter for in the production vector.
+        trade_unit (str): Unit to filter for in the trade matrix.
         element (str): Element to filter for in the trade matrix.
         year (str): Year to filter for.
 
@@ -356,45 +221,83 @@ def format_prod_trad_data(
         depend on particular datasets. E.g., unit can be "tonnes" in one file and "t"
         in another.
     """
-    prod_vec = _prep_prod_vec(prod_pkl, item, prod_unit, year)
-    trad_mat = _prep_trad_mat(trad_pkl, item, trad_unit, element, year)
-    return _unify_indices(prod_vec, trad_mat)
+    production_vector = _prep_production_vector(production_pkl, item, production_unit, year)
+    trade_matrix = _prep_trade_matrix(trade_pkl, item, trade_unit, element, year)
+    return _unify_indices(production_vector, trade_matrix)
 
 
 def main(
-    prod_pkl: str,
-    trad_pkl: str,
+    region: str,
     item: str,
-    prod_unit="t",
-    trad_unit="tonnes",
+    production_unit="t",
+    trade_unit="tonnes",
     element="Export Quantity",
     year="Y2021",
 ) -> pd.DataFrame:
     try:
+        print(f"Reading in data for {item} in {region}...")
+        production_pkl = f"data{os.sep}temp_files{os.sep}Production_Crops_Livestock_E_{region}.pkl"
+        trade_pkl = f"data{os.sep}temp_files{os.sep}Trade_DetailedTradeMatrix_E_{region}.pkl"
         production, trade_matrix = format_prod_trad_data(
-            prod_pkl,
-            trad_pkl,
+            production_pkl,
+            trade_pkl,
             item,
-            prod_unit,
-            trad_unit,
+            production_unit,
+            trade_unit,
             element,
             year,
         )
     except FileNotFoundError:
-        serialise_faostat_bulk(prod_pkl.replace("pkl", "zip"))
-        serialise_faostat_bulk(trad_pkl.replace("pkl", "zip"))
+        print(
+            f"Data for {item} in {region} in pickle format not found. Reading zip to create pickle"
+        )
+        production_zip = f"data{os.sep}data_raw{os.sep}Production_Crops_Livestock_E_{region}.zip"
+        trade_zip = f"data{os.sep}data_raw{os.sep}Trade_DetailedTradeMatrix_E_{region}.zip"
+        serialise_faostat_bulk(production_zip)
+        serialise_faostat_bulk(trade_zip)
+        print(f"Pickles created. Reading in data for {item} in {region}...")
+        production_pkl = production_zip.replace("zip", "pkl")
+        trade_pkl = trade_zip.replace("zip", "pkl")
         production, trade_matrix = format_prod_trad_data(
-            prod_pkl,
-            trad_pkl,
+            production_pkl,
+            trade_pkl,
             item,
-            prod_unit,
-            trad_unit,
+            production_unit,
+            trade_unit,
             element,
             year,
         )
+    # Replace the area codes with country names. This is based on the M49 codes
+    # https://data.apps.fao.org/catalog/dataset/m49-code-list-global-region-country
+    codes = pd.read_csv(
+        f"data{os.sep}supplemental_data{os.sep}m49.csv"
+    )
+    # Create a dictionary of country codes and names with the m49 column as the key
+    # and the country_names_en column as the value. This also adds two leading zeros
+    # to the codes with only one character and one leading zero to the codes with
+    # two characters. This is to match the codes in the production and trade matrix
+    # which have two leading zeros. This is not the case for the codes in the m49
+    # file for unknown reasons. Would be too much to ask for the UN to be consistent.
+    # Convert the codes to strings to allow for the leading zeros
+    codes_dict = {
+        str(code).zfill(3): country_name
+        for code, country_name in zip(codes["m49"], codes["country_name_en"])
+    }    
+
+    # Go through the index of production and index/columns of trade matrix
+    # and replace the codes with country names
+    for code in production.index:
+        production.rename(index={code: codes_dict[code]}, inplace=True)
+    for code in trade_matrix.index:
+        trade_matrix.rename(index={code: codes_dict[code]}, inplace=True)
+        trade_matrix.rename(columns={code: codes_dict[code]}, inplace=True)
+
+    # Rename the item for readability
+    item = rename_item(item)
+
     # Save to CSV
-    production.to_csv(f"data{os.sep}preprocessed_data{os.sep}production.csv")
-    trade_matrix.to_csv(f"data{os.sep}preprocessed_data{os.sep}trade_matrix.csv")
+    production.to_csv(f"data{os.sep}preprocessed_data{os.sep}{item}_{year}_production.csv")
+    trade_matrix.to_csv(f"data{os.sep}preprocessed_data{os.sep}{item}_{year}_trade.csv")
 
 
 if __name__ == "__main__":
@@ -402,10 +305,11 @@ if __name__ == "__main__":
     year = 2018
     items_trade = ["Maize (corn)", "Wheat", "Rice, paddy (rice milled equivalent)"]
     items_production = ["Maize (corn)", "Wheat", "Rice"]
+    # Define regions for which the data is processed
+    region = "Oceania"
 
     for item in items_trade:
         main(
-            "data_raw/Production_Crops_Livestock_E_Oceania.pkl",
-            "data_raw/Trade_DetailedTradeMatrix_E_Oceania.pkl",
+            region,
             item,
         )
