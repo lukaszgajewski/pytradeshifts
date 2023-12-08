@@ -154,3 +154,6 @@ data/Trade_DetailedTradeMatrix_E_All_Data/Trade_DetailedTradeMatrix_E_AreaCodes.
 data/Trade_DetailedTradeMatrix_E_All_Data/Trade_DetailedTradeMatrix_E_Flags.csv
 data/Trade_DetailedTradeMatrix_E_All_Data/Trade_DetailedTradeMatrix_E_ItemCodes.csv
 data/data_raw/Trade_DetailedTradeMatrix_E_All_Data.zip
+
+# Ignores all pickle files
+*.pkl
