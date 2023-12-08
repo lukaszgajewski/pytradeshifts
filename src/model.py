@@ -29,7 +29,7 @@ class PyTradeShifts:
             self.base_year,
         )
         self.trade_matrix = self.build_trade_matrix()
-        
+
     def load_data(
             self,
             crop: str,
@@ -131,7 +131,7 @@ class PyTradeShifts:
         assert trade_matrix.shape[0] == production_data.shape[0]
 
         print("Ignoring countries without production data.")
- 
+
         trade_matrix = self.prebalance(production_data, trade_matrix)
         production_data, trade_matrix = self.remove_net_zero_countries(
             production_data,
@@ -143,7 +143,7 @@ class PyTradeShifts:
         # of the total trade of all countries for this crop
         trade_matrix = self.remove_above_percentile(trade_matrix, self.percentile)
         self.trade_matrix = trade_matrix
-        
+
     def prebalance(
             self,
             production_data: pd.Series,
@@ -213,7 +213,7 @@ class PyTradeShifts:
         Arguments:
             production_data (pd.Series): Vector of production data.
             trade_matrix (pd.DataFrame): Trade matrix of the crop specified
-        
+
         Returns:
             pd.DataFrame: Trade matrix without re-exports.
         """
