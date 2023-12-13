@@ -157,3 +157,6 @@ data/data_raw/Trade_DetailedTradeMatrix_E_All_Data.zip
 
 # Ignores all pickle files
 *.pkl
+*.zip
+*.csv
+*.csv
