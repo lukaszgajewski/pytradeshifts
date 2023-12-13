@@ -144,9 +144,6 @@ def _prep_trade_matrix(
         columns="Partner Country Code (M49)", index="Reporter Country Code (M49)", values="Value"
     )
     print("Finished pivoting trade matrix")
-    # Remoev the ' from the index and columns
-    trad.index = trad.index.str.replace("'", "")
-    trad.columns = trad.columns.str.replace("'", "")
 
     return trad
 
@@ -180,8 +177,6 @@ def _prep_production_vector(
     prod = prod[["Area Code (M49)", "Value"]]
     print("Finished filtering production vector")
     prod = prod.set_index("Area Code (M49)")
-    # Remoev the ' from the index
-    prod.index = prod.index.str.replace("'", "")
     return prod
 
 
@@ -251,47 +246,38 @@ def format_prod_trad_data(
     return _unify_indices(production_vector, trade_matrix)
 
 
-def remove_non_countries(data: pd.Series | pd.DataFrame) -> pd.Series | pd.DataFrame:
+def rename_countries(data: pd.Series | pd.DataFrame, region, filename: str) -> pd.DataFrame:
     """
-    Removes non-country entries from the production data.
+    Rename country codes with country names in either production or trade data.
 
-    Args:
-        data: The data data.
+    Arguments:
+        data (pd.DataFrame): The data to be renamed.
+        region (str): The region of the data.
+        filename (str): The filename for the country codes CSV file.
 
     Returns:
-        pd.Series or pd.DataFrame: The data with non-country entries removed.
+        pd.DataFrame: The data with country codes replaced by country names.
     """
-    to_remove = [
-        "001",  # World
-        "097",  # EU
-        "199",  # Least developed countries
-        "902",  # Net food importing countries
-        "432",  # Land locked developing countries
-        "901",  # Low income food deficit countries
-        "722",  # Small island developing states
-    ]
-    # Go through the index of production and index/columns of trade matrix
-    # and remove the codes which are not countries
-    for code in to_remove:
-        data.drop(code, inplace=True)
-        if isinstance(data, pd.DataFrame):
-            data.drop(code, inplace=True, axis=1)
+    # Read in the country codes from the zip file
+    faostat_zip = f"data{os.sep}data_raw{os.sep}{filename}_{region}.zip"
+    zip_file = ZipFile(faostat_zip)
+    # Open the csv file in the zip Production_Crops_Livestock_E_AreaCodes.csv
+    # and read it into a dataframe
+    codes = pd.read_csv(
+        zip_file.open(filename + "_AreaCodes.csv"),
+        encoding="latin1",
+        low_memory=False,
+    )
+    # Create a dictionary with the country codes as keys and country names as values
+    codes_dict = dict(zip(codes["M49 Code"], codes["Area"]))
 
-    # Take care of China
-    # Country codes for China are a mess, due to Taiwan.
-    # Code 156 includes China and Taiwan, but Taiwan is also listed as 158.
-    # Take care of China
-    # Code 159 is China, excluding Taiwan.
-    # We will therefore drop 156, but keep 158 and 159 and treat them as separate countries.
-    # https://statisticstimes.com/geography/countries-by-continents.php
-    if isinstance(data, pd.Series):
-        data.drop("156", inplace=True)
-        data.rename(index={"159": "156"}, inplace=True)
-    else:
-        data.drop("156", inplace=True)
-        data.rename(index={"159": "156"}, inplace=True)
-        data.drop("156", inplace=True, axis=1)
-        data.rename(columns={"159": "156"}, inplace=True)
+    print(f"Replacing country codes with country names in {filename.split('_')[0]} data")
+    for code in data.index:
+        data.rename(index={code: codes_dict[code]}, inplace=True)
+
+    if isinstance(data, pd.DataFrame):
+        for code in data.columns:
+            data.rename(columns={code: codes_dict[code]}, inplace=True)
 
     return data
 
@@ -341,36 +327,10 @@ def main(
             element,
             year,
         )
-    # Replace the area codes with country names. This is based on the M49 codes
-    # https://data.apps.fao.org/catalog/dataset/m49-code-list-global-region-country
-    codes = pd.read_csv(
-        f"data{os.sep}supplemental_data{os.sep}m49.csv"
-    )
-    # Create a dictionary of country codes and names with the m49 column as the key
-    # and the country_names_en column as the value. This also adds two leading zeros
-    # to the codes with only one character and one leading zero to the codes with
-    # two characters. This is to match the codes in the production and trade matrix
-    # which have two leading zeros. This is not the case for the codes in the m49
-    # file for unknown reasons. Would be too much to ask for the UN to be consistent.
-    # Convert the codes to strings to allow for the leading zeros
-    codes_dict = {
-        str(code).zfill(3): country_name
-        for code, country_name in zip(codes["m49"], codes["country_name_en"])
-    }
-    print("Removing non-country entries from production data")
-    production = remove_non_countries(production)
-    print("Removing non-country entries from trade matrix")
-    trade_matrix = remove_non_countries(trade_matrix)
 
-    # Go through the index of production and index/columns of trade matrix
-    # and replace the codes with country names
-    print("Replacing country codes with country names in production data")
-    for code in production.index:
-        production.rename(index={code: codes_dict[code]}, inplace=True)
-    print("Replacing country codes with country names in trade matrix")
-    for code in trade_matrix.index:
-        trade_matrix.rename(index={code: codes_dict[code]}, inplace=True)
-        trade_matrix.rename(columns={code: codes_dict[code]}, inplace=True)
+    # Replace country codes with country names
+    production = rename_countries(production, region, "Production_Crops_Livestock_E")
+    trade_matrix = rename_countries(trade_matrix, region, "Trade_DetailedTradeMatrix_E")
 
     # Rename the item for readability
     item = rename_item(item)
@@ -392,11 +352,10 @@ if __name__ == "__main__":
     # Define values
     year = "Y2021"
     items_trade = ["Maize (corn)", "Wheat", "Rice, paddy (rice milled equivalent)"]
-    items_production = ["Maize (corn)", "Wheat", "Rice"]
     # Define regions for which the data is processed
     # "Oceania" is used for testing, as it has the least amount of countries
     # to run with all data use: "All_Data" for region
-    region = "All_Data"
+    region = "Asia"
     print("\n")
     for item in items_trade:
         main(
