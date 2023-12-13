@@ -41,12 +41,17 @@ def read_faostat_bulk(faostat_zip: str) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The FAOSTAT data.
     """
+    print("Unzipping file")
     zip_file = ZipFile(faostat_zip)
-    return pd.read_csv(
+    print("Finished unzipping file")
+    print("Reading csv from zip")
+    df = pd.read_csv(
         zip_file.open(faostat_zip[faostat_zip.rfind("/") + 1:].replace("zip", "csv")),
         encoding="latin1",
         low_memory=False,
     )
+    print("Finished reading csv from zip")
+    return df
 
 
 def serialise_faostat_bulk(faostat_zip: str) -> None:
@@ -61,11 +66,13 @@ def serialise_faostat_bulk(faostat_zip: str) -> None:
         None
     """
     data = read_faostat_bulk(faostat_zip)
+    print("Starting to convert zip to pickle")
     data.to_pickle(
         f"data{os.sep}temp_files{os.sep}{faostat_zip[faostat_zip.rfind('/') + 1:].replace(
             'zip', 'pkl'
         )}"
     )
+    print("Finished converting zip to pickle")
     return None
 
 
@@ -79,6 +86,7 @@ def _melt_year_cols(data: pd.Series | pd.DataFrame) -> pd.Series | pd.DataFrame:
     Returns:
         pd.Series | pd.DataFrame: The melted data.
     """
+    print("Melt year columns")
     # there are columns of format: Y2021N, Y2021F, Y2021
     # where 2021 can be any year. We only want to keep of format Y2021
     data = data[
@@ -87,11 +95,14 @@ def _melt_year_cols(data: pd.Series | pd.DataFrame) -> pd.Series | pd.DataFrame:
     # and then we want to melt all those year columns (Y2019, Y2020, Y2021 etc.)
     # so that we have a "Year" and "Value" columns
     # there are other ways of handling this but this is consistent with Croft et al.
-    return data.melt(
+    # Though this implementation floods the RAM, sorry about that.
+    melted = data.melt(
         id_vars=[c for c in data.columns if c[0] != "Y"],
         var_name="Year",
         value_name="Value",
     ).dropna(subset="Value")
+    print("Finished melting year columns")
+    return melted
 
 
 def _prep_trade_matrix(
@@ -117,6 +128,7 @@ def _prep_trade_matrix(
     """
     trad = pd.read_pickle(trade_pkl)
     trad = _melt_year_cols(trad)
+    print("Filter trade matrix")
     trad = trad[
         (
             (trad["Item"] == item)
@@ -126,9 +138,12 @@ def _prep_trade_matrix(
         )
     ]
     trad = trad[["Reporter Country Code (M49)", "Partner Country Code (M49)", "Value"]]
+    print("Finished filtering trade matrix")
+    print("Pivot trade matrix")
     trad = trad.pivot(
         columns="Partner Country Code (M49)", index="Reporter Country Code (M49)", values="Value"
     )
+    print("Finished pivoting trade matrix")
     # Remoev the ' from the index and columns
     trad.index = trad.index.str.replace("'", "")
     trad.columns = trad.columns.str.replace("'", "")
@@ -158,10 +173,12 @@ def _prep_production_vector(
     """
     prod = pd.read_pickle(production_pkl)
     prod = _melt_year_cols(prod)
+    print("Filter production vector")
     prod = prod[
         ((prod["Item"] == item) & (prod["Unit"] == unit) & (prod["Year"] == year))
     ]
     prod = prod[["Area Code (M49)", "Value"]]
+    print("Finished filtering production vector")
     prod = prod.set_index("Area Code (M49)")
     # Remoev the ' from the index
     prod.index = prod.index.str.replace("'", "")
@@ -185,11 +202,13 @@ def _unify_indices(
         tuple[pd.Series, pd.DataFrame]: The production vector and trade matrix
             with unified indices/columns.
     """
+    print("Unify indices")
     index = trade_matrix.index.union(trade_matrix.columns).union(production_vector.index)
     index = index.sort_values()
     trade_matrix = trade_matrix.reindex(index=index, columns=index).fillna(0)
     production_vector = production_vector.reindex(index=index).fillna(0)
     production_vector = production_vector.squeeze()
+    print("Finished unifying indices")
     return (production_vector, trade_matrix)
 
 
@@ -223,9 +242,58 @@ def format_prod_trad_data(
         depend on particular datasets. E.g., unit can be "tonnes" in one file and "t"
         in another.
     """
+    print("Started to format production data")
     production_vector = _prep_production_vector(production_pkl, item, production_unit, year)
+    print("Finished formatting production data\n")
+    print("Started to format trade data")
     trade_matrix = _prep_trade_matrix(trade_pkl, item, trade_unit, element, year)
+    print("Finished formatting trade data\n")
     return _unify_indices(production_vector, trade_matrix)
+
+
+def remove_non_countries(data: pd.Series | pd.DataFrame) -> pd.Series | pd.DataFrame:
+    """
+    Removes non-country entries from the production data.
+
+    Args:
+        data: The data data.
+
+    Returns:
+        pd.Series or pd.DataFrame: The data with non-country entries removed.
+    """
+    to_remove = [
+        "001",  # World
+        "097",  # EU
+        "199",  # Least developed countries
+        "902",  # Net food importing countries
+        "432",  # Land locked developing countries
+        "901",  # Low income food deficit countries
+        "722",  # Small island developing states
+    ]
+    # Go through the index of production and index/columns of trade matrix
+    # and remove the codes which are not countries
+    for code in to_remove:
+        data.drop(code, inplace=True)
+        if isinstance(data, pd.DataFrame):
+            data.drop(code, inplace=True, axis=1)
+
+    # Take care of China
+    # Country codes for China are a mess, due to Taiwan.
+    # Code 156 includes China and Taiwan, but Taiwan is also listed as 158.
+    # Take care of China
+    # Code 159 is China, excluding Taiwan.
+    # We will therefore drop 156, but keep 158 and 159 and treat them as separate countries.
+    # https://statisticstimes.com/geography/countries-by-continents.php
+    if isinstance(data, pd.Series):
+        data.drop("156", inplace=True)
+        data.rename(index={"159": "156"}, inplace=True)
+    else:
+        data.drop("156", inplace=True)
+        data.rename(index={"159": "156"}, inplace=True)
+        data.drop("156", inplace=True, axis=1)
+        data.rename(columns={"159": "156"}, inplace=True)
+
+    return data
 
 
 def main(
@@ -258,8 +326,12 @@ def main(
         serialise_faostat_bulk(production_zip)
         serialise_faostat_bulk(trade_zip)
         print(f"Pickles created. Reading in data for {item} in {region}...")
+        # Replace the zip with the pickle and link to the temp files folder
         production_pkl = production_zip.replace("zip", "pkl")
         trade_pkl = trade_zip.replace("zip", "pkl")
+        production_pkl = production_pkl.replace("data_raw", "temp_files")
+        trade_pkl = trade_pkl.replace("data_raw", "temp_files")
+
         production, trade_matrix = format_prod_trad_data(
             production_pkl,
             trade_pkl,
@@ -285,11 +357,17 @@ def main(
         str(code).zfill(3): country_name
         for code, country_name in zip(codes["m49"], codes["country_name_en"])
     }
+    print("Removing non-country entries from production data")
+    production = remove_non_countries(production)
+    print("Removing non-country entries from trade matrix")
+    trade_matrix = remove_non_countries(trade_matrix)
 
     # Go through the index of production and index/columns of trade matrix
     # and replace the codes with country names
+    print("Replacing country codes with country names in production data")
     for code in production.index:
         production.rename(index={code: codes_dict[code]}, inplace=True)
+    print("Replacing country codes with country names in trade matrix")
     for code in trade_matrix.index:
         trade_matrix.rename(index={code: codes_dict[code]}, inplace=True)
         trade_matrix.rename(columns={code: codes_dict[code]}, inplace=True)
@@ -297,21 +375,33 @@ def main(
     # Rename the item for readability
     item = rename_item(item)
 
+    # Make sure that production index and trade matrix index/columns are the same
+    assert production.index.equals(trade_matrix.index)
+    assert production.index.equals(trade_matrix.columns)
+
+    # Replace "All_Data" with "global" for readability
+    if region == "All_Data":
+        region = "Global"
+
     # Save to CSV
-    production.to_csv(f"data{os.sep}preprocessed_data{os.sep}{item}_{year}_production.csv")
-    trade_matrix.to_csv(f"data{os.sep}preprocessed_data{os.sep}{item}_{year}_trade.csv")
+    production.to_csv(f"data{os.sep}preprocessed_data{os.sep}{item}_{year}_{region}_production.csv")
+    trade_matrix.to_csv(f"data{os.sep}preprocessed_data{os.sep}{item}_{year}_{region}_trade.csv")
 
 
 if __name__ == "__main__":
     # Define values
-    year = 2018
+    year = "Y2021"
     items_trade = ["Maize (corn)", "Wheat", "Rice, paddy (rice milled equivalent)"]
     items_production = ["Maize (corn)", "Wheat", "Rice"]
     # Define regions for which the data is processed
-    region = "Oceania"
-
+    # "Oceania" is used for testing, as it has the least amount of countries
+    # to run with all data use: "All_Data" for region
+    region = "All_Data"
+    print("\n")
     for item in items_trade:
         main(
             region,
             item,
+            year=year,
         )
+        print("\n\n")
