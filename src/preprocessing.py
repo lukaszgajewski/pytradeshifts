@@ -329,8 +329,8 @@ def main(
         )
 
     # Replace country codes with country names
-    production = rename_countries(production, region, "Production_Crops_Livestock_E")
     trade_matrix = rename_countries(trade_matrix, region, "Trade_DetailedTradeMatrix_E")
+    production = rename_countries(production, region, "Production_Crops_Livestock_E")
 
     # Rename the item for readability
     item = rename_item(item)
@@ -355,7 +355,7 @@ if __name__ == "__main__":
     # Define regions for which the data is processed
     # "Oceania" is used for testing, as it has the least amount of countries
     # to run with all data use: "All_Data" for region
-    region = "Asia"
+    region = "All_Data"
     print("\n")
     for item in items_trade:
         main(
