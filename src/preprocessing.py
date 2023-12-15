@@ -1,6 +1,5 @@
 import pandas as pd
 import os
-import re
 from zipfile import ZipFile
 
 """
@@ -146,6 +145,9 @@ def _prep_trade_matrix(
     )
     print("Finished pivoting trade matrix")
 
+    # Remove entries which are not countries
+    trad = remove_entries_from_data(trad)
+
     return trad
 
 
@@ -178,6 +180,10 @@ def _prep_production_vector(
     prod = prod[["Area Code (M49)", "Value"]]
     print("Finished filtering production vector")
     prod = prod.set_index("Area Code (M49)")
+
+    # Remove entries which are not countries
+    prod = remove_entries_from_data(prod)
+
     return prod
 
 
@@ -261,6 +267,7 @@ def rename_countries(
         region (str): The region of the data.
         filename (str): The filename for the country codes CSV file.
         code_type (str): The type of country code to be used.
+        after_union (bool): Whether the index/columns of the data are already unified.
 
     Returns:
         pd.DataFrame: The data with country codes replaced by country names.
@@ -285,6 +292,70 @@ def rename_countries(
     if isinstance(data, pd.DataFrame):
         for code in data.columns:
             data.rename(columns={code: codes_dict[code]}, inplace=True)
+
+    return data
+
+
+def remove_entries_from_data(data: pd.Series | pd.DataFrame) -> pd.Series | pd.DataFrame:
+    """
+    Removes a bunch of entries from the data, which do not actually represent countries
+    or where no trade data is available.
+
+    Arguments:
+        data (pd.Series | pd.DataFrame): The data to be filtered.
+
+    Returns:
+        pd.Series | pd.DataFrame: The filtered data.
+    """
+    entries_to_remove = {
+        # Groups of countries by region
+        "World": "'001",
+        "Africa": "'002",
+        "South America": "'005",
+        "Oceania": "'009",
+        "Western Africa": "'011",
+        "Central America": "'013",
+        "Eastern Africa": "'014",
+        "Northern Africa": "'015",
+        "Middle Africa": "'017",
+        "Southern Africa": "'018",
+        "Americas": "'019",
+        "Northern America": "'021",
+        "Eastern Asia": "'030",
+        "Southern Asia": "'034",
+        "South-eastern Asia": "'035",
+        "Southern Europe": "'039",
+        "Australia and New Zealand": "'053",
+        "Melanesia": "'054",
+        "European Union (27)": "'97",
+        "Asia": "'142",
+        "Central Asia": "'143",
+        "Western Asia": "'145",
+        "Europe": "'150",
+        "Eastern Europe": "'151",
+        "Northern Europe": "'154",
+        "Western Europe": "'155",
+        # Groups of countries by property
+        "Least Developed Countries": "'163",
+        "Land Locked Developing Countries": "'432",
+        "Small Island Developing States": "'722",
+        "Low Income Food Deficit Countries": "'788",
+        "Net Food Importing Developing Countries": "'832",
+        # We want to look at China and Taiwan seperately, so this is not needed
+        # as 159 refers to China incl. Taiwan
+        "China": "'159",
+        # No reliable data available, therefore they are excluded
+        # This assessment is based on the fact that all of these countries
+        # don't show up as a partner country in the trade data of the FAO
+        "Democratic People's Republic of Korea": "'408",
+        "Chad": "'148",
+        "South Sudan": "'728",
+    }
+
+    # Remove the entries
+    data = data[~data.index.isin(entries_to_remove.values())]
+    if isinstance(data, pd.DataFrame):
+        data = data.loc[:, ~data.columns.isin(entries_to_remove.values())]
 
     return data
 
