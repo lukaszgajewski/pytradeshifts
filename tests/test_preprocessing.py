@@ -127,11 +127,13 @@ def test_format_prod_trad_data_global():
     # print all the countries that only exist in one of the dataframes
     for c in production_from_R.index:
         if c not in production.index:
+            print("not in R")
             print(c)
 
     # and now the other way around
     for c in production.index:
         if c not in production_from_R.index:
+            print("not in Python")
             print(c)
 
     assert production_from_R.shape == production.shape
