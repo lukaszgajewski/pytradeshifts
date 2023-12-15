@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import re
 from zipfile import ZipFile
 
 """
@@ -246,7 +247,12 @@ def format_prod_trad_data(
     return _unify_indices(production_vector, trade_matrix)
 
 
-def rename_countries(data: pd.Series | pd.DataFrame, region, filename: str) -> pd.DataFrame:
+def rename_countries(
+        data: pd.Series | pd.DataFrame,
+        region: str,
+        filename: str,
+        code_type: str = "M49 Code",
+) -> pd.DataFrame:
     """
     Rename country codes with country names in either production or trade data.
 
@@ -254,6 +260,7 @@ def rename_countries(data: pd.Series | pd.DataFrame, region, filename: str) -> p
         data (pd.DataFrame): The data to be renamed.
         region (str): The region of the data.
         filename (str): The filename for the country codes CSV file.
+        code_type (str): The type of country code to be used.
 
     Returns:
         pd.DataFrame: The data with country codes replaced by country names.
@@ -269,7 +276,7 @@ def rename_countries(data: pd.Series | pd.DataFrame, region, filename: str) -> p
         low_memory=False,
     )
     # Create a dictionary with the country codes as keys and country names as values
-    codes_dict = dict(zip(codes["M49 Code"], codes["Area"]))
+    codes_dict = dict(zip(codes[code_type], codes["Area"]))
 
     print(f"Replacing country codes with country names in {filename.split('_')[0]} data")
     for code in data.index:
