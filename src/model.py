@@ -40,15 +40,13 @@ class PyTradeShifts:
         of countries with trade below a certain percentile.
 
         Arguments:
-            crop (str): The crop to build the trade matrix for.
-            base_year (int): The base_year to extract data for.
+            None
 
         Returns:
-            pd.DataFrame: The trade data with countries with low trade removed
-                and only the relevant crop.
+            None
         """
         # Read in the data
-        self.trade_matrix = pd.read_csv(
+        trade_matrix = pd.read_csv(
             "." + os.sep +
             "data" + os.sep +
             "preprocessed_data" + os.sep +
@@ -56,7 +54,7 @@ class PyTradeShifts:
             index_col=0,
         )
 
-        self.production_data = pd.read_csv(
+        production_data = pd.read_csv(
             "." + os.sep +
             "data" + os.sep +
             "preprocessed_data" + os.sep +
@@ -65,6 +63,17 @@ class PyTradeShifts:
         ).squeeze()
 
         print(f"Loaded data for {self.crop} in {self.base_year}.")
+
+        # Retain only the countries where we have production data and trade data
+        countries = np.intersect1d(trade_matrix.index, production_data.index)
+        trade_matrix = trade_matrix.loc[countries, countries]
+        production_data = production_data.loc[countries]
+        # Make sure this worked
+        assert trade_matrix.shape[0] == production_data.shape[0]
+
+        # Save the data
+        self.trade_matrix = trade_matrix
+        self.production_data = production_data
 
 
     def remove_above_percentile(
@@ -97,54 +106,14 @@ class PyTradeShifts:
 
         return trade_matrix
 
-    def remove_re_exports(self):
-        """
-        Removes re-exports from the trade matrix.
-        This is a Python implementation of the R/Matlab code from:
-        Croft, S. A., West, C. D., & Green, J. M. H. (2018).
-        "Capturing the heterogeneity of sub-national production
-        in global trade flows."
-
-        Journal of Cleaner Production, 203, 1106–1118.
-
-        https://doi.org/10.1016/j.jclepro.2018.08.267
-
-        This implementation also includes pre-balancing to ensure that countries don't
-        export more than they produce and import.
-
-        Arguments:
-            None
-
-        Returns:
-            pd.DataFrame: The trade matrix without re-exports.
-        """
-        # Retain only the countries where we have production data and trade data
-        countries = np.intersect1d(self.trade_matrix.index, self.production_data.index)
-        trade_matrix = self.trade_matrix.loc[countries, countries]
-        production_data = self.production_data.loc[countries]
-        # Make sure this worked
-        assert trade_matrix.shape[0] == production_data.shape[0]
-
-        print("Ignoring countries without production data.")
-
-        trade_matrix = self.prebalance(production_data, trade_matrix)
-        production_data, trade_matrix = self.remove_net_zero_countries(
-            production_data,
-            trade_matrix
-        )
-        trade_matrix = self.correct_reexports(production_data, trade_matrix)
-
-        # Remove countries with trade which is below the percentile
-        # of the total trade of all countries for this crop
-        trade_matrix = self.remove_above_percentile(trade_matrix, self.percentile)
-        self.trade_matrix = trade_matrix
 
     def prebalance(
             self,
             precision=10**-3
     ):
         """
-        Prebalance trading data.
+        This implementation also includes pre-balancing to ensure that countries don't
+        export more than they produce and import.
 
         Arguments:
             precision (float, optional): Specifies precision of the prebalancing.
@@ -204,7 +173,16 @@ class PyTradeShifts:
             self,
     ):
         """
-        Return trading data after correcting for re-exports.
+        Removes re-exports from the trade matrix.
+        This is a Python implementation of the R/Matlab code from:
+        Croft, S. A., West, C. D., & Green, J. M. H. (2018).
+        "Capturing the heterogeneity of sub-national production
+        in global trade flows."
+
+        Journal of Cleaner Production, 203, 1106–1118.
+
+        https://doi.org/10.1016/j.jclepro.2018.08.267
+
 
         Input to this function should be prebalanced and have countries with all zeroes
         removed.

@@ -144,5 +144,4 @@ def test_removing_countries_with_zeros_and_reexport_global():
 
 
 if __name__ == "__main__":
-    test_prebalancing_oceania()
-    test_prebalancing_global()
+    test_removing_countries_with_zeros_and_reexport_global()
