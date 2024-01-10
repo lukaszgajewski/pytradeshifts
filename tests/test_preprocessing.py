@@ -1,64 +1,174 @@
-
-from src.preprocessing import read_in_raw_trade_data
-from src.preprocessing import read_in_raw_production_data
-from src.preprocessing import extract_relevant_trade_data
-from src.preprocessing import extract_relevant_production_data
 import pandas as pd
-
-import pytest
-
-
-def test_returns_correct_dataframe_trade():
-    # Only read in the Oceanian subset of the data for testing purposes.
-    # This is to reduce the time it takes to run the tests.
-    result = read_in_raw_trade_data(testing=True)
-    assert isinstance(result, pd.DataFrame)
-    # This is the shape of the Oceanian subset of the data.
-    assert result.shape == (215548, 84)
-    # The first country in the dataset is Australia.
-    assert result.iloc[0, 2] == "Australia"
+from src.preprocessing import format_prod_trad_data
+from src.preprocessing import rename_countries
+import os
 
 
-def test_extracts_right_data_trade():
-    # Only read in the Oceanian subset of the data for testing purposes.
-    # This is to reduce the time it takes to run the tests.
-    result = read_in_raw_trade_data(testing=True)
-    # Extract only the relevant data for the trade model.
-    result = extract_relevant_trade_data(result, ["Maize (corn)", "Wheat", "Rice, paddy (rice milled equivalent)"], year=2018)
-    assert isinstance(result, pd.DataFrame)
-    # This is the shape of the Oceanian subset of the data.
-    assert result.shape == (139, 6)
-    # The first country in the dataset is Australia.
-    assert result.iloc[0, 0] == "Australia"
-    # The first item in the dataset is Bananas.
-    assert result.iloc[0, 3] == "Maize"
+def test_format_prod_trad_data_oceania():
+    region = "Oceania"
+    production, trade = format_prod_trad_data(
+        f"data{os.sep}temp_files{os.sep}Production_Crops_Livestock_E_Oceania.pkl",
+        f"data{os.sep}temp_files{os.sep}Trade_DetailedTradeMatrix_E_Oceania.pkl",
+        item="Wheat",
+    )
+
+    production_from_R = pd.read_csv(
+        f"data{os.sep}validation_data_from_Hedlung_2022{os.sep}"
+        f"{region}{os.sep}NEW_production_wheat_2021.csv"
+    )[["Area", "value"]]
+
+    production_from_R.set_index("Area", inplace=True)
+    production_from_R.sort_index(inplace=True)
+    production_from_R = production_from_R.squeeze()
+
+    trade_from_R = pd.read_csv(
+        f"data{os.sep}validation_data_from_Hedlung_2022{os.sep}"
+        f"{region}{os.sep}NEW_trade_wheat_2021.csv"
+    )
+
+    trade_from_R.drop(columns="Unnamed: 0", inplace=True)
+    trade_from_R.columns = [int(c) for c in trade_from_R.columns]
+    trade_from_R.index = trade_from_R.columns
+    trade_from_R = trade_from_R[sorted(trade_from_R.columns)]
+    trade_from_R.sort_index(inplace=True)
+
+    # Replace country codes with country names in the R files
+    trade_from_R = rename_countries(
+        trade_from_R,
+        region,
+        "Trade_DetailedTradeMatrix_E",
+        "Area Code"
+    )
+    production_from_R = rename_countries(
+        production_from_R,
+        region,
+        "Production_Crops_Livestock_E",
+        "Area Code"
+    )
+    trade = rename_countries(
+        trade,
+        region,
+        "Trade_DetailedTradeMatrix_E",
+    )
+    production = rename_countries(
+        production,
+        region,
+        "Production_Crops_Livestock_E",
+    )
+
+    trade.sort_index(inplace=True)
+    production.sort_index(inplace=True)
+    trade_from_R.sort_index(inplace=True)
+    production_from_R.sort_index(inplace=True)
+    trade = trade[sorted(trade.columns)]
+    trade_from_R = trade_from_R[sorted(trade_from_R.columns)]
+
+    print(production_from_R.shape)
+    print(production.shape)
+
+    assert production_from_R.shape == production.shape
+    assert trade_from_R.shape == trade.shape
+
+    assert production_from_R.sum() == production.sum()
+    assert trade_from_R.sum().sum() == trade.sum().sum()
+
+    assert production_from_R.index.equals(production.index)
+    assert trade_from_R.index.equals(trade.index)
+    assert trade_from_R.columns.equals(trade.columns)
+
+    assert (production_from_R == production).all(axis=None)
+    assert (trade_from_R == trade).all(axis=None)
 
 
-def test_returns_correct_dataframe_production():
-    result = read_in_raw_production_data()
-    assert isinstance(result, pd.DataFrame)
-    # This is the shape of the complete dataset.
-    assert result.shape == (79297, 70)
-    # The first country in the dataset is Afghanistan.
-    assert result.iloc[0, 2] == "Afghanistan"
+def test_format_prod_trad_data_global():
+    region = "All_Data"
+
+    try:
+        production = pd.read_csv(
+            f"data{os.sep}preprocessed_data{os.sep}Wheat_Y2021_Global_production.csv",
+            index_col=0,
+        ).squeeze()
+        trade = pd.read_csv(
+            f"data{os.sep}preprocessed_data{os.sep}Wheat_Y2021_Global_trade.csv",
+            index_col=0,
+        )
+    except FileNotFoundError:
+        print("Files not found, loading from pickle files to redo preprocessing")
+        production, trade = format_prod_trad_data(
+            f"data{os.sep}temp_files{os.sep}Production_Crops_Livestock_E_All_Data.pkl",
+            f"data{os.sep}temp_files{os.sep}Trade_DetailedTradeMatrix_E_All_Data.pkl",
+            item="Wheat",
+        )
+
+    production_from_R = pd.read_csv(
+        f"data{os.sep}validation_data_from_Hedlung_2022{os.sep}"
+        f"{region}{os.sep}NEW_production_wheat_2021.csv"
+    )[["Area", "value"]]
+
+    production_from_R.set_index("Area", inplace=True)
+    production_from_R.sort_index(inplace=True)
+    production_from_R = production_from_R.squeeze()
+
+    trade_from_R = pd.read_csv(
+        f"data{os.sep}validation_data_from_Hedlung_2022{os.sep}"
+        f"{region}{os.sep}NEW_trade_wheat_2021.csv"
+    )
+    trade_from_R.drop(columns="Unnamed: 0", inplace=True)
+    trade_from_R.columns = [int(c) for c in trade_from_R.columns]
+    trade_from_R.index = trade_from_R.columns
+    trade_from_R = trade_from_R[sorted(trade_from_R.columns)]
+    trade_from_R.sort_index(inplace=True)
+
+    # Replace country codes with country names in the R files
+    trade_from_R = rename_countries(
+        trade_from_R,
+        region,
+        "Trade_DetailedTradeMatrix_E",
+        "Area Code"
+    )
+    production_from_R = rename_countries(
+        production_from_R,
+        region,
+        "Production_Crops_Livestock_E",
+        "Area Code"
+    )
+
+    # print all the countries that only exist in one of the dataframes
+    for c in production_from_R.index:
+        if c not in production.index:
+            print("This country is present in R, but not in Python:")
+            print(c)
+
+    # and now the other way around
+    for c in production.index:
+        if c not in production_from_R.index:
+            print("This country is present in Python, but not in R:")
+            print(c)
+
+    # Sort the Python and R files to make sure they are in the same order
+    production.sort_index(inplace=True)
+    trade.sort_index(inplace=True)
+    trade_from_R.sort_index(inplace=True)
+    production_from_R.sort_index(inplace=True)
+
+    # Also sort the columns of the trade dataframes
+    trade = trade[sorted(trade.columns)]
+    trade_from_R = trade_from_R[sorted(trade_from_R.columns)]
+
+    assert production_from_R.shape == production.shape
+    assert trade_from_R.shape == trade.shape
+
+    assert production_from_R.sum() == production.sum()
+    assert trade_from_R.sum().sum() == trade.sum().sum()
+
+    assert production_from_R.index.equals(production.index)
+    assert trade_from_R.index.equals(trade.index)
+    assert trade_from_R.columns.equals(trade.columns)
+
+    assert (production_from_R == production).all(axis=None)
+    assert (trade_from_R == trade).all(axis=None)
 
 
-def test_extracts_right_data_production():
-    result = read_in_raw_production_data()
-    # Extract only the relevant data for the production model.
-    result = extract_relevant_production_data(result, [
-        "Maize (corn)",
-        "Wheat",
-        "Rice, paddy (rice milled equivalent)"
-    ], year=2018)
-    assert isinstance(result, pd.DataFrame)
-    # This is the shape of the complete dataset.
-    assert result.shape == (362, 5)
-    # The first country in the dataset is Afghanistan.
-    assert result.iloc[0, 0] == "Afghanistan"
-    # The first item in the dataset is Bananas.
-    assert result.iloc[0, 1] == "Maize"
-
-
-
-
+if __name__ == "__main__":
+    test_format_prod_trad_data_global()
+    test_format_prod_trad_data_oceania()
