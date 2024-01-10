@@ -9,11 +9,6 @@ copyright: ALLFED
 
 #This specifies the autogeneration portion
 pages:
-  - page: "modules/src/model.md"
-    source: "src/model.py"
-    classes:
-      - PyTradeShifts
-
   - page: "modules/src/preprocessing.md"
     source: "src/preprocessing.py"
     functions:
@@ -25,4 +20,11 @@ pages:
       - _prep_production_vector
       - _unify_indices
       - format_prod_trad_data
+      - rename_countries
+      - remove_entries_from_data
+
+  - page: "modules/src/model.md"
+    source: "src/model.py"
+    classes:
+      - PyTradeShifts
 
