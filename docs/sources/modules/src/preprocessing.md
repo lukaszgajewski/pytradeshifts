@@ -55,7 +55,7 @@ https://rdrr.io/cran/FAOSTAT/src/R/faostat_bulk_download.R#sym-read_faostat_bulk
 
 
 ### serialise_faostat_bulk
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L52)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L57)
 ```python
 .serialise_faostat_bulk(
    faostat_zip: str
@@ -80,7 +80,7 @@ None
 
 
 ### _melt_year_cols
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L72)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L79)
 ```python
 ._melt_year_cols(
    data: (pd.Series|pd.DataFrame)
@@ -105,7 +105,7 @@ Filter out unnecessary columns from the data and melt the year columns.
 
 
 ### _prep_trade_matrix
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L97)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L108)
 ```python
 ._prep_trade_matrix(
    trade_pkl: str, item: str, unit = 'tonnes', element = 'ExportQuantity',
@@ -140,7 +140,7 @@ Notes:
 
 
 ### _prep_production_vector
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L139)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L154)
 ```python
 ._prep_production_vector(
    production_pkl: str, item = 'Wheat', unit = 't', year = 'Y2021'
@@ -173,7 +173,7 @@ Notes:
 
 
 ### _unify_indices
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L169)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L190)
 ```python
 ._unify_indices(
    production_vector: pd.DataFrame, trade_matrix: pd.DataFrame
@@ -203,7 +203,7 @@ Missing values are replaced by 0.
 
 
 ### format_prod_trad_data
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L194)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L217)
 ```python
 .format_prod_trad_data(
    production_pkl: str, trade_pkl: str, item: str, production_unit = 't',
@@ -236,3 +236,59 @@ Notes:
     The optional arguments must be determined semi-manually as their allowed values
     depend on particular datasets. E.g., unit can be "tonnes" in one file and "t"
     in another.
+
+----
+
+
+### rename_countries
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L256)
+```python
+.rename_countries(
+   data: (pd.Series|pd.DataFrame), region: str, filename: str,
+   code_type: str = 'M49Code'
+)
+```
+
+---
+Rename country codes with country names in either production or trade data.
+
+
+**Arguments**
+
+* **data** (pd.DataFrame) : The data to be renamed.
+* **region** (str) : The region of the data.
+* **filename** (str) : The filename for the country codes CSV file.
+* **code_type** (str) : The type of country code to be used.
+* **after_union** (bool) : Whether the index/columns of the data are already unified.
+
+
+**Returns**
+
+* **DataFrame**  : The data with country codes replaced by country names.
+
+
+----
+
+
+### remove_entries_from_data
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L299)
+```python
+.remove_entries_from_data(
+   data: (pd.Series|pd.DataFrame)
+)
+```
+
+---
+Removes a bunch of entries from the data, which do not actually represent countries
+or where no trade data is available.
+
+
+**Arguments**
+
+* **data** (pd.Series | pd.DataFrame) : The data to be filtered.
+
+
+**Returns**
+
+* **DataFrame**  : The filtered data.
+

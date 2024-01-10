@@ -5,7 +5,7 @@
 [source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L6)
 ```python 
 PyTradeShifts(
-   crop, base_year, percentile = 0.75
+   crop, base_year, percentile = 0.75, region = 'Global', testing = False
 )
 ```
 
@@ -34,11 +34,9 @@ None
 
 
 ### .load_data
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L33)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L35)
 ```python
-.load_data(
-   crop: str, base_year: int
-)
+.load_data()
 ```
 
 ---
@@ -59,7 +57,7 @@ of countries with trade below a certain percentile.
 
 
 ### .remove_above_percentile
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L75)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L70)
 ```python
 .remove_above_percentile(
    trade_matrix: pd.DataFrame, percentile: float = 0.75
@@ -85,7 +83,7 @@ Removes countries with trade below a certain percentile.
 
 
 ### .remove_re_exports
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L105)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L100)
 ```python
 .remove_re_exports()
 ```
@@ -116,35 +114,30 @@ None
 
 
 ### .prebalance
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L147)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L142)
 ```python
 .prebalance(
-   production_data: pd.Series, trade_matrix: pd.DataFrame, precision = 10**-3
+   precision = 10**-3
 )
 ```
 
 ---
-Return prebalaced trading data.
+Prebalance trading data.
 
 
 **Arguments**
 
-* **production_data** (pd.Series) : Vector of production data.
-* **trade_matrix** (pd.DataFrame) : Trade matrix of the crop specified
 * **precision** (float, optional) : Specifies precision of the prebalancing.
 
 
 **Returns**
 
-* **DataFrame**  : Prebalanced trade matrix.
-
+None
 
 ### .remove_net_zero_countries
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L177)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L175)
 ```python
-.remove_net_zero_countries(
-   production_data: pd.Series, trade_matrix: pd.DataFrame
-)
+.remove_net_zero_countries()
 ```
 
 ---
@@ -155,21 +148,17 @@ in trade matrix = 0, and sum of columns = 0.
 
 **Arguments**
 
-* **production_data** (pd.Series) : Vector of production data.
-* **trade_matrix** (pd.DataFrame) : Trade matrix of the crop specified
+None
 
 
 **Returns**
 
-* Production data and trade matrix
-without "all zero" countries.
+None
 
 ### .correct_reexports
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L202)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L203)
 ```python
-.correct_reexports(
-   production_data: pd.Series, trade_matrix: pd.DataFrame
-)
+.correct_reexports()
 ```
 
 ---
@@ -181,11 +170,9 @@ removed.
 
 **Arguments**
 
-* **production_data** (pd.Series) : Vector of production data.
-* **trade_matrix** (pd.DataFrame) : Trade matrix of the crop specified
+None
 
 
 **Returns**
 
-* **DataFrame**  : Trade matrix without re-exports.
-
+None
