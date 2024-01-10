@@ -1,6 +1,6 @@
 import pandas as pd
 from src.preprocessing import format_prod_trad_data
-from src.preprocessing import rename_countries, remove_entries_from_data
+from src.preprocessing import rename_countries
 import os
 
 
@@ -13,14 +13,19 @@ def test_format_prod_trad_data_oceania():
     )
 
     production_from_R = pd.read_csv(
-        f"data{os.sep}validation_data_from_Hedlung_2022{os.sep}{region}{os.sep}NEW_production_wheat_2021.csv"
+        f"data{os.sep}validation_data_from_Hedlung_2022{os.sep}"
+        f"{region}{os.sep}NEW_production_wheat_2021.csv"
     )[["Area", "value"]]
+
     production_from_R.set_index("Area", inplace=True)
     production_from_R.sort_index(inplace=True)
     production_from_R = production_from_R.squeeze()
+
     trade_from_R = pd.read_csv(
-        f"data{os.sep}validation_data_from_Hedlung_2022{os.sep}{region}{os.sep}NEW_trade_wheat_2021.csv"
+        f"data{os.sep}validation_data_from_Hedlung_2022{os.sep}"
+        f"{region}{os.sep}NEW_trade_wheat_2021.csv"
     )
+
     trade_from_R.drop(columns="Unnamed: 0", inplace=True)
     trade_from_R.columns = [int(c) for c in trade_from_R.columns]
     trade_from_R.index = trade_from_R.columns
@@ -96,13 +101,17 @@ def test_format_prod_trad_data_global():
         )
 
     production_from_R = pd.read_csv(
-        f"data{os.sep}validation_data_from_Hedlung_2022{os.sep}{region}{os.sep}NEW_production_wheat_2021.csv"
+        f"data{os.sep}validation_data_from_Hedlung_2022{os.sep}"
+        f"{region}{os.sep}NEW_production_wheat_2021.csv"
     )[["Area", "value"]]
+
     production_from_R.set_index("Area", inplace=True)
     production_from_R.sort_index(inplace=True)
     production_from_R = production_from_R.squeeze()
+
     trade_from_R = pd.read_csv(
-        f"data{os.sep}validation_data_from_Hedlung_2022{os.sep}{region}{os.sep}NEW_trade_wheat_2021.csv"
+        f"data{os.sep}validation_data_from_Hedlung_2022{os.sep}"
+        f"{region}{os.sep}NEW_trade_wheat_2021.csv"
     )
     trade_from_R.drop(columns="Unnamed: 0", inplace=True)
     trade_from_R.columns = [int(c) for c in trade_from_R.columns]
@@ -162,4 +171,4 @@ def test_format_prod_trad_data_global():
 
 if __name__ == "__main__":
     test_format_prod_trad_data_global()
-    #test_format_prod_trad_data_oceania()
+    test_format_prod_trad_data_oceania()
