@@ -327,7 +327,7 @@ def remove_entries_from_data(data: pd.Series | pd.DataFrame) -> pd.Series | pd.D
         "Southern Europe": "'039",
         "Australia and New Zealand": "'053",
         "Melanesia": "'054",
-        "European Union (27)": "'97",
+        "European Union (27)": "'097",
         "Asia": "'142",
         "Central Asia": "'143",
         "Western Asia": "'145",
@@ -336,11 +336,11 @@ def remove_entries_from_data(data: pd.Series | pd.DataFrame) -> pd.Series | pd.D
         "Northern Europe": "'154",
         "Western Europe": "'155",
         # Groups of countries by property
-        "Least Developed Countries": "'163",
+        "Least Developed Countries": "'199",
         "Land Locked Developing Countries": "'432",
         "Small Island Developing States": "'722",
-        "Low Income Food Deficit Countries": "'788",
-        "Net Food Importing Developing Countries": "'832",
+        "Low Income Food Deficit Countries": "'901",
+        "Net Food Importing Developing Countries": "'902",
         # We want to look at China and Taiwan seperately, so this is not needed
         # as 159 refers to China incl. Taiwan
         "China": "'159",

@@ -1,6 +1,6 @@
 import pandas as pd
 from src.preprocessing import format_prod_trad_data
-from src.preprocessing import rename_countries
+from src.preprocessing import rename_countries, remove_entries_from_data
 import os
 
 
@@ -60,7 +60,7 @@ def test_format_prod_trad_data_oceania():
 
     print(production_from_R.shape)
     print(production.shape)
-    
+
     assert production_from_R.shape == production.shape
     assert trade_from_R.shape == trade.shape
 
@@ -82,7 +82,7 @@ def test_format_prod_trad_data_global():
         production = pd.read_csv(
             f"data{os.sep}preprocessed_data{os.sep}Wheat_Y2021_Global_production.csv",
             index_col=0,
-        )
+        ).squeeze()
         trade = pd.read_csv(
             f"data{os.sep}preprocessed_data{os.sep}Wheat_Y2021_Global_trade.csv",
             index_col=0,
@@ -127,14 +127,24 @@ def test_format_prod_trad_data_global():
     # print all the countries that only exist in one of the dataframes
     for c in production_from_R.index:
         if c not in production.index:
-            print("not in R")
+            print("This country is present in R, but not in Python:")
             print(c)
 
     # and now the other way around
     for c in production.index:
         if c not in production_from_R.index:
-            print("not in Python")
+            print("This country is present in Python, but not in R:")
             print(c)
+
+    # Sort the Python and R files to make sure they are in the same order
+    production.sort_index(inplace=True)
+    trade.sort_index(inplace=True)
+    trade_from_R.sort_index(inplace=True)
+    production_from_R.sort_index(inplace=True)
+
+    # Also sort the columns of the trade dataframes
+    trade = trade[sorted(trade.columns)]
+    trade_from_R = trade_from_R[sorted(trade_from_R.columns)]
 
     assert production_from_R.shape == production.shape
     assert trade_from_R.shape == trade.shape
