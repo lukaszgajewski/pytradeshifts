@@ -433,7 +433,7 @@ if __name__ == "__main__":
     # Define regions for which the data is processed
     # "Oceania" is used for testing, as it has the least amount of countries
     # to run with all data use: "All_Data" for region
-    region = "Oceania"
+    region = "All_Data"
     print("\n")
     for item in items_trade:
         main(
