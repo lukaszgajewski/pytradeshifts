@@ -34,16 +34,10 @@ def test_format_prod_trad_data_oceania():
 
     # Replace country codes with country names in the R files
     trade_from_R = rename_countries(
-        trade_from_R,
-        region,
-        "Trade_DetailedTradeMatrix_E",
-        "Area Code"
+        trade_from_R, region, "Trade_DetailedTradeMatrix_E", "Area Code"
     )
     production_from_R = rename_countries(
-        production_from_R,
-        region,
-        "Production_Crops_Livestock_E",
-        "Area Code"
+        production_from_R, region, "Production_Crops_Livestock_E", "Area Code"
     )
     trade = rename_countries(
         trade,
@@ -121,16 +115,10 @@ def test_format_prod_trad_data_global():
 
     # Replace country codes with country names in the R files
     trade_from_R = rename_countries(
-        trade_from_R,
-        region,
-        "Trade_DetailedTradeMatrix_E",
-        "Area Code"
+        trade_from_R, region, "Trade_DetailedTradeMatrix_E", "Area Code"
     )
     production_from_R = rename_countries(
-        production_from_R,
-        region,
-        "Production_Crops_Livestock_E",
-        "Area Code"
+        production_from_R, region, "Production_Crops_Livestock_E", "Area Code"
     )
 
     # print all the countries that only exist in one of the dataframes
