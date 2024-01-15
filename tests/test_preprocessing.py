@@ -11,7 +11,6 @@ def test_format_prod_trad_data_oceania():
         f"data{os.sep}temp_files{os.sep}Trade_DetailedTradeMatrix_E_Oceania.pkl",
         item="Wheat",
     )
-
     production_from_R = pd.read_csv(
         f"data{os.sep}validation_data_from_Hedlung_2022{os.sep}"
         f"{region}{os.sep}NEW_production_wheat_2021.csv"
@@ -34,16 +33,10 @@ def test_format_prod_trad_data_oceania():
 
     # Replace country codes with country names in the R files
     trade_from_R = rename_countries(
-        trade_from_R,
-        region,
-        "Trade_DetailedTradeMatrix_E",
-        "Area Code"
+        trade_from_R, region, "Trade_DetailedTradeMatrix_E", "Area Code"
     )
     production_from_R = rename_countries(
-        production_from_R,
-        region,
-        "Production_Crops_Livestock_E",
-        "Area Code"
+        production_from_R, region, "Production_Crops_Livestock_E", "Area Code"
     )
     trade = rename_countries(
         trade,
@@ -121,16 +114,10 @@ def test_format_prod_trad_data_global():
 
     # Replace country codes with country names in the R files
     trade_from_R = rename_countries(
-        trade_from_R,
-        region,
-        "Trade_DetailedTradeMatrix_E",
-        "Area Code"
+        trade_from_R, region, "Trade_DetailedTradeMatrix_E", "Area Code"
     )
     production_from_R = rename_countries(
-        production_from_R,
-        region,
-        "Production_Crops_Livestock_E",
-        "Area Code"
+        production_from_R, region, "Production_Crops_Livestock_E", "Area Code"
     )
 
     # print all the countries that only exist in one of the dataframes
@@ -170,5 +157,5 @@ def test_format_prod_trad_data_global():
 
 
 if __name__ == "__main__":
-    test_format_prod_trad_data_global()
     test_format_prod_trad_data_oceania()
+    test_format_prod_trad_data_global()
