@@ -46,18 +46,15 @@ of countries with trade below a certain percentile.
 
 **Arguments**
 
-* **crop** (str) : The crop to build the trade matrix for.
-* **base_year** (int) : The base_year to extract data for.
+None
 
 
 **Returns**
 
-* **DataFrame**  : The trade data with countries with low trade removed
-    and only the relevant crop.
-
+None
 
 ### .remove_above_percentile
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L70)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L79)
 ```python
 .remove_above_percentile(
    trade_matrix: pd.DataFrame, percentile: float = 0.75
@@ -82,39 +79,8 @@ Removes countries with trade below a certain percentile.
     and only the relevant crop.
 
 
-### .remove_re_exports
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L100)
-```python
-.remove_re_exports()
-```
-
----
-Removes re-exports from the trade matrix.
-This is a Python implementation of the R/Matlab code from:
-Croft, S. A., West, C. D., & Green, J. M. H. (2018).
-"Capturing the heterogeneity of sub-national production
-in global trade flows."
-
-Journal of Cleaner Production, 203, 1106–1118.
-
-https://doi.org/10.1016/j.jclepro.2018.08.267
-
-This implementation also includes pre-balancing to ensure that countries don't
-export more than they produce and import.
-
-
-**Arguments**
-
-None
-
-
-**Returns**
-
-* **DataFrame**  : The trade matrix without re-exports.
-
-
 ### .prebalance
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L142)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L110)
 ```python
 .prebalance(
    precision = 10**-3
@@ -122,7 +88,8 @@ None
 ```
 
 ---
-Prebalance trading data.
+This implementation also includes pre-balancing to ensure that countries don't
+export more than they produce and import.
 
 
 **Arguments**
@@ -135,7 +102,7 @@ Prebalance trading data.
 None
 
 ### .remove_net_zero_countries
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L175)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L144)
 ```python
 .remove_net_zero_countries()
 ```
@@ -156,13 +123,22 @@ None
 None
 
 ### .correct_reexports
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L203)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L172)
 ```python
 .correct_reexports()
 ```
 
 ---
-Return trading data after correcting for re-exports.
+Removes re-exports from the trade matrix.
+This is a Python implementation of the R/Matlab code from:
+Croft, S. A., West, C. D., & Green, J. M. H. (2018).
+"Capturing the heterogeneity of sub-national production
+in global trade flows."
+
+Journal of Cleaner Production, 203, 1106–1118.
+
+https://doi.org/10.1016/j.jclepro.2018.08.267
+
 
 Input to this function should be prebalanced and have countries with all zeroes
 removed.
