@@ -34,7 +34,7 @@ None
 
 
 ### .load_data
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L35)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L38)
 ```python
 .load_data()
 ```
@@ -54,7 +54,7 @@ None
 None
 
 ### .remove_above_percentile
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L79)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L85)
 ```python
 .remove_above_percentile(
    trade_matrix: pd.DataFrame, percentile: float = 0.75
@@ -80,7 +80,7 @@ Removes countries with trade below a certain percentile.
 
 
 ### .prebalance
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L110)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L113)
 ```python
 .prebalance(
    precision = 10**-3
@@ -102,7 +102,7 @@ export more than they produce and import.
 None
 
 ### .remove_net_zero_countries
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L144)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L146)
 ```python
 .remove_net_zero_countries()
 ```
@@ -123,7 +123,7 @@ None
 None
 
 ### .correct_reexports
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L172)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/model.py/#L168)
 ```python
 .correct_reexports()
 ```
