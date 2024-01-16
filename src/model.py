@@ -34,6 +34,12 @@ class PyTradeShifts:
             self.load_data()
             # Prebalance the trade matrix
             self.prebalance(self.production_data, self.trade_matrix)
+            # Remove countries with all zeroes
+            self.remove_net_zero_countries()
+            # Remove re-exports
+            self.correct_reexports()
+            # Remove countries with low trade
+            self.remove_below_percentile()
 
     def load_data(self):
         """
@@ -82,33 +88,30 @@ class PyTradeShifts:
         self.trade_matrix = trade_matrix
         self.production_data = production_data
 
-    def remove_above_percentile(
-        self, trade_matrix: pd.DataFrame, percentile: float = 0.75
-    ) -> pd.DataFrame:
+    def remove_below_percentile(
+        self
+    ):
         """
         Removes countries with trade below a certain percentile.
 
         Arguments:
-            crop_trade_data (pd.DataFrame): The trade data with countries with low trade removed
-                and only the relevant crop.
-            percentile (float): The percentile to use for removing countries with
-                low trade.
+            None
 
         Returns:
-            pd.DataFrame: The trade data with countries with low trade removed
-                and only the relevant crop.
+            None
         """
-        # Calculate the percentile out of all values in the trade matrix
-        threshold = np.percentile(trade_matrix.values, percentile * 100)
+        # Calculate the percentile out of all values in the trade matrix. This
+        # only considers the values above 0.
+        threshold = np.percentile(
+            self.trade_matrix.values[self.trade_matrix.values > 0], self.percentile * 100
+        )
         # Set all values to 0 which are below the threshold
-        trade_matrix[trade_matrix < threshold] = 0
+        self.trade_matrix[self.trade_matrix < threshold] = 0
         # Remove all countries which have no trade
-        trade_matrix = trade_matrix.loc[trade_matrix.sum(axis=1) > 0, :]
-        trade_matrix = trade_matrix.loc[:, trade_matrix.sum(axis=0) > 0]
+        self.trade_matrix = self.trade_matrix.loc[self.trade_matrix.sum(axis=1) > 0, :]
+        self.trade_matrix = self.trade_matrix.loc[:, self.trade_matrix.sum(axis=0) > 0]
 
-        print(f"Removed countries with trade below the {percentile*100}th percentile.")
-
-        return trade_matrix
+        print(f"Removed countries with trade below the {int(self.percentile*100)}th percentile.")
 
     def prebalance(self, precision=10**-3):
         """
