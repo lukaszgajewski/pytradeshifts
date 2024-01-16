@@ -13,7 +13,7 @@ def test_format_prod_trad_data_oceania():
     )
     production_from_R = pd.read_csv(
         f"data{os.sep}validation_data_from_Hedlung_2022{os.sep}"
-        f"{region}{os.sep}NEW_production_wheat_2021.csv"
+        f"{region}{os.sep}NEW_production_wheat_2018.csv"
     )[["Area", "value"]]
 
     production_from_R.set_index("Area", inplace=True)
@@ -22,7 +22,7 @@ def test_format_prod_trad_data_oceania():
 
     trade_from_R = pd.read_csv(
         f"data{os.sep}validation_data_from_Hedlung_2022{os.sep}"
-        f"{region}{os.sep}NEW_trade_wheat_2021.csv"
+        f"{region}{os.sep}NEW_trade_wheat_2018.csv"
     )
 
     trade_from_R.drop(columns="Unnamed: 0", inplace=True)
@@ -78,11 +78,11 @@ def test_format_prod_trad_data_global():
 
     try:
         production = pd.read_csv(
-            f"data{os.sep}preprocessed_data{os.sep}Wheat_Y2021_Global_production.csv",
+            f"data{os.sep}preprocessed_data{os.sep}Wheat_Y2018_Global_production.csv",
             index_col=0,
         ).squeeze()
         trade = pd.read_csv(
-            f"data{os.sep}preprocessed_data{os.sep}Wheat_Y2021_Global_trade.csv",
+            f"data{os.sep}preprocessed_data{os.sep}Wheat_Y2018_Global_trade.csv",
             index_col=0,
         )
     except FileNotFoundError:
@@ -95,7 +95,7 @@ def test_format_prod_trad_data_global():
 
     production_from_R = pd.read_csv(
         f"data{os.sep}validation_data_from_Hedlung_2022{os.sep}"
-        f"{region}{os.sep}NEW_production_wheat_2021.csv"
+        f"{region}{os.sep}NEW_production_wheat_2018.csv"
     )[["Area", "value"]]
 
     production_from_R.set_index("Area", inplace=True)
@@ -104,7 +104,7 @@ def test_format_prod_trad_data_global():
 
     trade_from_R = pd.read_csv(
         f"data{os.sep}validation_data_from_Hedlung_2022{os.sep}"
-        f"{region}{os.sep}NEW_trade_wheat_2021.csv"
+        f"{region}{os.sep}NEW_trade_wheat_2018.csv"
     )
     trade_from_R.drop(columns="Unnamed: 0", inplace=True)
     trade_from_R.columns = [int(c) for c in trade_from_R.columns]

@@ -77,7 +77,7 @@ def serialise_faostat_bulk(faostat_zip: str) -> None:
 
 
 def _prep_trade_matrix(
-    trade_pkl: str, item: str, unit="tonnes", element="Export Quantity", year="Y2021"
+    trade_pkl: str, item: str, unit="tonnes", element="Export Quantity", year="Y2018"
 ) -> pd.DataFrame:
     """
     Return properly formatted trade matrix.
@@ -122,7 +122,7 @@ def _prep_trade_matrix(
 
 
 def _prep_production_vector(
-        production_pkl: str, item="Wheat", unit="t", year="Y2021"
+        production_pkl: str, item="Wheat", unit="t", year="Y2018"
 ) -> pd.DataFrame:
     """
     Return properly formatted production vector.
@@ -190,7 +190,7 @@ def format_prod_trad_data(
     production_unit="t",
     trade_unit="tonnes",
     element="Export Quantity",
-    year="Y2021",
+    year="Y2018",
 ) -> tuple[pd.Series, pd.DataFrame]:
     """
     Return properly formatted production vector (as a Series),
@@ -316,9 +316,9 @@ def remove_entries_from_data(data: pd.Series | pd.DataFrame) -> pd.Series | pd.D
         # No reliable data available, therefore they are excluded
         # This assessment is based on the fact that all of these countries
         # don't show up as a partner country in the trade data of the FAO
-        "Democratic People's Republic of Korea": "'408",
-        "Chad": "'148",
-        "South Sudan": "'728",
+        # "Democratic People's Republic of Korea": "'408",
+        # "Chad": "'148",
+        # "South Sudan": "'728",
     }
 
     # Remove the entries
@@ -335,7 +335,7 @@ def main(
     production_unit="t",
     trade_unit="tonnes",
     element="Export Quantity",
-    year="Y2021",
+    year="Y2018",
 ) -> pd.DataFrame:
     try:
         print(f"Reading in data for {item} in {region}...")
@@ -397,12 +397,12 @@ def main(
 
 if __name__ == "__main__":
     # Define values
-    year = "Y2021"
+    year = "Y2018"
     items_trade = ["Maize (corn)", "Wheat", "Rice, paddy (rice milled equivalent)"]
     # Define regions for which the data is processed
     # "Oceania" is used for testing, as it has the least amount of countries
     # to run with all data use: "All_Data" for region
-    region = "Oceania"
+    region = "All_Data"
     print("\n")
     for item in items_trade:
         main(
