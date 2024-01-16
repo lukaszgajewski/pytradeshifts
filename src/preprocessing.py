@@ -76,35 +76,6 @@ def serialise_faostat_bulk(faostat_zip: str) -> None:
     return None
 
 
-def _melt_year_cols(data: pd.Series | pd.DataFrame) -> pd.Series | pd.DataFrame:
-    """
-    Filter out unnecessary columns from the data and melt the year columns.
-
-    Arguments:
-        data (pd.Series | pd.DataFrame): The data to be melted.
-
-    Returns:
-        pd.Series | pd.DataFrame: The melted data.
-    """
-    print("Melt year columns")
-    # there are columns of format: Y2021N, Y2021F, Y2021
-    # where 2021 can be any year. We only want to keep of format Y2021
-    data = data[
-        [c for c in data.columns if c[0] != "Y" or (c[-1] != "F" and c[-1] != "N")]
-    ]
-    # and then we want to melt all those year columns (Y2019, Y2020, Y2021 etc.)
-    # so that we have a "Year" and "Value" columns
-    # there are other ways of handling this but this is consistent with Croft et al.
-    # Though this implementation floods the RAM, sorry about that.
-    melted = data.melt(
-        id_vars=[c for c in data.columns if c[0] != "Y"],
-        var_name="Year",
-        value_name="Value",
-    ).dropna(subset="Value")
-    print("Finished melting year columns")
-    return melted
-
-
 def _prep_trade_matrix(
     trade_pkl: str, item: str, unit="tonnes", element="Export Quantity", year="Y2021"
 ) -> pd.DataFrame:
@@ -127,21 +98,20 @@ def _prep_trade_matrix(
         in another.
     """
     trad = pd.read_pickle(trade_pkl)
-    trad = _melt_year_cols(trad)
     print("Filter trade matrix")
     trad = trad[
         (
             (trad["Item"] == item)
             & (trad["Unit"] == unit)
             & (trad["Element"] == element)
-            & (trad["Year"] == year)
+            & (~trad[year].isna())
         )
     ]
-    trad = trad[["Reporter Country Code (M49)", "Partner Country Code (M49)", "Value"]]
+    trad = trad[["Reporter Country Code (M49)", "Partner Country Code (M49)", year]]
     print("Finished filtering trade matrix")
     print("Pivot trade matrix")
     trad = trad.pivot(
-        columns="Partner Country Code (M49)", index="Reporter Country Code (M49)", values="Value"
+        columns="Partner Country Code (M49)", index="Reporter Country Code (M49)", values=year
     )
     print("Finished pivoting trade matrix")
 
@@ -172,12 +142,11 @@ def _prep_production_vector(
         in another.
     """
     prod = pd.read_pickle(production_pkl)
-    prod = _melt_year_cols(prod)
     print("Filter production vector")
     prod = prod[
-        ((prod["Item"] == item) & (prod["Unit"] == unit) & (prod["Year"] == year))
+        ((prod["Item"] == item) & (prod["Unit"] == unit) & (~prod[year].isna()))
     ]
-    prod = prod[["Area Code (M49)", "Value"]]
+    prod = prod[["Area Code (M49)", year]]
     print("Finished filtering production vector")
     prod = prod.set_index("Area Code (M49)")
 

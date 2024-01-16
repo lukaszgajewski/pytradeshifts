@@ -11,7 +11,6 @@ def test_format_prod_trad_data_oceania():
         f"data{os.sep}temp_files{os.sep}Trade_DetailedTradeMatrix_E_Oceania.pkl",
         item="Wheat",
     )
-
     production_from_R = pd.read_csv(
         f"data{os.sep}validation_data_from_Hedlung_2022{os.sep}"
         f"{region}{os.sep}NEW_production_wheat_2021.csv"
@@ -158,5 +157,5 @@ def test_format_prod_trad_data_global():
 
 
 if __name__ == "__main__":
-    test_format_prod_trad_data_global()
     test_format_prod_trad_data_oceania()
+    test_format_prod_trad_data_global()
