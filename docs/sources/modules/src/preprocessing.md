@@ -79,33 +79,8 @@ None
 ----
 
 
-### _melt_year_cols
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L79)
-```python
-._melt_year_cols(
-   data: (pd.Series|pd.DataFrame)
-)
-```
-
----
-Filter out unnecessary columns from the data and melt the year columns.
-
-
-**Arguments**
-
-* **data** (pd.Series | pd.DataFrame) : The data to be melted.
-
-
-**Returns**
-
-* **DataFrame**  : The melted data.
-
-
-----
-
-
 ### _prep_trade_matrix
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L108)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L79)
 ```python
 ._prep_trade_matrix(
    trade_pkl: str, item: str, unit = 'tonnes', element = 'ExportQuantity',
@@ -140,7 +115,7 @@ Notes:
 
 
 ### _prep_production_vector
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L154)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L124)
 ```python
 ._prep_production_vector(
    production_pkl: str, item = 'Wheat', unit = 't', year = 'Y2021'
@@ -173,7 +148,7 @@ Notes:
 
 
 ### _unify_indices
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L190)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L159)
 ```python
 ._unify_indices(
    production_vector: pd.DataFrame, trade_matrix: pd.DataFrame
@@ -203,7 +178,7 @@ Missing values are replaced by 0.
 
 
 ### format_prod_trad_data
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L217)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L186)
 ```python
 .format_prod_trad_data(
    production_pkl: str, trade_pkl: str, item: str, production_unit = 't',
@@ -241,7 +216,7 @@ Notes:
 
 
 ### rename_countries
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L256)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L225)
 ```python
 .rename_countries(
    data: (pd.Series|pd.DataFrame), region: str, filename: str,
@@ -271,7 +246,7 @@ Rename country codes with country names in either production or trade data.
 
 
 ### remove_entries_from_data
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L299)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L268)
 ```python
 .remove_entries_from_data(
    data: (pd.Series|pd.DataFrame)
