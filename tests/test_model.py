@@ -7,12 +7,7 @@ def loading(region):
     """
     Just loads the data to make sure it is loaded correctly.
     """
-    Wheat2021 = PyTradeShifts(
-        "Wheat",
-        "Y2021",
-        region=region,
-        testing=True
-    )
+    Wheat2021 = PyTradeShifts("Wheat", "Y2021", region=region, testing=True)
     Wheat2021.load_data()
 
     # Make sure the data is loaded correctly
@@ -39,12 +34,7 @@ def prebalancing(region):
     Runs the model with prebalancing and compares the results with the
     results from the R script.
     """
-    Wheat2021 = PyTradeShifts(
-        "Wheat",
-        "Y2021",
-        region=region,
-        testing=True
-    )
+    Wheat2021 = PyTradeShifts("Wheat", "Y2021", region=region, testing=True)
 
     # Load the data
     Wheat2021.load_data()
@@ -56,17 +46,22 @@ def prebalancing(region):
         region = "All_Data"
     # Load the data from the R script
     wheat2021_from_R = pd.read_csv(
-        "data" + os.sep +
-        "validation_data_from_Hedlung_2022" + os.sep +
-        region + os.sep +
-        "TEST_prebalanced_trade_wheat_2021.csv",
+        "data"
+        + os.sep
+        + "validation_data_from_Hedlung_2022"
+        + os.sep
+        + region
+        + os.sep
+        + "TEST_prebalanced_trade_wheat_2021.csv",
         index_col=0,
     )
 
     # Compare the results
     assert wheat2021_from_R.shape == Wheat2021.trade_matrix.shape
     # Comparing the sum this has only be correct to 2 decimal places
-    assert round(wheat2021_from_R.sum().sum(), 2) == round(Wheat2021.trade_matrix.sum().sum(), 2)
+    assert round(wheat2021_from_R.sum().sum(), 2) == round(
+        Wheat2021.trade_matrix.sum().sum(), 2
+    )
 
 
 def test_prebalancing_oceania():
@@ -90,12 +85,7 @@ def removing_countries_with_zeros_and_reexport(region):
     Runs the model with prebalancing and compares the results with the
     results from the R script.
     """
-    Wheat2021 = PyTradeShifts(
-        "Wheat",
-        "Y2021",
-        region=region,
-        testing=True
-    )
+    Wheat2021 = PyTradeShifts("Wheat", "Y2021", region=region, testing=True)
 
     # Load the data
     Wheat2021.load_data()
@@ -114,17 +104,22 @@ def removing_countries_with_zeros_and_reexport(region):
 
     # Load the data from the R script
     wheat2021_from_R = pd.read_csv(
-        "data" + os.sep +
-        "validation_data_from_Hedlung_2022" + os.sep +
-        region + os.sep +
-        "NEW_Ex_wheat_2021.csv",
+        "data"
+        + os.sep
+        + "validation_data_from_Hedlung_2022"
+        + os.sep
+        + region
+        + os.sep
+        + "NEW_Ex_wheat_2021.csv",
         index_col=0,
     )
 
     # Compare the results
     assert wheat2021_from_R.shape == Wheat2021.trade_matrix.shape
     # Comparing the sum this has only be correct to 2 decimal places
-    assert round(wheat2021_from_R.sum().sum(), 2) == round(Wheat2021.trade_matrix.sum().sum(), 2)
+    assert round(wheat2021_from_R.sum().sum(), 2) == round(
+        Wheat2021.trade_matrix.sum().sum(), 2
+    )
 
 
 def test_removing_countries_with_zeros_and_reexport_oceania():
