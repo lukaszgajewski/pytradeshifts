@@ -1,6 +1,14 @@
 import pandas as pd
 import numpy as np
+import networkx as nx
+import matplotlib.pyplot as plt
 import os
+import geopandas as gpd
+import country_converter as coco
+
+plt.style.use(
+    "https://raw.githubusercontent.com/allfed/ALLFED-matplotlib-style-sheet/main/ALLFED.mplstyle"
+)
 
 
 class PyTradeShifts:
@@ -27,13 +35,27 @@ class PyTradeShifts:
         self.crop = crop
         self.percentile = percentile
         self.region = region
+        self.trade_graph = None
+        self.trade_matrix = None
+        self.production_data = None
+        self.threshold = None
+        self.prebalanced = False
+        self.reexports_corrected = False
+        self.no_trade_removed = False
+        self.trade_communities = None
 
         # Don't run the methods if we are testing, so we can test them individually
         if not testing:
             # Read in the data
             self.load_data()
+            # Remove countries with all zeroes in trade and production
+            self.remove_net_zero_countries()
             # Prebalance the trade matrix
-            self.prebalance(self.production_data, self.trade_matrix)
+            self.prebalance()
+            # Remove re-exports
+            self.correct_reexports()
+            # Remove countries with low trade
+            self.remove_below_percentile()
 
     def load_data(self):
         """
@@ -46,6 +68,7 @@ class PyTradeShifts:
         Returns:
             None
         """
+        assert self.trade_matrix is None
         # Read in the data
         trade_matrix = pd.read_csv(
             "."
@@ -82,33 +105,42 @@ class PyTradeShifts:
         self.trade_matrix = trade_matrix
         self.production_data = production_data
 
-    def remove_above_percentile(
-        self, trade_matrix: pd.DataFrame, percentile: float = 0.75
-    ) -> pd.DataFrame:
+    def remove_below_percentile(
+        self
+    ):
         """
         Removes countries with trade below a certain percentile.
 
         Arguments:
-            crop_trade_data (pd.DataFrame): The trade data with countries with low trade removed
-                and only the relevant crop.
-            percentile (float): The percentile to use for removing countries with
-                low trade.
+            None
 
         Returns:
-            pd.DataFrame: The trade data with countries with low trade removed
-                and only the relevant crop.
+            None
         """
-        # Calculate the percentile out of all values in the trade matrix
-        threshold = np.percentile(trade_matrix.values, percentile * 100)
+        # Make sure the data is loaded and no threshold is calculated yet
+        assert self.trade_matrix is not None
+        assert self.percentile is not None
+        assert self.threshold is None
+        # Calculate the percentile out of all values in the trade matrix. This
+        # only considers the values above 0.
+        threshold = np.percentile(
+            self.trade_matrix.values[self.trade_matrix.values > 0], self.percentile * 100
+        )
         # Set all values to 0 which are below the threshold
-        trade_matrix[trade_matrix < threshold] = 0
-        # Remove all countries which have no trade
-        trade_matrix = trade_matrix.loc[trade_matrix.sum(axis=1) > 0, :]
-        trade_matrix = trade_matrix.loc[:, trade_matrix.sum(axis=0) > 0]
+        self.trade_matrix[self.trade_matrix < threshold] = 0
 
-        print(f"Removed countries with trade below the {percentile*100}th percentile.")
+        # b_ signifies boolean here, these are filtering masks
+        row_sums = self.trade_matrix.sum(axis=1)
+        col_sums = self.trade_matrix.sum(axis=0)
 
-        return trade_matrix
+        b_filter = ~(row_sums.eq(0) & col_sums.eq(0))
+        # Filter out the countries with all zeroes in trade
+        self.trade_matrix = self.trade_matrix.loc[b_filter, b_filter]
+
+        print(f"Removed countries with trade below the {int(self.percentile*100)}th percentile.")
+
+        # Save threshold for testing purposes
+        self.threshold = threshold
 
     def prebalance(self, precision=10**-3):
         """
@@ -121,6 +153,9 @@ class PyTradeShifts:
         Returns:
             None
         """
+        assert self.prebalanced is False
+        self.prebalanced = True
+
         # this is virtually 1:1 as in Croft et al.
         test = (
             self.production_data
@@ -155,11 +190,14 @@ class PyTradeShifts:
         Returns:
             None
         """
+        assert self.no_trade_removed is False
+        self.no_trade_removed = True
+
         # b_ signifies boolean here, these are filtering masks
-        b_zero_prod = self.production_data == 0
-        b_zero_colsum = self.trade_matrix.sum(axis=0) == 0
-        b_zero_rowsum = self.trade_matrix.sum(axis=1) == 0
-        b_filter = ~(b_zero_prod & b_zero_rowsum & b_zero_colsum)
+        row_sums = self.trade_matrix.sum(axis=1)
+        col_sums = self.trade_matrix.sum(axis=0)
+
+        b_filter = ~(row_sums.eq(0) & col_sums.eq(0) & (self.production_data == 0))
 
         # Filter out the countries with all zeroes
         self.production_data = self.production_data[b_filter]
@@ -187,6 +225,9 @@ class PyTradeShifts:
         Returns:
             None
         """
+        assert self.reexports_corrected is False
+        self.reexports_corrected = True
+
         # I know that the variable names here are confusing, but this is a conversion
         # by the original R code from Johanna Hedlung/Croft et al.. The variable names are the
         # same as in the R code and we leave them this way, so we can more easily
@@ -207,3 +248,145 @@ class PyTradeShifts:
         self.trade_matrix = pd.DataFrame(
             R, index=self.trade_matrix.index, columns=self.trade_matrix.columns
         )
+
+    def build_graph(self):
+        """
+        Builds a directed and weighted graph from the trade matrix.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        assert self.trade_graph is None
+        # only build the graph if all the prep is done
+        assert self.prebalanced is True
+        assert self.reexports_corrected is True
+        assert self.no_trade_removed is True
+        assert self.threshold is not None
+
+        # Build the graph
+        # Initialize a directed graph
+        trade_graph = nx.DiGraph()
+
+        # Iterate over the dataframe to add nodes and edges
+        for source_country in self.trade_matrix.index:
+            for destination_country in self.trade_matrix.columns:
+                # Don't add self-loops
+                if source_country == destination_country:
+                    continue
+                # Get the trade amount
+                trade_amount = self.trade_matrix.loc[source_country, destination_country]
+
+                # Add nodes if not already in the graph
+                trade_graph.add_node(source_country)
+                trade_graph.add_node(destination_country)
+
+                # Add edge if trade amount is non-zero
+                if trade_amount != 0:
+                    trade_graph.add_edge(source_country, destination_country, weight=trade_amount)
+
+        self.trade_graph = trade_graph
+
+    def find_trade_communities(self):
+        """
+        Finds the trade communities in the trade graph using the Louvain algorithm.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        assert self.trade_graph is not None
+        assert self.trade_communities is None
+        # Find the communities
+        trade_communities = nx.community.louvain_communities(self.trade_graph)
+        # Remove all the communities with only one country
+        trade_communities = [c for c in trade_communities if len(c) > 1]
+        self.trade_communities = trade_communities
+
+    def plot_trade_communities(self):
+        """
+        Plots the trade communities in the trade graph on a world map.
+
+        Arguments:
+            save (bool, optional): Whether to save the plot or not.
+
+        Returns:
+            None
+        """
+        assert self.trade_communities is not None
+
+        # get the world map
+        world = gpd.read_file(
+            "." +
+            os.sep
+            + "data"
+            + os.sep
+            + "geospatial_references"
+            + os.sep
+            + "ne_110m_admin_0_countries"
+            + os.sep
+            + "ne_110m_admin_0_countries.shp"
+        )
+        world = world.to_crs('+proj=wintri')  # Change projection to Winkel Tripel
+
+        # Create a dictionary with the countries and which community they belong to
+        # The communities are numbered from 0 to n
+        country_community = {}
+        for i, community in enumerate(self.trade_communities):
+            for country in community:
+                # Convert to standard short names
+                country_short = coco.convert(names=country, to="name_short")
+                country_community[country_short] = i
+
+        world["names_short"] = world["ADMIN"].apply(coco.convert, to="name_short")
+
+        # Join the country_community dictionary to the world dataframe
+        world["community"] = world["names_short"].map(country_community)
+
+        # Plot the world map and color the countries according to their community
+        fig, ax = plt.subplots(figsize=(10, 6))
+        world.plot(
+            ax=ax,
+            column="community",
+            cmap="tab20",
+            missing_kwds={"color": "lightgrey"},
+            legend=False,
+        )
+
+        plot_winkel_tripel_map(ax)
+
+        # Add a title
+        ax.set_title(
+            f"Trade communities for {self.crop} with base year {self.base_year}",
+            fontsize=18,
+        )
+
+        # save the plot
+        plt.savefig(
+            "."
+            + os.sep
+            + "results"
+            + os.sep
+            + "figures"
+            + os.sep
+            + f"{self.crop}_{self.base_year}_{self.region}_trade_communities.png",
+            dpi=300,
+            bbox_inches="tight",
+        )
+
+
+def plot_winkel_tripel_map(ax):
+    """
+    Helper function to plot a Winkel Tripel map with a border.
+    """
+    border_geojson = gpd.read_file('https://raw.githubusercontent.com/JuanesLamilla/winkel-tripel-border/main/border.geojson')
+    border_geojson.plot(ax=ax, edgecolor='black', linewidth=0.1, facecolor='none')
+    ax.grid(False)
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+
