@@ -271,8 +271,6 @@ def rename_countries(
         if "China; Taiwan Province of" in data.columns:
             data.rename(columns={"China; Taiwan Province of": "Taiwan"}, inplace=True)
 
-
-
     return data
 
 
