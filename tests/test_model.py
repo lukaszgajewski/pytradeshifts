@@ -246,5 +246,24 @@ def test_removing_low_trade_countries_global():
     removing_low_trade_countries("Global")
 
 
+def test_build_graph():
+    """
+    Builds a graph from the trade matrix and checks if it has the
+    same dimensions as the trade matrix.
+    """
+    Wheat2018 = PyTradeShifts("Wheat", "Y2018", region="Global")
+
+    # Build the graph
+    Wheat2018.build_graph()
+
+    assert Wheat2018.trade_graph is not None
+
+    # Check is the graph has the same number of
+    # nodes as the trade matrix has unique countries in rows and columns
+    assert Wheat2018.trade_graph.number_of_nodes() == len(
+        np.unique(Wheat2018.trade_matrix.index)
+    )
+
+
 if __name__ == "__main__":
     reexport("Global")
