@@ -36,6 +36,7 @@ class PyTradeShifts:
         self.prebalanced = False
         self.reexports_corrected = False
         self.no_trade_removed = False
+        self.trade_communities = None
 
         # Don't run the methods if we are testing, so we can test them individually
         if not testing:
@@ -121,12 +122,13 @@ class PyTradeShifts:
         )
         # Set all values to 0 which are below the threshold
         self.trade_matrix[self.trade_matrix < threshold] = 0
-        
+
         # b_ signifies boolean here, these are filtering masks
         row_sums = self.trade_matrix.sum(axis=1)
         col_sums = self.trade_matrix.sum(axis=0)
 
         b_filter = ~(row_sums.eq(0) & col_sums.eq(0))
+        # Filter out the countries with all zeroes in trade
         self.trade_matrix = self.trade_matrix.loc[b_filter, b_filter]
 
         print(f"Removed countries with trade below the {int(self.percentile*100)}th percentile.")
@@ -281,3 +283,20 @@ class PyTradeShifts:
 
         self.trade_graph = trade_graph
 
+    def find_trade_communities(self):
+        """
+        Finds the trade communities in the trade graph using the Louvain algorithm.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        assert self.trade_graph is not None
+        assert self.trade_communities is None
+        # Find the communities
+        trade_communities = nx.community.louvain_communities(self.trade_graph)
+        # Remove all the communities with only one country
+        trade_communities = [c for c in trade_communities if len(c) > 1]
+        self.trade_communities = trade_communities

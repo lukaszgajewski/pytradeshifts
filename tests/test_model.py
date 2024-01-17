@@ -264,6 +264,35 @@ def test_build_graph():
         np.unique(Wheat2018.trade_matrix.index)
     )
 
+def test_find_communities():
+    """
+    Builds a graph from the trade matrix and finds the trade communities.
+    """
+    Wheat2018 = PyTradeShifts("Wheat", "Y2018", region="Global")
+
+    # Build the graph
+    Wheat2018.build_graph()
+
+    # Find the communities
+    Wheat2018.find_trade_communities()
+
+    assert Wheat2018.trade_communities is not None
+
+    # The resulting communities should be a list of sets
+    assert isinstance(Wheat2018.trade_communities, list)
+    assert isinstance(Wheat2018.trade_communities[0], set)
+
+    # At least one community should contain both Brazil and Chile
+    assert any({"Brazil", "Chile"} <= community for community in Wheat2018.trade_communities)
+    # Another community should contain both Germany and France
+    assert any({"Germany", "France"} <= community for community in Wheat2018.trade_communities)
+    # Canada and the US should be in the same community
+    assert any(
+        {
+            "Canada", "United States of America"
+        } <= community for community in Wheat2018.trade_communities
+    )
+
 
 if __name__ == "__main__":
     reexport("Global")
