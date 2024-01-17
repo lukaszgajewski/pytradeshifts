@@ -41,10 +41,10 @@ class PyTradeShifts:
         if not testing:
             # Read in the data
             self.load_data()
+            # Remove countries with all zeroes in trade and production
+            self.remove_net_zero_countries()
             # Prebalance the trade matrix
             self.prebalance()
-            # Remove countries with all zeroes
-            self.remove_net_zero_countries()
             # Remove re-exports
             self.correct_reexports()
             # Remove countries with low trade
@@ -182,10 +182,10 @@ class PyTradeShifts:
         self.no_trade_removed = True
 
         # b_ signifies boolean here, these are filtering masks
-        b_zero_prod = self.production_data == 0
-        b_zero_colsum = self.trade_matrix.sum(axis=0) == 0
-        b_zero_rowsum = self.trade_matrix.sum(axis=1) == 0
-        b_filter = ~(b_zero_prod & b_zero_rowsum & b_zero_colsum)
+        row_sums = self.trade_matrix.sum(axis=1)
+        col_sums = self.trade_matrix.sum(axis=0)
+
+        b_filter = ~(row_sums.eq(0) & col_sums.eq(0) & (self.production_data == 0))
 
         # Filter out the countries with all zeroes
         self.production_data = self.production_data[b_filter]
@@ -252,4 +252,3 @@ class PyTradeShifts:
         assert self.prebalanced is True
         assert self.reexports_corrected is True
         assert self.no_trade_removed is True
-
