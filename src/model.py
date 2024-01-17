@@ -3,6 +3,12 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 import os
+import geopandas as gpd
+import country_converter as coco
+
+plt.style.use(
+    "https://raw.githubusercontent.com/allfed/ALLFED-matplotlib-style-sheet/main/ALLFED.mplstyle"
+)
 
 
 class PyTradeShifts:
@@ -300,3 +306,81 @@ class PyTradeShifts:
         # Remove all the communities with only one country
         trade_communities = [c for c in trade_communities if len(c) > 1]
         self.trade_communities = trade_communities
+
+    def plot_trade_communities(self):
+        """
+        Plots the trade communities in the trade graph on a world map.
+
+        Arguments:
+            save (bool, optional): Whether to save the plot or not.
+
+        Returns:
+            None
+        """
+        assert self.trade_communities is not None
+
+        # get the world map
+        world = gpd.read_file(
+            "." +
+            os.sep
+            + "data"
+            + os.sep
+            + "geospatial_references"
+            + os.sep
+            + "ne_110m_admin_0_countries"
+            + os.sep
+            + "ne_110m_admin_0_countries.shp"
+        )
+        world = world.to_crs('+proj=wintri')  # Change projection to Winkel Tripel
+
+        # Create a dictionary with the countries and which community they belong to
+        # The communities are numbered from 0 to n
+        country_community = {}
+        for i, community in enumerate(self.trade_communities):
+            for country in community:
+                # Convert to standard short names
+                country_short = coco.convert(names=country, to="name_short")
+                country_community[country_short] = i
+
+        world["names_short"] = world["ADMIN"].apply(coco.convert, to="name_short")
+
+        # Join the country_community dictionary to the world dataframe
+        world["community"] = world["names_short"].map(country_community)
+
+        # Plot the world map and color the countries according to their community
+        fig, ax = plt.subplots(figsize=(10, 6))
+        world.plot(
+            ax=ax,
+            column="community",
+            cmap="tab20",
+            missing_kwds={"color": "lightgrey"},
+            legend=False,
+        )
+
+        plot_winkel_tripel_map(ax)
+
+        # save the plot
+        plt.savefig(
+            "."
+            + os.sep
+            + "results"
+            + os.sep
+            + "figures"
+            + os.sep
+            + f"{self.crop}_{self.base_year}_{self.region}_trade_communities.png",
+            dpi=300,
+            bbox_inches="tight",
+        )
+
+
+def plot_winkel_tripel_map(ax):
+    """
+    Helper function to plot a Winkel Tripel map with a border.
+    """
+    border_geojson = gpd.read_file('https://raw.githubusercontent.com/JuanesLamilla/winkel-tripel-border/main/border.geojson')
+    border_geojson.plot(ax=ax, edgecolor='black', linewidth=0.1, facecolor='none')
+    ax.grid(False)
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+

@@ -258,9 +258,20 @@ def rename_countries(
     for code in data.index:
         data.rename(index={code: codes_dict[code]}, inplace=True)
 
+    # Also rename China; Taiwan Province of to Taiwan, so we don't run into
+    # problems later on with the country names
+    if "China; Taiwan Province of" in data.index:
+        data.rename(index={"China; Taiwan Province of": "Taiwan"}, inplace=True)
+    
     if isinstance(data, pd.DataFrame):
         for code in data.columns:
             data.rename(columns={code: codes_dict[code]}, inplace=True)
+        # Also rename China; Taiwan Province of to Taiwan, so we don't run into
+        # problems later on with the country names
+        if "China; Taiwan Province of" in data.columns:
+            data.rename(columns={"China; Taiwan Province of": "Taiwan"}, inplace=True)
+
+
 
     return data
 
