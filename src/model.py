@@ -359,6 +359,12 @@ class PyTradeShifts:
 
         plot_winkel_tripel_map(ax)
 
+        # Add a title
+        ax.set_title(
+            f"Trade communities for {self.crop} with base year {self.base_year}",
+            fontsize=18,
+        )
+
         # save the plot
         plt.savefig(
             "."
