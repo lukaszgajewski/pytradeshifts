@@ -29,7 +29,7 @@ class PyTradeShifts:
         self.crop = crop
         self.percentile = percentile
         self.region = region
-        self.graph = None
+        self.trade_graph = None
         self.trade_matrix = None
         self.production_data = None
         self.threshold = None
@@ -121,9 +121,13 @@ class PyTradeShifts:
         )
         # Set all values to 0 which are below the threshold
         self.trade_matrix[self.trade_matrix < threshold] = 0
-        # Remove all countries which have no trade
-        self.trade_matrix = self.trade_matrix.loc[self.trade_matrix.sum(axis=1) > 0, :]
-        self.trade_matrix = self.trade_matrix.loc[:, self.trade_matrix.sum(axis=0) > 0]
+        
+        # b_ signifies boolean here, these are filtering masks
+        row_sums = self.trade_matrix.sum(axis=1)
+        col_sums = self.trade_matrix.sum(axis=0)
+
+        b_filter = ~(row_sums.eq(0) & col_sums.eq(0))
+        self.trade_matrix = self.trade_matrix.loc[b_filter, b_filter]
 
         print(f"Removed countries with trade below the {int(self.percentile*100)}th percentile.")
 
@@ -247,8 +251,33 @@ class PyTradeShifts:
         Returns:
             None
         """
-        assert self.graph is None
+        assert self.trade_graph is None
         # only build the graph if all the prep is done
         assert self.prebalanced is True
         assert self.reexports_corrected is True
         assert self.no_trade_removed is True
+        assert self.threshold is not None
+
+        # Build the graph
+        # Initialize a directed graph
+        trade_graph = nx.DiGraph()
+
+        # Iterate over the dataframe to add nodes and edges
+        for source_country in self.trade_matrix.index:
+            for destination_country in self.trade_matrix.columns:
+                # Don't add self-loops
+                if source_country == destination_country:
+                    continue
+                # Get the trade amount
+                trade_amount = self.trade_matrix.loc[source_country, destination_country]
+
+                # Add nodes if not already in the graph
+                trade_graph.add_node(source_country)
+                trade_graph.add_node(destination_country)
+
+                # Add edge if trade amount is non-zero
+                if trade_amount != 0:
+                    trade_graph.add_edge(source_country, destination_country, weight=trade_amount)
+
+        self.trade_graph = trade_graph
+
