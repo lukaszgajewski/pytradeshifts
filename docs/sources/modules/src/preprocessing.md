@@ -84,7 +84,7 @@ None
 ```python
 ._prep_trade_matrix(
    trade_pkl: str, item: str, unit = 'tonnes', element = 'ExportQuantity',
-   year = 'Y2021'
+   year = 'Y2018'
 )
 ```
 
@@ -118,7 +118,7 @@ Notes:
 [source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L124)
 ```python
 ._prep_production_vector(
-   production_pkl: str, item = 'Wheat', unit = 't', year = 'Y2021'
+   production_pkl: str, item = 'Wheat', unit = 't', year = 'Y2018'
 )
 ```
 
@@ -182,7 +182,7 @@ Missing values are replaced by 0.
 ```python
 .format_prod_trad_data(
    production_pkl: str, trade_pkl: str, item: str, production_unit = 't',
-   trade_unit = 'tonnes', element = 'ExportQuantity', year = 'Y2021'
+   trade_unit = 'tonnes', element = 'ExportQuantity', year = 'Y2018'
 )
 ```
 
@@ -246,7 +246,7 @@ Rename country codes with country names in either production or trade data.
 
 
 ### remove_entries_from_data
-[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L268)
+[source](https://github.com/allfed/My-Super-Cool-Respository/blob/master/src/preprocessing.py/#L277)
 ```python
 .remove_entries_from_data(
    data: (pd.Series|pd.DataFrame)

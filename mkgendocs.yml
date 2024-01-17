@@ -22,8 +22,3 @@ pages:
       - rename_countries
       - remove_entries_from_data
 
-  - page: "modules/src/model.md"
-    source: "src/model.py"
-    classes:
-      - PyTradeShifts
-
