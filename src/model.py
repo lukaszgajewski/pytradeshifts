@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import networkx as nx
+import matplotlib.pyplot as plt
 import os
 
 
@@ -27,13 +29,20 @@ class PyTradeShifts:
         self.crop = crop
         self.percentile = percentile
         self.region = region
+        self.graph = None
+        self.trade_matrix = None
+        self.production_data = None
+        self.threshold = None
+        self.prebalanced = False
+        self.reexports_corrected = False
+        self.no_trade_removed = False
 
         # Don't run the methods if we are testing, so we can test them individually
         if not testing:
             # Read in the data
             self.load_data()
             # Prebalance the trade matrix
-            self.prebalance(self.production_data, self.trade_matrix)
+            self.prebalance()
             # Remove countries with all zeroes
             self.remove_net_zero_countries()
             # Remove re-exports
@@ -52,6 +61,7 @@ class PyTradeShifts:
         Returns:
             None
         """
+        assert self.trade_matrix is None
         # Read in the data
         trade_matrix = pd.read_csv(
             "."
@@ -100,6 +110,10 @@ class PyTradeShifts:
         Returns:
             None
         """
+        # Make sure the data is loaded and no threshold is calculated yet
+        assert self.trade_matrix is not None
+        assert self.percentile is not None
+        assert self.threshold is None
         # Calculate the percentile out of all values in the trade matrix. This
         # only considers the values above 0.
         threshold = np.percentile(
@@ -113,6 +127,9 @@ class PyTradeShifts:
 
         print(f"Removed countries with trade below the {int(self.percentile*100)}th percentile.")
 
+        # Save threshold for testing purposes
+        self.threshold = threshold
+
     def prebalance(self, precision=10**-3):
         """
         This implementation also includes pre-balancing to ensure that countries don't
@@ -124,6 +141,9 @@ class PyTradeShifts:
         Returns:
             None
         """
+        assert self.prebalanced is False
+        self.prebalanced = True
+
         # this is virtually 1:1 as in Croft et al.
         test = (
             self.production_data
@@ -158,6 +178,9 @@ class PyTradeShifts:
         Returns:
             None
         """
+        assert self.no_trade_removed is False
+        self.no_trade_removed = True
+
         # b_ signifies boolean here, these are filtering masks
         b_zero_prod = self.production_data == 0
         b_zero_colsum = self.trade_matrix.sum(axis=0) == 0
@@ -190,6 +213,9 @@ class PyTradeShifts:
         Returns:
             None
         """
+        assert self.reexports_corrected is False
+        self.reexports_corrected = True
+
         # I know that the variable names here are confusing, but this is a conversion
         # by the original R code from Johanna Hedlung/Croft et al.. The variable names are the
         # same as in the R code and we leave them this way, so we can more easily
@@ -210,3 +236,20 @@ class PyTradeShifts:
         self.trade_matrix = pd.DataFrame(
             R, index=self.trade_matrix.index, columns=self.trade_matrix.columns
         )
+
+    def build_graph(self):
+        """
+        Builds a directed and weighted graph from the trade matrix.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        assert self.graph is None
+        # only build the graph if all the prep is done
+        assert self.prebalanced is True
+        assert self.reexports_corrected is True
+        assert self.no_trade_removed is True
+
