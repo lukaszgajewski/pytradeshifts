@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import os
 import geopandas as gpd
 import country_converter as coco
+from matplotlib.colors import ListedColormap
+import seaborn as sns
 
 plt.style.use(
     "https://raw.githubusercontent.com/allfed/ALLFED-matplotlib-style-sheet/main/ALLFED.mplstyle"
@@ -289,7 +291,7 @@ class PyTradeShifts:
 
         self.trade_graph = trade_graph
 
-    def find_trade_communities(self):
+    def find_trade_communities(self, keep_singletons=False):
         """
         Finds the trade communities in the trade graph using the Louvain algorithm.
 
@@ -302,9 +304,17 @@ class PyTradeShifts:
         assert self.trade_graph is not None
         assert self.trade_communities is None
         # Find the communities
-        trade_communities = nx.community.louvain_communities(self.trade_graph)
-        # Remove all the communities with only one country
-        trade_communities = [c for c in trade_communities if len(c) > 1]
+        trade_communities = nx.community.louvain_communities(self.trade_graph, seed=1)
+        # Remove all the communities with only one country and print the names of the
+        # communities that are removed
+        if keep_singletons:
+            print("Keeping communities with only one country.")
+        else:
+            for community in list(trade_communities):
+                if len(community) == 1:
+                    trade_communities.remove(community)
+                    print(f"Removed community {community} with only one country.")
+
         self.trade_communities = trade_communities
 
     def plot_trade_communities(self):
@@ -348,11 +358,12 @@ class PyTradeShifts:
         world["community"] = world["names_short"].map(country_community)
 
         # Plot the world map and color the countries according to their community
+        cmap = ListedColormap(sns.color_palette("deep", len(self.trade_communities)).as_hex())
         fig, ax = plt.subplots(figsize=(10, 6))
         world.plot(
             ax=ax,
             column="community",
-            cmap="tab20",
+            cmap=cmap,
             missing_kwds={"color": "lightgrey"},
             legend=False,
         )
@@ -388,5 +399,3 @@ def plot_winkel_tripel_map(ax):
     ax.grid(False)
     ax.set_xticks([])
     ax.set_yticks([])
-
-
