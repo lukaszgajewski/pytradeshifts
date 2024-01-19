@@ -7,6 +7,8 @@ import geopandas as gpd
 import country_converter as coco
 from matplotlib.colors import ListedColormap
 import seaborn as sns
+from src.preprocessing import main as preprocessing_main
+from src.utils import plot_winkel_tripel_map
 
 plt.style.use(
     "https://raw.githubusercontent.com/allfed/ALLFED-matplotlib-style-sheet/main/ALLFED.mplstyle"
@@ -25,29 +27,54 @@ class PyTradeShifts:
             are built relative to this year.
         percentile (float): The percentile to use for removing countries with
             low trade.
+        region (str): The region to extract data for.
+        testing (bool): Whether to run the methods or not. This is only used for
+            testing purposes.
+        scenario_name (str, optional): The name of the scenario to apply.
+            If None, no scenario is applied.
+        scenario_file_name (str, optional): The path to the scenario file.
+            If None, no scenario is applied.
+        with_preprocessing (bool, optional): Whether to run the preprocessing
+            or not.
 
     Returns:
         None
     """
 
     def __init__(
-        self, crop, base_year, percentile=0.75, region="Global", testing=False
+        self,
+        crop,
+        base_year,
+        percentile=0.75,
+        region="Global",
+        testing=False,
+        scenario_name=None,
+        scenario_file_name=None,
+        with_preprocessing=False,
     ):
-        self.base_year = base_year
+        # Save the arguments
         self.crop = crop
+        self.base_year = base_year
         self.percentile = percentile
         self.region = region
+        self.scenario_name = scenario_name
+        self.scenario_path = scenario_file_name
+        # State variables to keep track of the progress
+        self.prebalanced = False
+        self.reexports_corrected = False
+        self.no_trade_removed = False
+        self.scenario_run = False
+        # variables to keep track of the results
         self.trade_graph = None
         self.trade_matrix = None
         self.production_data = None
         self.threshold = None
-        self.prebalanced = False
-        self.reexports_corrected = False
-        self.no_trade_removed = False
         self.trade_communities = None
 
         # Don't run the methods if we are testing, so we can test them individually
         if not testing:
+            if with_preprocessing:
+                preprocessing_main(self.crop, self.base_year, self.region)
             # Read in the data
             self.load_data()
             # Remove countries with all zeroes in trade and production
@@ -58,6 +85,14 @@ class PyTradeShifts:
             self.correct_reexports()
             # Remove countries with low trade
             self.remove_below_percentile()
+            if scenario_name is not None:
+                self.apply_scenario()
+            # Build the graph
+            self.build_graph()
+            # Find the trade communities
+            self.find_trade_communities()
+            # Plot the trade communities
+            self.plot_trade_communities()
 
     def load_data(self):
         """
@@ -227,6 +262,8 @@ class PyTradeShifts:
         Returns:
             None
         """
+        assert self.prebalanced is True
+        assert self.no_trade_removed is True
         assert self.reexports_corrected is False
         self.reexports_corrected = True
 
@@ -250,6 +287,35 @@ class PyTradeShifts:
         self.trade_matrix = pd.DataFrame(
             R, index=self.trade_matrix.index, columns=self.trade_matrix.columns
         )
+
+    def apply_scenario(self):
+        """
+        Loads the scenario files unifies the names and applies the scenario to the trade matrix.
+        by multiplying the trade matrix with the scenario scalar.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        assert self.scenario_run is False
+        self.scenario_run = True
+
+        # Read in the scenario data
+        scenario_data = pd.read_csv(
+            self.scenario_path,
+            index_col=0,
+        )
+
+        # Convert the country names to the same format as in the trade matrix
+        scenario_data.index = scenario_data.index.map(coco.convert, to="name_short")
+
+        # Make sure that the scenario data and the trade matrix have the same countries
+        assert np.all(np.isin(scenario_data.index, self.trade_matrix.index))
+
+        # Multiply the trade matrix with the scenario data
+        self.trade_matrix = self.trade_matrix * scenario_data
 
     def build_graph(self):
         """
@@ -370,10 +436,10 @@ class PyTradeShifts:
 
         plot_winkel_tripel_map(ax)
 
-        # Add a title
+        # Add a title with self.scenario_name if applicable
         ax.set_title(
-            f"Trade communities for {self.crop} with base year {self.base_year}",
-            fontsize=18,
+            f"Trade communities for {self.crop} with base year {self.base_year[1:]}"
+            + (f" in scenario: {self.scenario_name}" if self.scenario_name is not None else "(no scenario)")
         )
 
         # save the plot
@@ -384,18 +450,9 @@ class PyTradeShifts:
             + os.sep
             + "figures"
             + os.sep
-            + f"{self.crop}_{self.base_year}_{self.region}_trade_communities.png",
+            + f"{self.crop}_{self.base_year}_{self.region}_"
+            + (f"_{self.scenario_name}" if self.scenario_name is not None else "no_scenario")
+            + "_trade_communities.png",
             dpi=300,
             bbox_inches="tight",
         )
-
-
-def plot_winkel_tripel_map(ax):
-    """
-    Helper function to plot a Winkel Tripel map with a border.
-    """
-    border_geojson = gpd.read_file('https://raw.githubusercontent.com/JuanesLamilla/winkel-tripel-border/main/border.geojson')
-    border_geojson.plot(ax=ax, edgecolor='black', linewidth=0.1, facecolor='none')
-    ax.grid(False)
-    ax.set_xticks([])
-    ax.set_yticks([])
