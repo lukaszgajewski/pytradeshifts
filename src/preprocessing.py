@@ -1,6 +1,13 @@
 import pandas as pd
 import os
+import country_converter as coco
+import logging
 from zipfile import ZipFile
+
+# This is just to keep the output clean, as otherwise the coco packages notifies
+# you about every regex match that did not work
+coco_logger = coco.logging.getLogger()
+coco_logger.setLevel(logging.CRITICAL)
 
 """
 Data for this project is downloaded from FAOSTAT.
@@ -251,25 +258,23 @@ def rename_countries(
         encoding="latin1",
         low_memory=False,
     )
+    # Also rename China; Taiwan Province of to Taiwan, so we don't run into
+    # problems later on with the country names
+    codes.loc[codes["Area"] == "China; Taiwan Province of", "Area"] = "Taiwan"
+
     # Create a dictionary with the country codes as keys and country names as values
-    codes_dict = dict(zip(codes[code_type], codes["Area"]))
+    cc = coco.CountryConverter()
+    codes_area_short = cc.pandas_convert(pd.Series(codes["Area"]), to="name_short")
+
+    codes_dict = dict(zip(codes[code_type], codes_area_short))
 
     print(f"Replacing country codes with country names in {filename.split('_')[0]} data")
     for code in data.index:
         data.rename(index={code: codes_dict[code]}, inplace=True)
 
-    # Also rename China; Taiwan Province of to Taiwan, so we don't run into
-    # problems later on with the country names
-    if "China; Taiwan Province of" in data.index:
-        data.rename(index={"China; Taiwan Province of": "Taiwan"}, inplace=True)
-    
     if isinstance(data, pd.DataFrame):
         for code in data.columns:
             data.rename(columns={code: codes_dict[code]}, inplace=True)
-        # Also rename China; Taiwan Province of to Taiwan, so we don't run into
-        # problems later on with the country names
-        if "China; Taiwan Province of" in data.columns:
-            data.rename(columns={"China; Taiwan Province of": "Taiwan"}, inplace=True)
 
     return data
 
@@ -322,12 +327,6 @@ def remove_entries_from_data(data: pd.Series | pd.DataFrame) -> pd.Series | pd.D
         # We want to look at China and Taiwan seperately, so this is not needed
         # as 159 refers to China incl. Taiwan
         "China": "'159",
-        # No reliable data available, therefore they are excluded
-        # This assessment is based on the fact that all of these countries
-        # don't show up as a partner country in the trade data of the FAO
-        # "Democratic People's Republic of Korea": "'408",
-        # "Chad": "'148",
-        # "South Sudan": "'728",
     }
 
     # Remove the entries

@@ -8,7 +8,7 @@ def loading(region):
     """
     Just loads the data to make sure it is loaded correctly.
     """
-    Wheat2018 = PyTradeShifts("Wheat", "Y2018", region=region, testing=True)
+    Wheat2018 = PyTradeShifts("Wheat", 2018, region=region, testing=True)
     Wheat2018.load_data()
 
     # Make sure the data is loaded correctly
@@ -35,7 +35,7 @@ def removing_countries_with_zeros(region):
     Runs the model with prebalancing and compares the results with the
     results from the R script.
     """
-    Wheat2018 = PyTradeShifts("Wheat", "Y2018", region=region, testing=True)
+    Wheat2018 = PyTradeShifts("Wheat", 2018, region=region, testing=True)
 
     # Load the data
     Wheat2018.load_data()
@@ -87,7 +87,7 @@ def prebalancing(region):
     Runs the model with prebalancing and compares the results with the
     results from the R script.
     """
-    Wheat2018 = PyTradeShifts("Wheat", "Y2018", region=region, testing=True)
+    Wheat2018 = PyTradeShifts("Wheat", 2018, region=region, testing=True)
 
     # Load the data
     Wheat2018.load_data()
@@ -141,7 +141,7 @@ def reexport(region):
     Runs the model with prebalancing and compares the results with the
     results from the R script.
     """
-    Wheat2018 = PyTradeShifts("Wheat", "Y2018", region=region, testing=True)
+    Wheat2018 = PyTradeShifts("Wheat", 2018, region=region, testing=True)
 
     # Load the data
     Wheat2018.load_data()
@@ -203,7 +203,7 @@ def removing_low_trade_countries(region):
     Runs the model with prebalancing, prebalancing, removing re-exports
     and removing countries with low trade and check if this worked out. 
     """
-    Wheat2018 = PyTradeShifts("Wheat", "Y2018", region=region, testing=True)
+    Wheat2018 = PyTradeShifts("Wheat", 2018, region=region, testing=True)
 
     # Load the data
     Wheat2018.load_data()
@@ -251,7 +251,22 @@ def test_build_graph():
     Builds a graph from the trade matrix and checks if it has the
     same dimensions as the trade matrix.
     """
-    Wheat2018 = PyTradeShifts("Wheat", "Y2018", region="Global")
+    Wheat2018 = PyTradeShifts("Wheat", 2018, region="Global", testing=True)
+
+    # Load the data
+    Wheat2018.load_data()
+    
+    # Remove countries with zero trade
+    Wheat2018.remove_net_zero_countries()
+
+    # Run the prebalancing
+    Wheat2018.prebalance()
+
+    # Reexport
+    Wheat2018.correct_reexports()
+
+    # Remove countries with low trade
+    Wheat2018.remove_below_percentile()
 
     # Build the graph
     Wheat2018.build_graph()
@@ -264,11 +279,27 @@ def test_build_graph():
         np.unique(Wheat2018.trade_matrix.index)
     )
 
+
 def test_find_communities():
     """
     Builds a graph from the trade matrix and finds the trade communities.
     """
-    Wheat2018 = PyTradeShifts("Wheat", "Y2018", region="Global")
+    Wheat2018 = PyTradeShifts("Wheat", 2018, region="Global", testing=True)
+
+    # Load the data
+    Wheat2018.load_data()
+    
+    # Remove countries with zero trade
+    Wheat2018.remove_net_zero_countries()
+
+    # Run the prebalancing
+    Wheat2018.prebalance()
+
+    # Reexport
+    Wheat2018.correct_reexports()
+
+    # Remove countries with low trade
+    Wheat2018.remove_below_percentile()
 
     # Build the graph
     Wheat2018.build_graph()
@@ -289,10 +320,59 @@ def test_find_communities():
     # Canada and the US should be in the same community
     assert any(
         {
-            "Canada", "United States of America"
+            "Canada", "United States"
         } <= community for community in Wheat2018.trade_communities
     )
 
 
+def test_apply_scenario():
+    """
+    Builds a graph from the trade matrix and finds the trade communities.
+    """
+    Wheat2018 = PyTradeShifts(
+        "Wheat",
+        2018,
+        region="Global",
+        testing=True,
+        scenario_name="ISIMIP",
+        scenario_file_name="ISIMIP_wheat_Hedlung.csv",
+    )
+
+    # Load the data
+    Wheat2018.load_data()
+    
+    # Remove countries with zero trade
+    Wheat2018.remove_net_zero_countries()
+
+    # Run the prebalancing
+    Wheat2018.prebalance()
+
+    # Reexport
+    Wheat2018.correct_reexports()
+
+    # Remove countries with low trade
+    Wheat2018.remove_below_percentile()
+
+    print(Wheat2018.trade_matrix.shape)
+
+    # Apply the scenario
+    Wheat2018.apply_scenario()
+
+    print(Wheat2018.trade_matrix.shape)
+
+    # Build the graph
+    Wheat2018.build_graph()
+
+    # Find the communities
+    Wheat2018.find_trade_communities()
+
+    # Check if the amount of trade for some countries has been reduced by the right amount
+    aus_ban = 0.50777499999999998 * 91600.6390029294
+    assert round(Wheat2018.trade_matrix.loc["Australia", "Bangladesh"], 2) == round(aus_ban, 2)
+
+    # Check if a country which is not in the scenario has been removed
+    assert "Indonesia" not in Wheat2018.trade_matrix.index
+
+
 if __name__ == "__main__":
-    reexport("Global")
+    test_apply_scenario()
