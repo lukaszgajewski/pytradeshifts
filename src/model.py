@@ -54,11 +54,11 @@ class PyTradeShifts:
     ):
         # Save the arguments
         self.crop = crop
-        self.base_year = base_year
+        self.base_year = "Y"+str(base_year)
         self.percentile = percentile
         self.region = region
         self.scenario_name = scenario_name
-        self.scenario_path = scenario_file_name
+        self.scenario_file_name = scenario_file_name
         # State variables to keep track of the progress
         self.prebalanced = False
         self.reexports_corrected = False
@@ -299,23 +299,48 @@ class PyTradeShifts:
         Returns:
             None
         """
+        assert self.scenario_name is not None
+        assert self.scenario_file_name is not None
         assert self.scenario_run is False
         self.scenario_run = True
 
         # Read in the scenario data
         scenario_data = pd.read_csv(
-            self.scenario_path,
+            "."
+            + os.sep
+            + "data"
+            + os.sep
+            + "scenario_files"
+            + os.sep
+            + self.scenario_file_name,
             index_col=0,
         )
+        # Drop all NaNs
+        scenario_data = scenario_data.dropna()
 
+        cc = coco.CountryConverter()
         # Convert the country names to the same format as in the trade matrix
-        scenario_data.index = scenario_data.index.map(coco.convert, to="name_short")
+        scenario_data.index = cc.pandas_convert(pd.Series(scenario_data.index), to="name_short")
 
-        # Make sure that the scenario data and the trade matrix have the same countries
-        assert np.all(np.isin(scenario_data.index, self.trade_matrix.index))
+        # Only keep the countries that are in the trade matrix index, trade matrix columns and
+        # the scenario data
+        countries = np.intersect1d(
+            np.intersect1d(self.trade_matrix.index, self.trade_matrix.columns),
+            scenario_data.index,
+        )
+        self.trade_matrix = self.trade_matrix.loc[countries, countries]
+        scenario_data = scenario_data.loc[countries]
 
-        # Multiply the trade matrix with the scenario data
-        self.trade_matrix = self.trade_matrix * scenario_data
+        # Sort the indices
+        self.trade_matrix = self.trade_matrix.sort_index(axis=0).sort_index(axis=1)
+        scenario_data = scenario_data.sort_index()
+
+        # Make sure the indices + columns are the same
+        assert self.trade_matrix.index.equals(self.trade_matrix.columns)
+        assert self.trade_matrix.index.equals(scenario_data.index)
+
+        # Multiply all the columns with the scenario data
+        self.trade_matrix = self.trade_matrix.mul(scenario_data.values, axis=1)
 
     def build_graph(self):
         """
