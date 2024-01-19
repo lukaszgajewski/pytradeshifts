@@ -294,6 +294,9 @@ class PyTradeShifts:
         Loads the scenario files unifies the names and applies the scenario to the trade matrix.
         by multiplying the trade matrix with the scenario scalar.
 
+        This assumes that the scenario file consists of a csv file with the country names
+        as the index and the changes in production as the only column.
+
         Arguments:
             None
 
@@ -315,7 +318,17 @@ class PyTradeShifts:
             + os.sep
             + self.scenario_file_name,
             index_col=0,
-        )
+        ).squeeze()
+
+        assert isinstance(scenario_data, pd.Series)
+
+        # Make sure that all the values are below -100 and +100, as this is a percentage change
+        assert scenario_data.max() <= 100
+        assert scenario_data.min() >= -100
+
+        # Convert the percentage change to a scalar, so we can multiply the trade matrix with it
+        scenario_data = 1 + scenario_data / 100
+
         # Drop all NaNs
         scenario_data = scenario_data.dropna()
 
@@ -343,7 +356,7 @@ class PyTradeShifts:
         assert self.trade_matrix.index.equals(scenario_data.index)
 
         # Multiply all the columns with the scenario data
-        self.trade_matrix = self.trade_matrix.mul(scenario_data.values, axis=1)
+        self.trade_matrix = self.trade_matrix.mul(scenario_data.values, axis=0)
 
     def build_graph(self):
         """

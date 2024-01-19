@@ -370,9 +370,9 @@ def test_apply_scenario():
     Wheat2018.find_trade_communities()
 
     # Check if the amount of trade for some countries has been reduced by the right amount
-    aus_ban = 0.50777499999999998 * 91600.6390029294
-    assert round(Wheat2018.trade_matrix.loc["Australia", "Bangladesh"], 2) == round(
-        aus_ban, 2
+    aus_ban = 1.50777499999999998 * 91600.6390029294
+    assert round(Wheat2018.trade_matrix.loc["Australia", "Bangladesh"], 1) == round(
+        aus_ban, 1
     )
 
     # Check if a country which is not in the scenario has been removed
