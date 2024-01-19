@@ -201,13 +201,13 @@ def test_reexport_global():
 def removing_low_trade_countries(region):
     """
     Runs the model with prebalancing, prebalancing, removing re-exports
-    and removing countries with low trade and check if this worked out. 
+    and removing countries with low trade and check if this worked out.
     """
     Wheat2018 = PyTradeShifts("Wheat", 2018, region=region, testing=True)
 
     # Load the data
     Wheat2018.load_data()
-    
+
     # Remove countries with zero trade
     Wheat2018.remove_net_zero_countries()
 
@@ -241,7 +241,7 @@ def test_removing_low_trade_countries_oceania():
 def test_removing_low_trade_countries_global():
     """
     Runs the model with prebalancing, prebalancing, removing re-exports
-    and removing countries with low trade and check if this worked out. 
+    and removing countries with low trade and check if this worked out.
     """
     removing_low_trade_countries("Global")
 
@@ -255,7 +255,7 @@ def test_build_graph():
 
     # Load the data
     Wheat2018.load_data()
-    
+
     # Remove countries with zero trade
     Wheat2018.remove_net_zero_countries()
 
@@ -288,7 +288,7 @@ def test_find_communities():
 
     # Load the data
     Wheat2018.load_data()
-    
+
     # Remove countries with zero trade
     Wheat2018.remove_net_zero_countries()
 
@@ -314,14 +314,17 @@ def test_find_communities():
     assert isinstance(Wheat2018.trade_communities[0], set)
 
     # At least one community should contain both Brazil and Chile
-    assert any({"Brazil", "Chile"} <= community for community in Wheat2018.trade_communities)
+    assert any(
+        {"Brazil", "Chile"} <= community for community in Wheat2018.trade_communities
+    )
     # Another community should contain both Germany and France
-    assert any({"Germany", "France"} <= community for community in Wheat2018.trade_communities)
+    assert any(
+        {"Germany", "France"} <= community for community in Wheat2018.trade_communities
+    )
     # Canada and the US should be in the same community
     assert any(
-        {
-            "Canada", "United States"
-        } <= community for community in Wheat2018.trade_communities
+        {"Canada", "United States"} <= community
+        for community in Wheat2018.trade_communities
     )
 
 
@@ -340,7 +343,7 @@ def test_apply_scenario():
 
     # Load the data
     Wheat2018.load_data()
-    
+
     # Remove countries with zero trade
     Wheat2018.remove_net_zero_countries()
 
@@ -368,7 +371,9 @@ def test_apply_scenario():
 
     # Check if the amount of trade for some countries has been reduced by the right amount
     aus_ban = 0.50777499999999998 * 91600.6390029294
-    assert round(Wheat2018.trade_matrix.loc["Australia", "Bangladesh"], 2) == round(aus_ban, 2)
+    assert round(Wheat2018.trade_matrix.loc["Australia", "Bangladesh"], 2) == round(
+        aus_ban, 2
+    )
 
     # Check if a country which is not in the scenario has been removed
     assert "Indonesia" not in Wheat2018.trade_matrix.index
