@@ -356,7 +356,7 @@ class PyTradeShifts:
         assert self.trade_matrix.index.equals(scenario_data.index)
 
         # Multiply all the columns with the scenario data
-        self.trade_matrix = self.trade_matrix.mul(scenario_data.values, axis=1)
+        self.trade_matrix = self.trade_matrix.mul(scenario_data.values, axis=0)
 
     def build_graph(self):
         """
