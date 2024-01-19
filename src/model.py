@@ -415,10 +415,10 @@ class PyTradeShifts:
         for i, community in enumerate(self.trade_communities):
             for country in community:
                 # Convert to standard short names
-                country_short = coco.convert(names=country, to="name_short")
-                country_community[country_short] = i
+                country_community[country] = i
 
-        world["names_short"] = world["ADMIN"].apply(coco.convert, to="name_short")
+        cc = coco.CountryConverter()
+        world["names_short"] = cc.pandas_convert(pd.Series(world["ADMIN"]), to="name_short")
 
         # Join the country_community dictionary to the world dataframe
         world["community"] = world["names_short"].map(country_community)

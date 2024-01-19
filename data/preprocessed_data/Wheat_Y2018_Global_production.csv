@@ -14,7 +14,7 @@ Armenia,187453.0
 Barbados,0.0
 Belgium,1661860.0
 Bhutan,1445.19
-Bolivia (Plurinational State of),301688.85
+Bolivia,301688.85
 Bosnia and Herzegovina,295810.0
 Botswana,1212.0
 Brazil,5469236.0
@@ -33,12 +33,12 @@ Central African Republic,0.0
 Sri Lanka,0.0
 Chad,1798.02
 Chile,1469003.4
-China; mainland,131440500.0
+China,131440500.0
 Taiwan,6096.0
 Colombia,6399.28
 Comoros,0.0
-Congo,0.0
-Democratic Republic of the Congo,11500.0
+Congo Republic,0.0
+DR Congo,11500.0
 Cook Islands,0.0
 Costa Rica,0.0
 Croatia,753060.0
@@ -73,27 +73,27 @@ Guinea,0.0
 Guyana,0.0
 Haiti,0.0
 Honduras,1254.65
-China; Hong Kong SAR,0.0
+Hong Kong,0.0
 Hungary,5258430.0
 Iceland,0.0
 India,99869520.0
 Indonesia,0.0
-Iran (Islamic Republic of),13012380.31
+Iran,13012380.31
 Iraq,2177885.0
 Ireland,485480.0
 Israel,70500.0
 Italy,7104650.0
-Côte d'Ivoire,0.0
+Cote d'Ivoire,0.0
 Jamaica,0.0
 Japan,764900.0
 Kazakhstan,13944108.0
 Jordan,16389.0
 Kenya,336600.0
-Democratic People's Republic of Korea,50900.0
-Republic of Korea,25788.0
+North Korea,50900.0
+South Korea,25788.0
 Kuwait,9.0
-Kyrgyzstan,615926.0
-Lao People's Democratic Republic,0.0
+Kyrgyz Republic,615926.0
+Laos,0.0
 Lebanon,130000.0
 Lesotho,6975.0
 Latvia,1431600.0
@@ -101,7 +101,7 @@ Liberia,0.0
 Libya,200000.0
 Lithuania,2838900.0
 Luxembourg,79650.0
-China; Macao SAR,0.0
+Macau,0.0
 Madagascar,5000.0
 Malawi,729.0
 Malaysia,0.0
@@ -112,14 +112,14 @@ Mauritania,7438.84
 Mauritius,0.0
 Mexico,2943445.12
 Mongolia,436114.89
-Republic of Moldova,1162778.0
+Moldova,1162778.0
 Montenegro,2466.9
 Morocco,7320620.11
 Mozambique,17000.0
 Oman,3579.0
 Namibia,6094.0
 Nepal,1949001.0
-Netherlands (Kingdom of the),961920.0
+Netherlands,961920.0
 New Caledonia,4.4
 New Zealand,371026.79
 Nicaragua,0.0
@@ -137,10 +137,10 @@ Poland,9637620.0
 Portugal,70110.0
 Qatar,15.0
 Romania,10143670.0
-Russian Federation,72136149.0
+Russia,72136149.0
 Rwanda,13475.16
-Saint Lucia,0.0
-Saint Vincent and the Grenadines,0.0
+St. Lucia,0.0
+St. Vincent and the Grenadines,0.0
 Saudi Arabia,586413.0
 Senegal,0.0
 Serbia,2941601.0
@@ -148,7 +148,7 @@ Seychelles,0.0
 Sierra Leone,0.0
 Singapore,0.0
 Slovakia,1927930.0
-Viet Nam,0.0
+Vietnam,0.0
 Slovenia,121900.0
 Somalia,1046.65
 South Africa,1868000.0
@@ -160,7 +160,7 @@ Suriname,0.0
 Eswatini,724.76
 Sweden,1620300.0
 Switzerland,511446.0
-Syrian Arab Republic,1222987.62
+Syria,1222987.62
 Tajikistan,778986.3
 Thailand,1306.58
 Togo,0.0
@@ -173,12 +173,12 @@ Uganda,23206.0
 Ukraine,24652840.0
 North Macedonia,241106.0
 Egypt,8348629.0
-United Kingdom of Great Britain and Northern Ireland,13555000.0
-United Republic of Tanzania,56651.0
-United States of America,51305540.0
+United Kingdom,13555000.0
+Tanzania,56651.0
+United States,51305540.0
 Burkina Faso,0.0
 Uruguay,440000.0
 Uzbekistan,5410760.0
-Venezuela (Bolivarian Republic of),1151.0
+Venezuela,1151.0
 Yemen,92210.0
 Zambia,114462.73
