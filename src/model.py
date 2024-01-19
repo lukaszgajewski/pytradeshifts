@@ -54,7 +54,7 @@ class PyTradeShifts:
     ):
         # Save the arguments
         self.crop = crop
-        self.base_year = "Y"+str(base_year)
+        self.base_year = "Y" + str(base_year)
         self.percentile = percentile
         self.region = region
         self.scenario_name = scenario_name
@@ -142,9 +142,7 @@ class PyTradeShifts:
         self.trade_matrix = trade_matrix
         self.production_data = production_data
 
-    def remove_below_percentile(
-        self
-    ):
+    def remove_below_percentile(self):
         """
         Removes countries with trade below a certain percentile.
 
@@ -161,7 +159,8 @@ class PyTradeShifts:
         # Calculate the percentile out of all values in the trade matrix. This
         # only considers the values above 0.
         threshold = np.percentile(
-            self.trade_matrix.values[self.trade_matrix.values > 0], self.percentile * 100
+            self.trade_matrix.values[self.trade_matrix.values > 0],
+            self.percentile * 100,
         )
         # Set all values to 0 which are below the threshold
         self.trade_matrix[self.trade_matrix < threshold] = 0
@@ -174,7 +173,9 @@ class PyTradeShifts:
         # Filter out the countries with all zeroes in trade
         self.trade_matrix = self.trade_matrix.loc[b_filter, b_filter]
 
-        print(f"Removed countries with trade below the {int(self.percentile*100)}th percentile.")
+        print(
+            f"Removed countries with trade below the {int(self.percentile*100)}th percentile."
+        )
 
         # Save threshold for testing purposes
         self.threshold = threshold
@@ -320,7 +321,9 @@ class PyTradeShifts:
 
         cc = coco.CountryConverter()
         # Convert the country names to the same format as in the trade matrix
-        scenario_data.index = cc.pandas_convert(pd.Series(scenario_data.index), to="name_short")
+        scenario_data.index = cc.pandas_convert(
+            pd.Series(scenario_data.index), to="name_short"
+        )
 
         # Only keep the countries that are in the trade matrix index, trade matrix columns and
         # the scenario data
@@ -370,7 +373,9 @@ class PyTradeShifts:
                 if source_country == destination_country:
                     continue
                 # Get the trade amount
-                trade_amount = self.trade_matrix.loc[source_country, destination_country]
+                trade_amount = self.trade_matrix.loc[
+                    source_country, destination_country
+                ]
 
                 # Add nodes if not already in the graph
                 trade_graph.add_node(source_country)
@@ -378,7 +383,9 @@ class PyTradeShifts:
 
                 # Add edge if trade amount is non-zero
                 if trade_amount != 0:
-                    trade_graph.add_edge(source_country, destination_country, weight=trade_amount)
+                    trade_graph.add_edge(
+                        source_country, destination_country, weight=trade_amount
+                    )
 
         self.trade_graph = trade_graph
 
@@ -422,8 +429,8 @@ class PyTradeShifts:
 
         # get the world map
         world = gpd.read_file(
-            "." +
-            os.sep
+            "."
+            + os.sep
             + "data"
             + os.sep
             + "geospatial_references"
@@ -432,7 +439,7 @@ class PyTradeShifts:
             + os.sep
             + "ne_110m_admin_0_countries.shp"
         )
-        world = world.to_crs('+proj=wintri')  # Change projection to Winkel Tripel
+        world = world.to_crs("+proj=wintri")  # Change projection to Winkel Tripel
 
         # Create a dictionary with the countries and which community they belong to
         # The communities are numbered from 0 to n
@@ -443,13 +450,17 @@ class PyTradeShifts:
                 country_community[country] = i
 
         cc = coco.CountryConverter()
-        world["names_short"] = cc.pandas_convert(pd.Series(world["ADMIN"]), to="name_short")
+        world["names_short"] = cc.pandas_convert(
+            pd.Series(world["ADMIN"]), to="name_short"
+        )
 
         # Join the country_community dictionary to the world dataframe
         world["community"] = world["names_short"].map(country_community)
 
         # Plot the world map and color the countries according to their community
-        cmap = ListedColormap(sns.color_palette("deep", len(self.trade_communities)).as_hex())
+        cmap = ListedColormap(
+            sns.color_palette("deep", len(self.trade_communities)).as_hex()
+        )
         fig, ax = plt.subplots(figsize=(10, 6))
         world.plot(
             ax=ax,
@@ -464,7 +475,11 @@ class PyTradeShifts:
         # Add a title with self.scenario_name if applicable
         ax.set_title(
             f"Trade communities for {self.crop} with base year {self.base_year[1:]}"
-            + (f" in scenario: {self.scenario_name}" if self.scenario_name is not None else "(no scenario)")
+            + (
+                f" in scenario: {self.scenario_name}"
+                if self.scenario_name is not None
+                else "(no scenario)"
+            )
         )
 
         # save the plot
@@ -476,7 +491,11 @@ class PyTradeShifts:
             + "figures"
             + os.sep
             + f"{self.crop}_{self.base_year}_{self.region}_"
-            + (f"_{self.scenario_name}" if self.scenario_name is not None else "no_scenario")
+            + (
+                f"_{self.scenario_name}"
+                if self.scenario_name is not None
+                else "no_scenario"
+            )
             + "_trade_communities.png",
             dpi=300,
             bbox_inches="tight",
