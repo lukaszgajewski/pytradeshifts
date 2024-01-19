@@ -1,240 +1,252 @@
-﻿NAME_EN,ISIMIP climate projection; wheat
-Indonesia,N/A
-Malaysia,N/A
-Chile,0.32358399999999998
-Bolivia (Plurinational State of),0.0243870000000000
-Peru,0.54821299999999995
-Argentina,0.11620600000000000
-Cyprus,0.064856999999999998
-India,0.036276000000000003
-China,0.23669399999999999
-Israel,0.34287299999999998
-Palestine,0.31904100000000002
-Lebanon,0.40019900000000003
-Ethiopia,0.25241599999999997
-South Sudan,-0.026820000000000000
-Somalia,0.045053000000000003
-Kenya,0.26873300000000000
-Pakistan,-0.179638000000000
-Malawi,0.227993000000000
-United Republic of Tanzania,0.14412500000000000
-Syrian Arab Republic,0.35538300000000000
-France,0.20990200000000001
-Suriname,N/A
-Guyana,N/A
-Republic of Korea,0.70601999999999998
-Democratic People's Republic of Korea,0.31798599999999999
-Morocco,0.68886000000000003
-Costa Rica,N/A
-Nicaragua,N/A
-Congo,N/A
-Democratic Republic of the Congo,N/A
-Bhutan,0.030086999999999999
-Ukraine,0.16066200000000000
-Belarus,0.21959400000000001
-Namibia,N/A
-South Africa,0.15138299999999999
-Saint Martin,N/A
-Sint Maarten,N/A
-Oman,-0.31681799999999999
-Uzbekistan,0.49949800000000000
-Kazakhstan,0.29819800000000002
-Tajikistan,0.69972199999999996
-Lithuania,0.22292799999999999
-Brazil,-0.0094490000000000008
-Uruguay,0.153877000000000
-Mongolia,0.25531500000000001
-Russian Federation,0.121262000000000
-Czechia,0.41528700000000002
-Germany,0.28457900000000003
-Estonia,0.29220600000000002
-Latvia,0.21117700000000000
-Norway,0.18580500000000000
-Sweden,0.29682700000000001
-Finland,0.27462500000000001
-Viet Nam,-0.160940000000000
-Cambodia,N/A
-Luxembourg,0.33254699999999998
-United Arab Emirates,N/A
-Belgium,0.32319799999999999
-Georgia,0.20795000000000000
-North Macedonia,0.33846700000000002
-Albania,0.36023200000000000
-Azerbaijan,0.20164399999999999
-Kosovo,0.34219600000000000
-Turkey,0.44236199999999998
-Spain,0.146194000000000
-Lao People's Democratic Republic,-0.0175080000000000
-Kyrgyzstan,0.352404000000000
-Armenia,0.154341000000000
-Denmark,0.31018400000000002
-Libya,0.40588600000000002
-Tunisia,0.19482900000000000
-Romania,0.31040200000000001
-Hungary,0.26683600000000002
-Slovakia,0.33558199999999999
-Poland,0.34066999999999997
-Ireland,0.26772400000000002
-United Kingdom of Great Britain and Northern Ireland,0.30618200000000001
-Greece,0.42234300000000002
-Zambia,0.090510999999999994
-Sierra Leone,N/A
-Guinea,N/A
-Liberia,N/A
-Central African Republic,N/A
-Sudan,-0.21604300000000001
-Djibouti,N/A
-Eritrea,0.560571000000000
-Austria,0.41056799999999999
-Iraq,0.37897399999999998
-Italy,0.17698000000000000
-Switzerland,0.28373199999999998
-Iran (Islamic Republic of),0.42669099999999999
-Liechtenstein,0.34109000000000000
-Côte d'Ivoire,N/A
-Serbia,0.26942800000000000
-Mali,-0.32704600000000000
-Senegal,N/A
-Nigeria,-0.08466400000000000
-Benin,N/A
-Angola,N/A
-Croatia,0.28368599999999999
-Slovenia,0.31150600000000001
-Qatar,N/A
-Saudi Arabia,-0.28959800000000002
-Botswana,0.050781000000000000
-Zimbabwe,-0.022959000000000000
-Bulgaria,0.26285599999999998
-Thailand,-0.22132599999999999
-San Marino,0.139551000000000
-Haiti,N/A
-Dominican Republic,N/A
-Chad,N/A
-Kuwait,-0.34221499999999999
-El Salvador,N/A
-Guatemala,-0.1021570000000
-Timor-Leste,N/A
-Brunei,N/A
-Monaco,0.14408000000000
-Algeria,0.093461000000000002
-Mozambique,N/A
-eSwatini,N/A
-Burundi,0.11935800000000001
-Rwanda,0.070939000000000002
-Myanmar,-0.097782999999999995
-Bangladesh,-0.21047800000000000
-Andorra,0.31989600000000001
-Afghanistan,0.41285100000000002
-Montenegro,0.47508200000000000
-Bosnia and Herzegovina,0.28873700000000002
-Uganda,0.160585000000000
-Guantanamo Bay Naval Base,N/A
-Cuba,N/A
-Honduras,N/A
-Ecuador,0.042063999999999997
-Colombia,0.0082150000000000001
-Paraguay,-0.13214899999999999
-Portugal,0.12361700000000000
-Republic of Moldova,0.22506100000000001
-Turkmenistan,0.40048000000000000
-Jordan,0.070330000000000004
-Nepal,0.36429400000000001
-Lesotho,0.12903400000000001
-Cameroon,N/A
-Gabon,N/A
-Niger,-0.15344500000000000
-Burkina Faso,N/A
-Togo,N/A
-Ghana,N/A
-Guinea-Bissau,N/A
-Gibraltar,N/A
-United States of America,0.28265299999999999
-Canada,0.118974000000000
-Mexico,-0.16980100000000001
-Belize,N/A
-Panama,N/A
-Venezuela (Bolivarian Republic of),N/A
-Papua New Guinea,N/A
-Egypt,0.089352000000000001
-Yemen,0.17178700000000000
-Mauritania,N/A
-Equatorial Guinea,N/A
-Gambia,N/A
-Hong Kong,N/A
-Vatican City,0.0026099999999999999
-Australia,0.50777499999999998
-Greenland,N/A
-Fiji,N/A
-New Caledonia,N/A
-Madagascar,N/A
-Philippines,N/A
-Sri Lanka,N/A
-Curaçao,N/A
-Aruba,N/A
-The Bahamas,N/A
-Turks and Caicos Islands,N/A
-Japan,0.53335200000000005
-Saint Pierre and Miquelon,N/A
-Iceland,N/A
-Pitcairn Islands,N/A
-French Polynesia,N/A
-French Southern and Antarctic Lands,N/A
-Seychelles,N/A
-Kiribati,N/A
-Marshall Islands,N/A
-Trinidad and Tobago,N/A
-Grenada,N/A
-Saint Vincent and the Grenadines,N/A
-Barbados,N/A
-Saint Lucia,N/A
-Dominica,N/A
-Montserrat,N/A
-Antigua and Barbuda,N/A
-Saint Kitts and Nevis,N/A
-United States Virgin Islands,N/A
-Saint-Barthélemy,N/A
-Puerto Rico,N/A
-Anguilla,N/A
-British Virgin Islands,N/A
-Jamaica,N/A
-Cayman Islands,N/A
-Bermuda,N/A
-Heard Island and McDonald Islands,N/A
-Saint Helena,N/A
-Mauritius,N/A
-Comoros,N/A
-São Tomé and Príncipe,N/A
-Cape Verde,N/A
-Malta,N/A
-Jersey,N/A
-Guernsey,N/A
-Isle of Man,N/A
-Faroe Islands,N/A
-British Indian Ocean Territory,N/A
-Singapore,N/A
-Norfolk Island,N/A
-Cook Islands,N/A
-Tonga,N/A
-Wallis and Futuna,N/A
-Samoa,N/A
-Solomon Islands,N/A
-Tuvalu,N/A
-Maldives,N/A
-Nauru,N/A
-Federated States of Micronesia,N/A
-South Georgia and the South Sandwich Islands,N/A
-Falkland Islands,N/A
-Vanuatu,N/A
-Niue,N/A
-American Samoa,N/A
-Palau,N/A
-Guam,N/A
-Northern Mariana Islands,N/A
-Bahrain,N/A
-Clipperton Island,N/A
-Macau,N/A
-Netherlands,0.32205800000000001
-Australian Indian Ocean Territories,N/A
-Australian Indian Ocean Territories,N/A
-United States Minor Outlying Islands,N/A
-New Zealand,0.257151000000000
+name, yield_change
+Indonesia,NA
+Malaysia,NA
+Chile,32.358410704726701
+Bolivia,2.4387397575638499
+Peru,54.821288678576103
+Argentina,11.620562301188601
+Cyprus,6.48571090898111
+India,3.62757484623079
+China,23.6693776566206
+Israel,34.287286388197003
+West Bank and Gaza,31.904096327228501
+Lebanon,40.019925878562503
+Ethiopia,25.241630248324501
+South Sudan,-2.6819750603505002
+Somalia,4.5053343802551202
+Kenya,26.873260348275501
+Pakistan,-17.963786677973701
+Malawi,22.7993365042887
+Tanzania,14.412508789526701
+Syrian Arab Republic,35.538325861252098
+France,20.990153531036899
+Suriname,NA
+Guyana,NA
+"Korea, Republic of",70.601963478947695
+"Korea, Democratic People's Republic of",31.798623371052301
+Morocco,68.885972849232203
+Costa Rica,NA
+Nicaragua,NA
+"Congo, Rep. of",NA
+"Congo, Democratic Republic of",NA
+Bhutan,3.0087311650106598
+Ukraine,16.0662116476941
+Belarus,21.959353297485801
+Namibia,NA
+South Africa,15.138301753459899
+Saint-Martin (Fr.),NA
+Sint Maarten (Neth.),NA
+Oman,-31.681846973053499
+Uzbekistan,49.949765250462399
+Kazakhstan,29.819828415810601
+Tajikistan,69.972184309234905
+Lithuania,22.292777800514301
+Brazil,-0.94492748132172799
+Uruguay,15.387650050029899
+Mongolia,25.531471556372701
+Russian Federation,12.126237801308299
+Czech Republic,41.5287455074589
+Germany,28.457931399391601
+Estonia,29.2206019216828
+Latvia,21.117678962408899
+Norway,18.580468772501298
+Sweden,29.682740400318998
+Finland,27.462493579912199
+Vietnam,-16.093960256343902
+Cambodia,NA
+Luxembourg,33.254658507438997
+United Arab Emirates,NA
+Belgium,32.319794365746397
+Georgia,20.795021006111298
+North Macedonia,33.846686851836701
+Albania,36.023217941208998
+Azerbaijan,20.1643991697226
+Kosovo,34.219569578646698
+Turkey,44.236208765053398
+Spain,14.6193967218542
+Lao People's Democratic Republic,-1.75082668463869
+Kyrgyz Republic,35.240413149346502
+Armenia,15.4341312330255
+Denmark,31.0184282800112
+Libya,40.588567414359403
+Tunisia,19.4828848239964
+Romania,31.0402120380718
+Hungary,26.683622514671701
+Slovak Republic,33.5582469625149
+Poland,34.066961616128403
+Ireland,26.7723586480429
+United Kingdom,30.618183029428899
+Greece,42.234252391099297
+Zambia,9.0510598232982407
+Sierra Leone,NA
+Guinea,NA
+Liberia,NA
+Central African Republic,NA
+Sudan,-21.6042977183922
+Djibouti,NA
+Eritrea,56.057103624893699
+Austria,41.056763047079102
+Iraq,37.897429429021699
+Italy,17.698017253527201
+Switzerland,28.373241138250801
+"Iran, Islamic Republic of",42.669060554843199
+Liechtenstein,34.109030288593303
+Côte d'Ivoire,NA
+Serbia,26.942793918873601
+Mali,-32.7046491118708
+Senegal,NA
+Nigeria,-8.4664246674795507
+Benin,NA
+Angola,NA
+Croatia,28.368570383076602
+Slovenia,31.1505821956323
+Qatar,NA
+Saudi Arabia,-28.959757924151301
+Botswana,5.0780928351544699
+Zimbabwe,-2.2958595545965799
+Bulgaria,26.285643382387601
+Thailand,-22.132569688450399
+San Marino,13.9550584424808
+Haiti,NA
+Dominican Republic,NA
+Chad,NA
+Kuwait,-34.221542601793601
+El Salvador,NA
+Guatemala,-10.21568300315
+Timor-Leste,NA
+Brunei Darussalam,NA
+Monaco,14.408009898935999
+Algeria,9.3460573380801399
+Mozambique,NA
+eSwatini,NA
+Burundi,11.9358468383183
+Rwanda,7.0938891864900899
+Myanmar,-9.7782770259674106
+Bangladesh,-21.047762871452701
+Andorra,31.989579778326501
+Afghanistan,41.285109310895798
+Montenegro,47.508221458669297
+Bosnia and Herzegovina,28.873728871242299
+Uganda,16.058472871856299
+Guantanamo Bay (US),NA
+Cuba,NA
+Honduras,NA
+Ecuador,4.2064412891299998
+Colombia,0.82151247907165503
+Paraguay,-13.2149170895125
+Portugal,12.361749162875
+Moldova,22.506146440533399
+Turkmenistan,40.048035833092001
+Jordan,7.0330140936566901
+Nepal,36.429410341180599
+Lesotho,12.903362453528899
+Cameroon,NA
+Gabon,NA
+Niger,-15.3445109144195
+Burkina Faso,NA
+Togo,NA
+Ghana,NA
+Guinea-Bissau,NA
+Gibraltar (UK),NA
+United States of America,28.2653328857538
+Canada,11.8973798612514
+Mexico,-16.980078221829299
+Belize,NA
+Panama,NA
+"Venezuela, Republica Bolivariana de",NA
+Papua New Guinea,NA
+"Egypt, Arab Republic of",8.9351866478924808
+"Yemen, Republic of",17.1786739192145
+Mauritania,NA
+Equatorial Guinea,NA
+"Gambia, The",NA
+"Hong Kong (SAR, China)",NA
+Vatican City,0.261013478069543
+Australia,50.777502650496302
+Greenland (Den.),NA
+Fiji,NA
+New Caledonia (Fr.),NA
+Madagascar,NA
+Philippines,NA
+Sri Lanka,NA
+Curaçao (Neth.),NA
+Aruba (Neth.),NA
+"Bahamas, The",NA
+Turks and Caicos Islands (UK),NA
+Japan,53.335183137638801
+Saint-Pierre-et-Miquelon (Fr.),NA
+Iceland,NA
+Pitcairn Islands (UK),NA
+French Polynesia (Fr.),NA
+French Southern and Antarctic Lands (Fr.),NA
+Seychelles,NA
+Kiribati,NA
+Marshall Islands,NA
+Trinidad and Tobago,NA
+Grenada,NA
+Saint Vincent and the Grenadines,NA
+Barbados,NA
+Saint Lucia,NA
+Dominica,NA
+Montserrat (UK),NA
+Antigua and Barbuda,NA
+Saint Kitts and Nevis,NA
+U.S. Virgin Islands (US),NA
+Saint-Barthélemy (Fr.),NA
+Puerto Rico (US),NA
+Anguilla (UK),NA
+British Virgin Islands (UK),NA
+Jamaica,NA
+Cayman Islands (UK),NA
+Bermuda (UK),NA
+Heard Island and McDonald Islands (Aus.),NA
+"Saint Helena, Ascension and Tristan da Cunha (UK)",NA
+Mauritius,NA
+Comoros,NA
+São Tomé and Príncipe,NA
+Cabo Verde,NA
+Malta,NA
+Jersey (UK),NA
+Guernsey (UK),NA
+Isle of Man (UK),NA
+Faroe Islands (Den.),NA
+British Indian Ocean Territory (UK),NA
+Singapore,NA
+Norfolk Island (Aus.),NA
+Cook Islands (NZ),NA
+Tonga,NA
+Wallis-et-Futuna (Fr.),NA
+Samoa,NA
+Solomon Islands,NA
+Tuvalu,NA
+Maldives,NA
+Nauru,NA
+"Micronesia, Federated States of",NA
+South Georgia and South Sandwich Islands (UK),NA
+Falkland Islands (UK)/Islas Malvinas,NA
+Vanuatu,NA
+Niue (NZ),NA
+American Samoa (US),NA
+Palau,NA
+Guam (US),NA
+Northern Mariana Islands (US),NA
+Bahrain,NA
+Clipperton Island (Fr.),NA
+"Macau (SAR, China)",NA
+Bonaire (Neth.),NA
+Sint Eustatius (Neth.),NA
+Saba (Neth.),NA
+Netherlands,32.2057535537555
+Cocos (Keeling) Islands (Aus.),NA
+Christmas Island (Aus.),NA
+Johnston Atoll (US),NA
+Jarvis Island (US),NA
+Baker Island (US),NA
+Howland Island (US),NA
+Wake Island (US),NA
+Midway Islands (US),NA
+Navassa Island (US),NA
+Palmyra Atoll (US),NA
+Kingman Reef (US),NA
+Tokelau (NZ),NA
+New Zealand,25.7150978328823
