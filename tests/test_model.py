@@ -270,16 +270,26 @@ def test_removing_countries_except():
     assert Wheat2018.trade_matrix.shape == (2, 2)
 
 
-
-def removing_low_trade_countries(region):
+def test_removing_low_trade_countries():
     """
     Runs the model with prebalancing, prebalancing, removing re-exports
     and removing countries with low trade and check if this worked out.
     """
-    Wheat2018 = PyTradeShifts("Wheat", 2018, region=region, testing=True)
+    # Remove the countries which don't have ISIMIP data, as
+    # Johanna Hedlund did in her analysis for determining the global threshold
+    ISIMIP = pd.read_csv("data/scenario_files/ISIMIP_wheat_Hedlung.csv", index_col=0)
+    # Get only those countries with NaNs in the ISIMIP data
+    nan_indices = ISIMIP.index[ISIMIP.iloc[:, 0].isnull()].tolist()
+
+    Wheat2018 = PyTradeShifts(
+        "Wheat", 2018, region="Global", testing=True, countries_to_remove=nan_indices
+    )
 
     # Load the data
     Wheat2018.load_data()
+
+    # Remove countries
+    Wheat2018.remove_countries()
 
     # Remove countries with zero trade
     Wheat2018.remove_net_zero_countries()
@@ -295,35 +305,12 @@ def removing_low_trade_countries(region):
 
     print(Wheat2018.trade_matrix.shape)
 
-    if region == "Oceania":
-        assert Wheat2018.threshold == 0.1
-        assert Wheat2018.trade_matrix.shape == (1, 2)
-    elif region == "Global":
-        assert Wheat2018.threshold == 165.372
-        assert Wheat2018.trade_matrix.shape == (1, 2)
+    assert Wheat2018.threshold == 165.372
 
     # Check if these countries are still present, as they are missing from
     # the R data in the Hedlund paper
-    if region == "Global":
-        assert "South Sudan" in list(Wheat2018.trade_matrix.index)
-        assert "Laos" in list(Wheat2018.trade_matrix.index)
-
-
-
-def test_removing_low_trade_countries_oceania():
-    """
-    Runs the model with prebalancing, prebalancing, removing re-exports
-    and removing countries with low trade and check if this worked out.
-    """
-    removing_low_trade_countries("Oceania")
-
-
-def test_removing_low_trade_countries_global():
-    """
-    Runs the model with prebalancing, prebalancing, removing re-exports
-    and removing countries with low trade and check if this worked out.
-    """
-    removing_low_trade_countries("Global")
+    assert "South Sudan" in list(Wheat2018.trade_matrix.index)
+    assert "Laos" in list(Wheat2018.trade_matrix.index)
 
 
 def test_build_graph():

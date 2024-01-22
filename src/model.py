@@ -43,7 +43,7 @@ class PyTradeShifts:
         keep_singletons (bool, optional): Whether to keep the communities
             with only one country or not. If False, these communities are
             removed.
-        
+
     Returns:
         None
     """
@@ -93,6 +93,8 @@ class PyTradeShifts:
             # Remove countries
             if self.countries_to_remove is not None:
                 self.remove_countries()
+            if self.countries_to_keep is not None:
+                self.remove_countries_except()
             # Remove countries with all zeroes in trade and production
             self.remove_net_zero_countries()
             # Prebalance the trade matrix
@@ -567,8 +569,8 @@ class PyTradeShifts:
                 else " (no scenario)"
             )
             + (
-                " with countries removed"
-                if self.countries_to_remove is not None
+                " with country subset"
+                if self.countries_to_remove is not None or self.countries_to_keep is not None
                 else ""
             )
         )
@@ -588,8 +590,8 @@ class PyTradeShifts:
                 else "no_scenario"
             )
             + (
-                "_with_countries_removed"
-                if self.countries_to_remove is not None
+                "_with_country_subset"
+                if self.countries_to_remove is not None or self.countries_to_keep is not None
                 else ""
             )
             + "_trade_communities.png",
