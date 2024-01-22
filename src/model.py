@@ -36,6 +36,7 @@ class PyTradeShifts:
             If None, no scenario is applied.
         with_preprocessing (bool, optional): Whether to run the preprocessing
             or not.
+        countries_to_remove (list, optional): A list of countries to remove
 
     Returns:
         None
@@ -51,6 +52,7 @@ class PyTradeShifts:
         scenario_name=None,
         scenario_file_name=None,
         with_preprocessing=False,
+        countries_to_remove=None,
     ):
         # Save the arguments
         self.crop = crop
@@ -59,6 +61,7 @@ class PyTradeShifts:
         self.region = region
         self.scenario_name = scenario_name
         self.scenario_file_name = scenario_file_name
+        self.countries_to_remove = countries_to_remove
         # State variables to keep track of the progress
         self.prebalanced = False
         self.reexports_corrected = False
@@ -77,6 +80,9 @@ class PyTradeShifts:
                 preprocessing_main(self.crop, self.base_year, self.region)
             # Read in the data
             self.load_data()
+            # Remove countries
+            if self.countries_to_remove is not None:
+                self.remove_countries()
             # Remove countries with all zeroes in trade and production
             self.remove_net_zero_countries()
             # Prebalance the trade matrix
@@ -141,6 +147,35 @@ class PyTradeShifts:
         # Save the data
         self.trade_matrix = trade_matrix
         self.production_data = production_data
+
+    def remove_countries(self):
+        """
+        Removes countries from the trade matrix and production data.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        assert self.trade_matrix is not None
+        assert self.production_data is not None
+        assert self.countries_to_remove is not None
+        assert isinstance(self.countries_to_remove, list)
+        # Convert the country names to the same format as in the trade matrix
+        cc = coco.CountryConverter()
+        self.countries_to_remove = cc.pandas_convert(
+            pd.Series(self.countries_to_remove), to="name_short"
+        ).to_list()
+
+        # Take the index of the trade matrix and production data and remove all the countries
+        # in self.countries_to_remove
+        countries_to_keep = [
+            country for country in self.trade_matrix.index if country not in self.countries_to_remove
+        ]
+        self.trade_matrix = self.trade_matrix.loc[countries_to_keep, countries_to_keep]
+        self.production_data = self.production_data.loc[countries_to_keep]
+
 
     def remove_below_percentile(self):
         """
@@ -491,7 +526,12 @@ class PyTradeShifts:
             + (
                 f" in scenario: {self.scenario_name}"
                 if self.scenario_name is not None
-                else "(no scenario)"
+                else " (no scenario)"
+            )
+            + (
+                " with countries removed"
+                if self.countries_to_remove is not None
+                else ""
             )
         )
 
@@ -508,6 +548,11 @@ class PyTradeShifts:
                 f"_{self.scenario_name}"
                 if self.scenario_name is not None
                 else "no_scenario"
+            )
+            + (
+                "_with_countries_removed"
+                if self.countries_to_remove is not None
+                else ""
             )
             + "_trade_communities.png",
             dpi=300,
