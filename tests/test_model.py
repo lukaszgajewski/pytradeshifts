@@ -234,6 +234,42 @@ def test_removing_countries():
     assert Wheat2018.trade_matrix.shape[0] == shape_before[0] - 2
 
 
+def test_removing_countries_except():
+    """
+    Tests if removing countries except works
+    """
+    Wheat2018 = PyTradeShifts(
+        "Wheat", 2018, region="Global", testing=True, countries_to_keep=[
+            "Australia", "Bangladesh"
+        ]
+    )
+
+    # Load the data
+    Wheat2018.load_data()
+
+    # Remove countries with zero trade and zero production
+    Wheat2018.remove_net_zero_countries()
+
+    # Run the prebalancing
+    Wheat2018.prebalance()
+
+    # Reexport
+    Wheat2018.correct_reexports()
+
+    assert "Australia" in list(Wheat2018.trade_matrix.index)
+    assert "Bangladesh" in list(Wheat2018.trade_matrix.index)
+    assert "Germany" in list(Wheat2018.trade_matrix.index)
+
+    # Remove countries
+    Wheat2018.remove_countries_except()
+
+    assert "Australia" in list(Wheat2018.trade_matrix.index)
+    assert "Bangladesh" in list(Wheat2018.trade_matrix.index)
+    assert "Germany" not in list(Wheat2018.trade_matrix.index)
+
+    assert Wheat2018.trade_matrix.shape == (2, 2)
+
+
 
 def removing_low_trade_countries(region):
     """
