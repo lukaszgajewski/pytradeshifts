@@ -198,6 +198,43 @@ def test_reexport_global():
     reexport("Global")
 
 
+def test_removing_countries():
+    """
+    Runs the model and removes countries to check if this works
+    """
+    Wheat2018 = PyTradeShifts(
+        "Wheat", 2018, region="Global", testing=True, countries_to_remove=[
+            "Australia", "Bangladesh"
+        ]
+    )
+
+    # Load the data
+    Wheat2018.load_data()
+
+    # Remove countries with zero trade and zero production
+    Wheat2018.remove_net_zero_countries()
+
+    # Run the prebalancing
+    Wheat2018.prebalance()
+
+    # Reexport
+    Wheat2018.correct_reexports()
+
+    assert "Australia" in list(Wheat2018.trade_matrix.index)
+    assert "Bangladesh" in list(Wheat2018.trade_matrix.index)
+
+    shape_before = Wheat2018.trade_matrix.shape
+
+    # Remove countries
+    Wheat2018.remove_countries()
+
+    assert "Australia" not in list(Wheat2018.trade_matrix.index)
+    assert "Bangladesh" not in list(Wheat2018.trade_matrix.index)
+
+    assert Wheat2018.trade_matrix.shape[0] == shape_before[0] - 2
+
+
+
 def removing_low_trade_countries(region):
     """
     Runs the model with prebalancing, prebalancing, removing re-exports
@@ -228,6 +265,13 @@ def removing_low_trade_countries(region):
     elif region == "Global":
         assert Wheat2018.threshold == 165.372
         assert Wheat2018.trade_matrix.shape == (1, 2)
+
+    # Check if these countries are still present, as they are missing from
+    # the R data in the Hedlund paper
+    if region == "Global":
+        assert "South Sudan" in list(Wheat2018.trade_matrix.index)
+        assert "Laos" in list(Wheat2018.trade_matrix.index)
+
 
 
 def test_removing_low_trade_countries_oceania():
@@ -380,4 +424,4 @@ def test_apply_scenario():
 
 
 if __name__ == "__main__":
-    test_apply_scenario()
+    test_loading_global()
