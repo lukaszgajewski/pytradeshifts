@@ -37,7 +37,13 @@ class PyTradeShifts:
         with_preprocessing (bool, optional): Whether to run the preprocessing
             or not.
         countries_to_remove (list, optional): A list of countries to remove
-
+            from the trade matrix. All other countries are kept.
+        countries_to_keep (list, optional): A list of countries to keep in
+            the trade matrix. All other countries are removed.
+        keep_singletons (bool, optional): Whether to keep the communities
+            with only one country or not. If False, these communities are
+            removed.
+        
     Returns:
         None
     """
@@ -53,6 +59,8 @@ class PyTradeShifts:
         scenario_file_name=None,
         with_preprocessing=False,
         countries_to_remove=None,
+        countries_to_keep=None,
+        keep_singletons=False,
     ):
         # Save the arguments
         self.crop = crop
@@ -62,6 +70,8 @@ class PyTradeShifts:
         self.scenario_name = scenario_name
         self.scenario_file_name = scenario_file_name
         self.countries_to_remove = countries_to_remove
+        self.countries_to_keep = countries_to_keep
+        self.keep_singletons = keep_singletons
         # State variables to keep track of the progress
         self.prebalanced = False
         self.reexports_corrected = False
@@ -176,6 +186,34 @@ class PyTradeShifts:
         self.trade_matrix = self.trade_matrix.loc[countries_to_keep, countries_to_keep]
         self.production_data = self.production_data.loc[countries_to_keep]
 
+    def remove_countries_except(self):
+        """
+        Removes all countries from the trade matrix and production data except for the ones
+        in self.countries_to_keep.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        assert self.trade_matrix is not None
+        assert self.production_data is not None
+        assert self.countries_to_keep is not None
+        assert isinstance(self.countries_to_keep, list)
+        # Convert the country names to the same format as in the trade matrix
+        cc = coco.CountryConverter()
+        self.countries_to_keep = cc.pandas_convert(
+            pd.Series(self.countries_to_keep), to="name_short"
+        ).to_list()
+
+        # Take the index of the trade matrix and production data and remove all the countries
+        # in self.countries_to_remove
+        countries_to_remove = [
+            country for country in self.trade_matrix.index if country in self.countries_to_keep
+        ]
+        self.trade_matrix = self.trade_matrix.loc[countries_to_remove, countries_to_remove]
+        self.production_data = self.production_data.loc[countries_to_remove]
 
     def remove_below_percentile(self):
         """
@@ -437,7 +475,7 @@ class PyTradeShifts:
 
         self.trade_graph = trade_graph
 
-    def find_trade_communities(self, keep_singletons=False):
+    def find_trade_communities(self):
         """
         Finds the trade communities in the trade graph using the Louvain algorithm.
 
@@ -453,7 +491,7 @@ class PyTradeShifts:
         trade_communities = nx.community.louvain_communities(self.trade_graph, seed=1)
         # Remove all the communities with only one country and print the names of the
         # communities that are removed
-        if keep_singletons:
+        if self.keep_singletons:
             print("Keeping communities with only one country.")
         else:
             for community in list(trade_communities):
