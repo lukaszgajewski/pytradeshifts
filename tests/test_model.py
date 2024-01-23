@@ -519,6 +519,8 @@ def test_compare_Hedlund_results_with_model_output():
     # Remove countries
     Wheat2018.remove_countries()
 
+    Wheat2018.set_diagonal_to_zero()
+
     cc = coco.CountryConverter()
 
     # Assert that index in the Hedlund data is the same as in the model
@@ -527,9 +529,9 @@ def test_compare_Hedlund_results_with_model_output():
     hedlund.sort_index(inplace=True)
     Wheat2018.trade_matrix.sort_index(inplace=True)
 
-    # print all the countries which are in the Hedlund data but not in the model
+    print("all the countries which are in the Hedlund data but not in the model")
     print(set(hedlund.index) - set(Wheat2018.trade_matrix.index))
-    # print all the countries which are in the model but not in the Hedlund data
+    print("all the countries which are in the model but not in the Hedlund data")
     print(set(Wheat2018.trade_matrix.index) - set(hedlund.index))
 
     assert hedlund.index.equals(Wheat2018.trade_matrix.index)
@@ -545,4 +547,4 @@ def test_compare_Hedlund_results_with_model_output():
 
 
 if __name__ == "__main__":
-    test_removing_countries_except()
+    test_compare_Hedlund_results_with_model_output()

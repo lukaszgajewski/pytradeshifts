@@ -588,6 +588,16 @@ class PyTradeShifts:
         )
 
         plot_winkel_tripel_map(ax)
+        # Add the countries which were removed from the trade matrix as shaded
+        # countries
+        if self.countries_to_remove is not None:
+            # Convert the country names to the same format as in the trade matrix
+            self.countries_to_remove = cc.pandas_convert(
+                pd.Series(self.countries_to_remove), to="name_short"
+            ).to_list()
+            world.loc[
+                world["names_short"].isin(self.countries_to_remove), "geometry"
+            ].plot(ax=ax, color="grey", hatch="xxx", alpha=0.5, edgecolor="black")
 
         # Add a title with self.scenario_name if applicable
         ax.set_title(
