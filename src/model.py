@@ -185,9 +185,13 @@ class PyTradeShifts:
         # Take the index of the trade matrix and production data and remove all the countries
         # in self.countries_to_remove
         countries_to_keep = [
-            country for country in self.trade_matrix.index if country not in self.countries_to_remove
+            country
+            for country in self.trade_matrix.index
+            if country not in self.countries_to_remove
         ]
-        self.trade_matrix = self.trade_matrix.loc[countries_to_keep, :]# countries_to_keep]
+        self.trade_matrix = self.trade_matrix.loc[
+            countries_to_keep, :
+        ]  # countries_to_keep]
         # Now also remove the columns from the trade matrix which have no trade anymore
 
         # Now also remove the columns from the trade matrix which have no trade anymore
@@ -196,7 +200,6 @@ class PyTradeShifts:
         self.trade_matrix = self.trade_matrix.loc[:, b_filter]
 
         self.production_data = self.production_data.loc[countries_to_keep]
-
 
     def remove_countries_except(self):
         """
@@ -222,14 +225,16 @@ class PyTradeShifts:
         # Take the index of the trade matrix and production data and remove all the countries
         # in self.countries_to_remove
         keep = [
-            country for country in self.trade_matrix.index if country in self.countries_to_keep
+            country
+            for country in self.trade_matrix.index
+            if country in self.countries_to_keep
         ]
         self.trade_matrix = self.trade_matrix.loc[keep, :]
         # Now also remove the columns from the trade matrix which have no trade anymore
         col_sums = self.trade_matrix.sum(axis=0)
         b_filter = ~(col_sums.eq(0))
         self.trade_matrix = self.trade_matrix.loc[:, b_filter]
-    
+
         self.production_data = self.production_data.loc[keep]
 
     def remove_below_percentile(self):
@@ -394,7 +399,6 @@ class PyTradeShifts:
         assert self.trade_matrix is not None
         # Set the diagonal to zero
         np.fill_diagonal(self.trade_matrix.values, 0)
-
 
     def apply_scenario(self):
         """
@@ -612,7 +616,8 @@ class PyTradeShifts:
             )
             + (
                 " with country subset"
-                if self.countries_to_remove is not None or self.countries_to_keep is not None
+                if self.countries_to_remove is not None
+                or self.countries_to_keep is not None
                 else ""
             )
         )
@@ -633,7 +638,8 @@ class PyTradeShifts:
             )
             + (
                 "_with_country_subset"
-                if self.countries_to_remove is not None or self.countries_to_keep is not None
+                if self.countries_to_remove is not None
+                or self.countries_to_keep is not None
                 else ""
             )
             + "_trade_communities.png",
