@@ -36,6 +36,13 @@ class PyTradeShifts:
             If None, no scenario is applied.
         with_preprocessing (bool, optional): Whether to run the preprocessing
             or not.
+        countries_to_remove (list, optional): A list of countries to remove
+            from the trade matrix. All other countries are kept.
+        countries_to_keep (list, optional): A list of countries to keep in
+            the trade matrix. All other countries are removed.
+        keep_singletons (bool, optional): Whether to keep the communities
+            with only one country or not. If False, these communities are
+            removed.
 
     Returns:
         None
@@ -51,6 +58,9 @@ class PyTradeShifts:
         scenario_name=None,
         scenario_file_name=None,
         with_preprocessing=False,
+        countries_to_remove=None,
+        countries_to_keep=None,
+        keep_singletons=False,
     ):
         # Save the arguments
         self.crop = crop
@@ -59,6 +69,9 @@ class PyTradeShifts:
         self.region = region
         self.scenario_name = scenario_name
         self.scenario_file_name = scenario_file_name
+        self.countries_to_remove = countries_to_remove
+        self.countries_to_keep = countries_to_keep
+        self.keep_singletons = keep_singletons
         # State variables to keep track of the progress
         self.prebalanced = False
         self.reexports_corrected = False
@@ -83,6 +96,13 @@ class PyTradeShifts:
             self.prebalance()
             # Remove re-exports
             self.correct_reexports()
+            # Set the diagonal to zero
+            self.set_diagonal_to_zero()
+            # Remove countries
+            if self.countries_to_remove is not None:
+                self.remove_countries()
+            if self.countries_to_keep is not None:
+                self.remove_countries_except()
             # Remove countries with low trade
             self.remove_below_percentile()
             if scenario_name is not None:
@@ -142,6 +162,76 @@ class PyTradeShifts:
         self.trade_matrix = trade_matrix
         self.production_data = production_data
 
+    def remove_countries(self):
+        """
+        Removes countries from the trade matrix and production data.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        assert self.trade_matrix is not None
+        assert self.production_data is not None
+        assert self.countries_to_remove is not None
+        assert isinstance(self.countries_to_remove, list)
+        # Convert the country names to the same format as in the trade matrix
+        cc = coco.CountryConverter()
+        self.countries_to_remove = cc.pandas_convert(
+            pd.Series(self.countries_to_remove), to="name_short"
+        ).to_list()
+
+        # Take the index of the trade matrix and production data and remove all the countries
+        # in self.countries_to_remove
+        countries_to_keep = [
+            country for country in self.trade_matrix.index if country not in self.countries_to_remove
+        ]
+        self.trade_matrix = self.trade_matrix.loc[countries_to_keep, :]# countries_to_keep]
+        # Now also remove the columns from the trade matrix which have no trade anymore
+
+        # Now also remove the columns from the trade matrix which have no trade anymore
+        col_sums = self.trade_matrix.sum(axis=0)
+        b_filter = ~(col_sums.eq(0))
+        self.trade_matrix = self.trade_matrix.loc[:, b_filter]
+
+        self.production_data = self.production_data.loc[countries_to_keep]
+
+
+    def remove_countries_except(self):
+        """
+        Removes all countries from the trade matrix and production data except for the ones
+        in self.countries_to_keep.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        assert self.trade_matrix is not None
+        assert self.production_data is not None
+        assert self.countries_to_keep is not None
+        assert isinstance(self.countries_to_keep, list)
+        # Convert the country names to the same format as in the trade matrix
+        cc = coco.CountryConverter()
+        self.countries_to_keep = cc.pandas_convert(
+            pd.Series(self.countries_to_keep), to="name_short"
+        ).to_list()
+
+        # Take the index of the trade matrix and production data and remove all the countries
+        # in self.countries_to_remove
+        keep = [
+            country for country in self.trade_matrix.index if country in self.countries_to_keep
+        ]
+        self.trade_matrix = self.trade_matrix.loc[keep, :]
+        # Now also remove the columns from the trade matrix which have no trade anymore
+        col_sums = self.trade_matrix.sum(axis=0)
+        b_filter = ~(col_sums.eq(0))
+        self.trade_matrix = self.trade_matrix.loc[:, b_filter]
+    
+        self.production_data = self.production_data.loc[keep]
+
     def remove_below_percentile(self):
         """
         Removes countries with trade below a certain percentile.
@@ -156,6 +246,7 @@ class PyTradeShifts:
         assert self.trade_matrix is not None
         assert self.percentile is not None
         assert self.threshold is None
+
         # Calculate the percentile out of all values in the trade matrix. This
         # only considers the values above 0.
         threshold = np.percentile(
@@ -289,6 +380,22 @@ class PyTradeShifts:
             R, index=self.trade_matrix.index, columns=self.trade_matrix.columns
         )
 
+    def set_diagonal_to_zero(self):
+        """
+        Sets the diagonal of the trade matrix to zero.
+        This is needed for the scenario analysis.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        assert self.trade_matrix is not None
+        # Set the diagonal to zero
+        np.fill_diagonal(self.trade_matrix.values, 0)
+
+
     def apply_scenario(self):
         """
         Loads the scenario files unifies the names and applies the scenario to the trade matrix.
@@ -402,7 +509,7 @@ class PyTradeShifts:
 
         self.trade_graph = trade_graph
 
-    def find_trade_communities(self, keep_singletons=False):
+    def find_trade_communities(self):
         """
         Finds the trade communities in the trade graph using the Louvain algorithm.
 
@@ -418,7 +525,7 @@ class PyTradeShifts:
         trade_communities = nx.community.louvain_communities(self.trade_graph, seed=1)
         # Remove all the communities with only one country and print the names of the
         # communities that are removed
-        if keep_singletons:
+        if self.keep_singletons:
             print("Keeping communities with only one country.")
         else:
             for community in list(trade_communities):
@@ -484,6 +591,16 @@ class PyTradeShifts:
         )
 
         plot_winkel_tripel_map(ax)
+        # Add the countries which were removed from the trade matrix as shaded
+        # countries
+        if self.countries_to_remove is not None:
+            # Convert the country names to the same format as in the trade matrix
+            self.countries_to_remove = cc.pandas_convert(
+                pd.Series(self.countries_to_remove), to="name_short"
+            ).to_list()
+            world.loc[
+                world["names_short"].isin(self.countries_to_remove), "geometry"
+            ].plot(ax=ax, color="grey", hatch="xxx", alpha=0.5, edgecolor="black")
 
         # Add a title with self.scenario_name if applicable
         ax.set_title(
@@ -491,7 +608,12 @@ class PyTradeShifts:
             + (
                 f" in scenario: {self.scenario_name}"
                 if self.scenario_name is not None
-                else "(no scenario)"
+                else " (no scenario)"
+            )
+            + (
+                " with country subset"
+                if self.countries_to_remove is not None or self.countries_to_keep is not None
+                else ""
             )
         )
 
@@ -508,6 +630,11 @@ class PyTradeShifts:
                 f"_{self.scenario_name}"
                 if self.scenario_name is not None
                 else "no_scenario"
+            )
+            + (
+                "_with_country_subset"
+                if self.countries_to_remove is not None or self.countries_to_keep is not None
+                else ""
             )
             + "_trade_communities.png",
             dpi=300,
