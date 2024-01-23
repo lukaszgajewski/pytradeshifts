@@ -90,17 +90,19 @@ class PyTradeShifts:
                 preprocessing_main(self.crop, self.base_year, self.region)
             # Read in the data
             self.load_data()
-            # Remove countries
-            if self.countries_to_remove is not None:
-                self.remove_countries()
-            if self.countries_to_keep is not None:
-                self.remove_countries_except()
             # Remove countries with all zeroes in trade and production
             self.remove_net_zero_countries()
             # Prebalance the trade matrix
             self.prebalance()
             # Remove re-exports
             self.correct_reexports()
+            # Set the diagonal to zero
+            self.set_diagonal_to_zero()
+            # Remove countries
+            if self.countries_to_remove is not None:
+                self.remove_countries()
+            if self.countries_to_keep is not None:
+                self.remove_countries_except()
             # Remove countries with low trade
             self.remove_below_percentile()
             if scenario_name is not None:
@@ -185,8 +187,16 @@ class PyTradeShifts:
         countries_to_keep = [
             country for country in self.trade_matrix.index if country not in self.countries_to_remove
         ]
-        self.trade_matrix = self.trade_matrix.loc[countries_to_keep, countries_to_keep]
+        self.trade_matrix = self.trade_matrix.loc[countries_to_keep, :]# countries_to_keep]
+        # Now also remove the columns from the trade matrix which have no trade anymore
+
+        # Now also remove the columns from the trade matrix which have no trade anymore
+        col_sums = self.trade_matrix.sum(axis=0)
+        b_filter = ~(col_sums.eq(0))
+        self.trade_matrix = self.trade_matrix.loc[:, b_filter]
+
         self.production_data = self.production_data.loc[countries_to_keep]
+
 
     def remove_countries_except(self):
         """
@@ -211,11 +221,13 @@ class PyTradeShifts:
 
         # Take the index of the trade matrix and production data and remove all the countries
         # in self.countries_to_remove
-        countries_to_remove = [
+        keep = [
             country for country in self.trade_matrix.index if country in self.countries_to_keep
         ]
-        self.trade_matrix = self.trade_matrix.loc[countries_to_remove, countries_to_remove]
-        self.production_data = self.production_data.loc[countries_to_remove]
+        self.trade_matrix = self.trade_matrix.loc[keep, keep]
+        # TODO make this behaviour consistent with remove_countries
+    
+        self.production_data = self.production_data.loc[keep]
 
     def remove_below_percentile(self):
         """
@@ -231,6 +243,7 @@ class PyTradeShifts:
         assert self.trade_matrix is not None
         assert self.percentile is not None
         assert self.threshold is None
+
         # Calculate the percentile out of all values in the trade matrix. This
         # only considers the values above 0.
         threshold = np.percentile(
@@ -363,6 +376,22 @@ class PyTradeShifts:
         self.trade_matrix = pd.DataFrame(
             R, index=self.trade_matrix.index, columns=self.trade_matrix.columns
         )
+
+    def set_diagonal_to_zero(self):
+        """
+        Sets the diagonal of the trade matrix to zero.
+        This is needed for the scenario analysis.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        assert self.trade_matrix is not None
+        # Set the diagonal to zero
+        np.fill_diagonal(self.trade_matrix.values, 0)
+
 
     def apply_scenario(self):
         """
