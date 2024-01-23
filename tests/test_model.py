@@ -233,9 +233,11 @@ def test_removing_countries():
     Runs the model and removes countries to check if this works
     """
     Wheat2018 = PyTradeShifts(
-        "Wheat", 2018, region="Global", testing=True, countries_to_remove=[
-            "Australia", "Bangladesh"
-        ]
+        "Wheat",
+        2018,
+        region="Global",
+        testing=True,
+        countries_to_remove=["Australia", "Bangladesh"],
     )
 
     # Load the data
@@ -269,9 +271,11 @@ def test_removing_countries_except():
     Tests if removing countries except works
     """
     Wheat2018 = PyTradeShifts(
-        "Wheat", 2018, region="Global", testing=True, countries_to_keep=[
-            "Australia", "Bangladesh"
-        ]
+        "Wheat",
+        2018,
+        region="Global",
+        testing=True,
+        countries_to_keep=["Australia", "Bangladesh"],
     )
 
     # Load the data
@@ -501,7 +505,7 @@ def test_compare_Hedlund_results_with_model_output():
         region="Global",
         testing=True,
         # Removing those here as Hedlund did in her analysis
-        countries_to_remove=nan_indices + ["Taiwan"] + ["Macau"]
+        countries_to_remove=nan_indices + ["Taiwan"] + ["Macau"],
     )
 
     # Load the data
@@ -542,8 +546,6 @@ def test_compare_Hedlund_results_with_model_output():
         # print the sum of the trade for this country
 
     assert Wheat2018.trade_matrix.shape == hedlund.shape
-
-
 
 
 if __name__ == "__main__":
