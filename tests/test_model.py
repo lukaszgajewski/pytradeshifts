@@ -2,6 +2,8 @@ from src.model import PyTradeShifts
 import pandas as pd
 import os
 import numpy as np
+from src.preprocessing import rename_countries
+import country_converter as coco
 
 
 def loading(region):
@@ -170,6 +172,19 @@ def reexport(region):
         index_col=0,
     )
 
+    # Convert all entries in index and columns to strings
+    wheat2018_from_R.index = wheat2018_from_R.index.astype(int)
+    wheat2018_from_R.columns = wheat2018_from_R.columns.astype(int)
+
+    # Rename the R names to match the Python names
+    wheat2018_from_R = rename_countries(
+        wheat2018_from_R, region, "Trade_DetailedTradeMatrix_E", "Area Code"
+    )
+
+    # Sort the index and columns
+    wheat2018_from_R.sort_index(inplace=True)
+    wheat2018_from_R = wheat2018_from_R[sorted(wheat2018_from_R.columns)]
+
     # Compare the results
     assert wheat2018_from_R.shape == Wheat2018.trade_matrix.shape
     # Comparing the sum this has only be correct to 2 decimal places
@@ -180,6 +195,21 @@ def reexport(region):
     assert round(wheat2018_from_R.median().median(), 2) == round(
         Wheat2018.trade_matrix.median().median(), 2
     )
+
+    # Compare the sorted trade matrix with the sorted R matrix
+    trade_matrix_sorted = Wheat2018.trade_matrix.sort_index()
+    trade_matrix_sorted = trade_matrix_sorted[sorted(trade_matrix_sorted.columns)]
+
+    if region == "Global":
+        assert wheat2018_from_R.index.equals(trade_matrix_sorted.index)
+        assert wheat2018_from_R.columns.equals(trade_matrix_sorted.columns)
+
+        # Check if the values if they are rounded to 2 decimal places
+        # First round the whole matrix to 2 decimal places
+        wheat2018_from_R = wheat2018_from_R.round(2)
+        trade_matrix_sorted = trade_matrix_sorted.round(2)
+
+        assert (wheat2018_from_R == trade_matrix_sorted).all(axis=None)
 
 
 def test_reexport_oceania():
@@ -288,9 +318,6 @@ def test_removing_low_trade_countries():
     # Load the data
     Wheat2018.load_data()
 
-    # Remove countries
-    Wheat2018.remove_countries()
-
     # Remove countries with zero trade
     Wheat2018.remove_net_zero_countries()
 
@@ -299,6 +326,9 @@ def test_removing_low_trade_countries():
 
     # Reexport
     Wheat2018.correct_reexports()
+
+    # Remove countries
+    Wheat2018.remove_countries()
 
     # Remove countries with low trade
     Wheat2018.remove_below_percentile()
@@ -446,5 +476,73 @@ def test_apply_scenario():
     assert "Indonesia" not in Wheat2018.trade_matrix.index
 
 
+def test_compare_Hedlund_results_with_model_output():
+    """
+    This compares the output of the model with the Excel file from Johanna Hedlund.
+    """
+    hedlund = pd.read_csv(
+        "data"
+        + os.sep
+        + "validation_data_from_Hedlung_2022"
+        + os.sep
+        + "Ex_15_third percentile_climate impacts.csv",
+        index_col=0,
+    )
+
+    # Remove the countries which don't have ISIMIP data, as
+    # Johanna Hedlund did in her analysis for determining the global threshold
+    ISIMIP = pd.read_csv("data/scenario_files/ISIMIP_wheat_Hedlung.csv", index_col=0)
+    # Get only those countries with NaNs in the ISIMIP data
+    nan_indices = ISIMIP.index[ISIMIP.iloc[:, 0].isnull()].tolist()
+
+    Wheat2018 = PyTradeShifts(
+        "Wheat",
+        2018,
+        region="Global",
+        testing=True,
+        # Removing those here as Hedlund did in her analysis
+        countries_to_remove=nan_indices + ["Taiwan"] + ["Macau"]
+    )
+
+    # Load the data
+    Wheat2018.load_data()
+
+    # Remove countries with zero trade
+    Wheat2018.remove_net_zero_countries()
+
+    # Run the prebalancing
+    Wheat2018.prebalance()
+
+    # Reexport
+    Wheat2018.correct_reexports()
+
+    # Remove countries
+    Wheat2018.remove_countries()
+
+    cc = coco.CountryConverter()
+
+    # Assert that index in the Hedlund data is the same as in the model
+    # Sort them first
+    hedlund.index = cc.pandas_convert(pd.Series(hedlund.index), to="name_short")
+    hedlund.sort_index(inplace=True)
+    Wheat2018.trade_matrix.sort_index(inplace=True)
+
+    # print all the countries which are in the Hedlund data but not in the model
+    print(set(hedlund.index) - set(Wheat2018.trade_matrix.index))
+    # print all the countries which are in the model but not in the Hedlund data
+    print(set(Wheat2018.trade_matrix.index) - set(hedlund.index))
+
+    assert hedlund.index.equals(Wheat2018.trade_matrix.index)
+
+    for country in Wheat2018.trade_matrix.columns:
+        if Wheat2018.trade_matrix[country].sum() == 0:
+            print(country)
+        # print the sum of the trade for this country
+
+    assert Wheat2018.trade_matrix.shape == hedlund.shape
+
+
+
+
 if __name__ == "__main__":
-    test_loading_global()
+    test_removing_countries_except()
