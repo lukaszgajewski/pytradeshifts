@@ -9,6 +9,10 @@ dependencies:
   - matplotlib
   - pandas
   - pytest
+  - country_converter
+  - networkx
+  - geopandas
+  - seaborn
   
 
 
