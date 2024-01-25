@@ -352,9 +352,9 @@ def test_removing_low_trade_countries():
     hedlund.dropna(axis=1, how="all", inplace=True)
 
     hedlund_threshold = np.percentile(
-            hedlund[hedlund > 0],
-            75,
-        )
+        hedlund[hedlund > 0],
+        75,
+    )
 
     assert Wheat2018.threshold == hedlund_threshold
 
@@ -555,7 +555,9 @@ def test_compare_Hedlund_results_with_model_output():
     Wheat2018.trade_matrix.sort_index(inplace=True)
     # Then sort the columns
     hedlund = hedlund[sorted(hedlund.columns)]
-    Wheat2018.trade_matrix = Wheat2018.trade_matrix[sorted(Wheat2018.trade_matrix.columns)]
+    Wheat2018.trade_matrix = Wheat2018.trade_matrix[
+        sorted(Wheat2018.trade_matrix.columns)
+    ]
 
     print("all the countries which are in the Hedlund data but not in the model")
     print(set(hedlund.index) - set(Wheat2018.trade_matrix.index))
