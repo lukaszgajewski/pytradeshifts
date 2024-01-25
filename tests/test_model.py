@@ -339,7 +339,24 @@ def test_removing_low_trade_countries():
 
     print(Wheat2018.trade_matrix.shape)
 
-    assert Wheat2018.threshold == 165.372
+    # Load the Hedlund Data for comparison
+    hedlund = pd.read_csv(
+        "data"
+        + os.sep
+        + "validation_data_from_Hedlung_2022"
+        + os.sep
+        + "Ex_15_third percentile_climate impacts.csv",
+        index_col=0,
+    )
+    # drop empty columns
+    hedlund.dropna(axis=1, how="all", inplace=True)
+
+    hedlund_threshold = np.percentile(
+            hedlund[hedlund > 0],
+            75,
+        )
+
+    assert Wheat2018.threshold == hedlund_threshold
 
     # Check if these countries are still present, as they are missing from
     # the R data in the Hedlund paper
@@ -492,6 +509,8 @@ def test_compare_Hedlund_results_with_model_output():
         + "Ex_15_third percentile_climate impacts.csv",
         index_col=0,
     )
+    # drop empty columns
+    hedlund.dropna(axis=1, how="all", inplace=True)
 
     # Remove the countries which don't have ISIMIP data, as
     # Johanna Hedlund did in her analysis for determining the global threshold
@@ -528,10 +547,15 @@ def test_compare_Hedlund_results_with_model_output():
     cc = coco.CountryConverter()
 
     # Assert that index in the Hedlund data is the same as in the model
-    # Sort them first
     hedlund.index = cc.pandas_convert(pd.Series(hedlund.index), to="name_short")
+    # ALso rename the columns
+    hedlund.columns = cc.pandas_convert(pd.Series(hedlund.columns), to="name_short")
+    # Sort them first
     hedlund.sort_index(inplace=True)
     Wheat2018.trade_matrix.sort_index(inplace=True)
+    # Then sort the columns
+    hedlund = hedlund[sorted(hedlund.columns)]
+    Wheat2018.trade_matrix = Wheat2018.trade_matrix[sorted(Wheat2018.trade_matrix.columns)]
 
     print("all the countries which are in the Hedlund data but not in the model")
     print(set(hedlund.index) - set(Wheat2018.trade_matrix.index))
@@ -539,6 +563,7 @@ def test_compare_Hedlund_results_with_model_output():
     print(set(Wheat2018.trade_matrix.index) - set(hedlund.index))
 
     assert hedlund.index.equals(Wheat2018.trade_matrix.index)
+    assert hedlund.columns.equals(Wheat2018.trade_matrix.columns)
 
     for country in Wheat2018.trade_matrix.columns:
         if Wheat2018.trade_matrix[country].sum() == 0:
@@ -547,6 +572,13 @@ def test_compare_Hedlund_results_with_model_output():
 
     assert Wheat2018.trade_matrix.shape == hedlund.shape
 
+    # Check if the values if they are rounded to 2 decimal places
+    # First round the whole matrix to 2 decimal places
+    hedlund = hedlund.round(2)
+    Wheat2018.trade_matrix = Wheat2018.trade_matrix.round(2)
+
+    assert (hedlund == Wheat2018.trade_matrix).all(axis=None)
+
 
 if __name__ == "__main__":
-    test_compare_Hedlund_results_with_model_output()
+    test_removing_low_trade_countries()
