@@ -9,6 +9,7 @@ from matplotlib.colors import ListedColormap
 import seaborn as sns
 from scipy.spatial.distance import squareform, pdist
 from geopy.distance import geodesic
+from math import isclose
 from src.preprocessing import main as preprocessing_main
 from src.utils import plot_winkel_tripel_map
 
@@ -76,7 +77,6 @@ class PyTradeShifts:
         self.countries_to_keep = countries_to_keep
         self.keep_singletons = keep_singletons
         self.beta = beta
-        self.beta_zero_precision = 1e-5
         # State variables to keep track of the progress
         self.prebalanced = False
         self.reexports_corrected = False
@@ -110,7 +110,10 @@ class PyTradeShifts:
                 self.remove_countries_except()
             # Remove countries with low trade
             self.remove_below_percentile()
-            if abs(beta - 0) < self.beta_zero_precision:
+            # apply the distance cost only if beta != 0
+            # for beta==0 there is no change in values
+            # so there's no point in computing them
+            if not isclose(self.beta, 0):
                 self.apply_distance_cost()
             if scenario_name is not None:
                 self.apply_scenario()
@@ -408,28 +411,41 @@ class PyTradeShifts:
         np.fill_diagonal(self.trade_matrix.values, 0)
 
     def _prepare_centroids(self) -> pd.DataFrame:
+        """
+        Prepares a DataFrame containing coordinates of centroids for each region.
+        A centroid is the geometric centre of a region
+        (also the centre of mass assuming uniform mass distribution).
+        This method should be considered private and is used internally for the
+        computation of the distance matrix between regions.
+
+        Arguments:
+            None
+
+        Returns:
+            pd.DataFrame
+        """
         # https://github.com/gavinr/world-countries-centroids
-        centroids_a = pd.read_csv("data/countries.csv")
+        centroids_a = pd.read_csv("data/country_centroid_locations.csv")
+        # convert whatever names data sets have to one format so that we can
+        # merge all data convieniently later
         centroids_a["name"] = [
             str(c) for c in coco.convert(centroids_a["COUNTRY"], to="name_short")
         ]
-
         # we need this for Taiwan
         centroids_b = gpd.read_file(gpd.datasets.get_path("naturalearth_lowres"))
         centroids_b["name"] = [
             str(c) for c in coco.convert(centroids_b["name"], to="name_short")
         ]
-
+        # we use natural earth data to compute centroids
         # https://gis.stackexchange.com/questions/372564/userwarning-when-trying-to-get-centroid-from-a-polygon-geopandas
         centroids_b["centroid"] = centroids_b.to_crs("+proj=cea").centroid.to_crs(
             centroids_b.crs
         )
         centroids_b["lon"] = centroids_b["centroid"].x
         centroids_b["lat"] = centroids_b["centroid"].y
+        # filter out unneeded columns
         centroids_b = centroids_b[["lon", "lat", "name"]]
-        # need to add manually; values taken from Google maps
-        # Macau 22.198228394900145, 113.54474590904003
-        # Hong Kong 22.32788145032773, 114.17506394778538
+        # need to add some regions manually; values taken from Google maps
         centroids_b = pd.concat(
             [
                 centroids_b,
@@ -442,8 +458,9 @@ class PyTradeShifts:
                 ),
             ]
         )
-
+        # merge the centroid data sets
         centroids = centroids_a.merge(centroids_b, how="outer", on="name")
+        # filter out the regions that aren't in the trade matrix
         centroids = (
             centroids.merge(
                 pd.DataFrame(
@@ -459,14 +476,36 @@ class PyTradeShifts:
             .sort_values("name")
             .reset_index(drop=True)
         )
+        # fill missing values from data set 'a' with values from data set 'b'
         centroids.loc[:, "longitude"].fillna(centroids["lon"], inplace=True)
         centroids.loc[:, "latitude"].fillna(centroids["lat"], inplace=True)
+        # filter out unneeded columns and remove duplicates
         centroids = centroids[["longitude", "latitude", "name"]]
         centroids = centroids.drop_duplicates()
         return centroids
 
     def apply_distance_cost(self) -> None:
+        """
+        Modifies the trade matrix to simulate transport costs.
+        This stemms from the gravity law of trade where T ~ r^(-a).
+        We modify the trade matrix by multiplying by r^(-b), effectively
+        altering the parameter 'a' to be (a+b). 'a' is now going to be whatever
+        follows from the data and 'b' is our control parameter (PyTradeShifts.beta).
+        When b == 0, there is no change to trade.
+        When b > 0, the farther the two regions are the less trade between them
+        When b < 0, the farther the two regions are the more trade between them
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        # get central point for each region
         centroids = self._prepare_centroids()
+        # compute the distance matrix using a geodesic
+        # on an ellipsoidal model of the Earth
+        # https://doi.org/10.1007%2Fs00190-012-0578-z
         distance_matrix = pd.DataFrame(
             squareform(
                 pdist(
@@ -477,7 +516,9 @@ class PyTradeShifts:
             columns=self.trade_matrix.columns,
             index=self.trade_matrix.index,
         )
+        # apply the modification of the gravity law of trade
         self.trade_matrix = self.trade_matrix.multiply(distance_matrix.pow(-self.beta))
+        # diagonal will often be NaN here, so fill it with zeroes
         np.fill_diagonal(self.trade_matrix.values, 0)
 
     def apply_scenario(self):
