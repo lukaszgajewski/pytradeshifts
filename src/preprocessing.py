@@ -18,7 +18,7 @@ http://www.fao.org/faostat/en/#data/QC
 """
 
 
-def rename_item(item):
+def rename_item(item: str) -> str:
     """
     Renames specific item entries for readability.
 
@@ -234,19 +234,19 @@ def rename_countries(
         region: str,
         filename: str,
         code_type: str = "M49 Code",
-) -> pd.DataFrame:
+) -> pd.Series | pd.DataFrame:
     """
     Rename country codes with country names in either production or trade data.
 
     Arguments:
-        data (pd.DataFrame): The data to be renamed.
+        data (pd.Series | pd.DataFrame): The data to be renamed.
         region (str): The region of the data.
         filename (str): The filename for the country codes CSV file.
         code_type (str): The type of country code to be used.
         after_union (bool): Whether the index/columns of the data are already unified.
 
     Returns:
-        pd.DataFrame: The data with country codes replaced by country names.
+        pd.Series | pd.DataFrame: The data with country codes replaced by country names.
     """
     # Read in the country codes from the zip file
     faostat_zip = f"data{os.sep}data_raw{os.sep}{filename}_{region}.zip"
@@ -269,12 +269,10 @@ def rename_countries(
     codes_dict = dict(zip(codes[code_type], codes_area_short))
 
     print(f"Replacing country codes with country names in {filename.split('_')[0]} data")
-    for code in data.index:
-        data.rename(index={code: codes_dict[code]}, inplace=True)
+    data.rename(index=codes_dict, inplace=True)
 
     if isinstance(data, pd.DataFrame):
-        for code in data.columns:
-            data.rename(columns={code: codes_dict[code]}, inplace=True)
+        data.rename(columns=codes_dict, inplace=True)
 
     return data
 
@@ -344,7 +342,7 @@ def main(
     trade_unit="tonnes",
     element="Export Quantity",
     year="Y2018",
-) -> pd.DataFrame:
+) -> None:
     try:
         print(f"Reading in data for {item} in {region}...")
         production_pkl = f"data{os.sep}temp_files{os.sep}Production_Crops_Livestock_E_{region}.pkl"
