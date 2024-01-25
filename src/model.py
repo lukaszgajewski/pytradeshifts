@@ -189,15 +189,10 @@ class PyTradeShifts:
             for country in self.trade_matrix.index
             if country not in self.countries_to_remove
         ]
-        self.trade_matrix = self.trade_matrix.loc[
-            countries_to_keep, :
-        ]  # countries_to_keep]
-        # Now also remove the columns from the trade matrix which have no trade anymore
 
-        # Now also remove the columns from the trade matrix which have no trade anymore
-        col_sums = self.trade_matrix.sum(axis=0)
-        b_filter = ~(col_sums.eq(0))
-        self.trade_matrix = self.trade_matrix.loc[:, b_filter]
+        self.trade_matrix = self.trade_matrix.loc[
+            countries_to_keep, countries_to_keep
+        ]
 
         self.production_data = self.production_data.loc[countries_to_keep]
 
@@ -229,11 +224,8 @@ class PyTradeShifts:
             for country in self.trade_matrix.index
             if country in self.countries_to_keep
         ]
-        self.trade_matrix = self.trade_matrix.loc[keep, :]
-        # Now also remove the columns from the trade matrix which have no trade anymore
-        col_sums = self.trade_matrix.sum(axis=0)
-        b_filter = ~(col_sums.eq(0))
-        self.trade_matrix = self.trade_matrix.loc[:, b_filter]
+
+        self.trade_matrix = self.trade_matrix.loc[keep, keep]
 
         self.production_data = self.production_data.loc[keep]
 
@@ -398,7 +390,10 @@ class PyTradeShifts:
         """
         assert self.trade_matrix is not None
         # Set the diagonal to zero
-        np.fill_diagonal(self.trade_matrix.values, 0)
+        mat = self.trade_matrix.values
+        n = mat.shape[0]
+        mat[range(n), range(n)] = 0
+        return pd.DataFrame(mat, index=df_matrix.index, columns=df_matrix.columns)
 
     def apply_scenario(self):
         """
