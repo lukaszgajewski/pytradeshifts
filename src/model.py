@@ -192,7 +192,8 @@ class PyTradeShifts:
 
         self.trade_matrix = self.trade_matrix.loc[
             countries_to_keep, countries_to_keep
-        ]  
+        ]
+
         self.production_data = self.production_data.loc[countries_to_keep]
 
     def remove_countries_except(self):
@@ -225,7 +226,7 @@ class PyTradeShifts:
         ]
 
         self.trade_matrix = self.trade_matrix.loc[keep, keep]
-    
+
         self.production_data = self.production_data.loc[keep]
 
     def remove_below_percentile(self):
@@ -389,7 +390,10 @@ class PyTradeShifts:
         """
         assert self.trade_matrix is not None
         # Set the diagonal to zero
-        np.fill_diagonal(self.trade_matrix.values, 0)
+        mat = self.trade_matrix.values
+        n = mat.shape[0]
+        mat[range(n), range(n)] = 0
+        return pd.DataFrame(mat, index=df_matrix.index, columns=df_matrix.columns)
 
     def apply_scenario(self):
         """
