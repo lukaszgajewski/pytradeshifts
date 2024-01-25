@@ -7,6 +7,8 @@ import geopandas as gpd
 import country_converter as coco
 from matplotlib.colors import ListedColormap
 import seaborn as sns
+from scipy.spatial.distance import squareform, pdist
+from geopy.distance import geodesic
 from src.preprocessing import main as preprocessing_main
 from src.utils import plot_winkel_tripel_map
 
@@ -61,6 +63,7 @@ class PyTradeShifts:
         countries_to_remove=None,
         countries_to_keep=None,
         keep_singletons=False,
+        beta=0.0,
     ):
         # Save the arguments
         self.crop = crop
@@ -72,6 +75,8 @@ class PyTradeShifts:
         self.countries_to_remove = countries_to_remove
         self.countries_to_keep = countries_to_keep
         self.keep_singletons = keep_singletons
+        self.beta = beta
+        self.beta_zero_precision = 1e-5
         # State variables to keep track of the progress
         self.prebalanced = False
         self.reexports_corrected = False
@@ -105,6 +110,8 @@ class PyTradeShifts:
                 self.remove_countries_except()
             # Remove countries with low trade
             self.remove_below_percentile()
+            if abs(beta - 0) < self.beta_zero_precision:
+                self.apply_distance_cost()
             if scenario_name is not None:
                 self.apply_scenario()
             # Build the graph
@@ -398,6 +405,79 @@ class PyTradeShifts:
         """
         assert self.trade_matrix is not None
         # Set the diagonal to zero
+        np.fill_diagonal(self.trade_matrix.values, 0)
+
+    def _prepare_centroids(self) -> pd.DataFrame:
+        # https://github.com/gavinr/world-countries-centroids
+        centroids_a = pd.read_csv("data/countries.csv")
+        centroids_a["name"] = [
+            str(c) for c in coco.convert(centroids_a["COUNTRY"], to="name_short")
+        ]
+
+        # we need this for Taiwan
+        centroids_b = gpd.read_file(gpd.datasets.get_path("naturalearth_lowres"))
+        centroids_b["name"] = [
+            str(c) for c in coco.convert(centroids_b["name"], to="name_short")
+        ]
+
+        # https://gis.stackexchange.com/questions/372564/userwarning-when-trying-to-get-centroid-from-a-polygon-geopandas
+        centroids_b["centroid"] = centroids_b.to_crs("+proj=cea").centroid.to_crs(
+            centroids_b.crs
+        )
+        centroids_b["lon"] = centroids_b["centroid"].x
+        centroids_b["lat"] = centroids_b["centroid"].y
+        centroids_b = centroids_b[["lon", "lat", "name"]]
+        # need to add manually; values taken from Google maps
+        # Macau 22.198228394900145, 113.54474590904003
+        # Hong Kong 22.32788145032773, 114.17506394778538
+        centroids_b = pd.concat(
+            [
+                centroids_b,
+                pd.DataFrame(
+                    [
+                        [113.54474590904003, 22.198228394900145, "Macau"],
+                        [114.17506394778538, 22.32788145032773, "Hong Kong"],
+                    ],
+                    columns=["lon", "lat", "name"],
+                ),
+            ]
+        )
+
+        centroids = centroids_a.merge(centroids_b, how="outer", on="name")
+        centroids = (
+            centroids.merge(
+                pd.DataFrame(
+                    [
+                        str(c)
+                        for c in coco.convert(self.trade_matrix.index, to="name_short")
+                    ],
+                    columns=["name"],
+                ),
+                how="inner",
+                on="name",
+            )
+            .sort_values("name")
+            .reset_index(drop=True)
+        )
+        centroids.loc[:, "longitude"].fillna(centroids["lon"], inplace=True)
+        centroids.loc[:, "latitude"].fillna(centroids["lat"], inplace=True)
+        centroids = centroids[["longitude", "latitude", "name"]]
+        centroids = centroids.drop_duplicates()
+        return centroids
+
+    def apply_distance_cost(self) -> None:
+        centroids = self._prepare_centroids()
+        distance_matrix = pd.DataFrame(
+            squareform(
+                pdist(
+                    centroids.loc[:, ["latitude", "longitude"]],
+                    metric=lambda lat, lon: geodesic(lat, lon).km,
+                )
+            ),
+            columns=self.trade_matrix.columns,
+            index=self.trade_matrix.index,
+        )
+        self.trade_matrix = self.trade_matrix.multiply(distance_matrix.pow(-self.beta))
         np.fill_diagonal(self.trade_matrix.values, 0)
 
     def apply_scenario(self):
