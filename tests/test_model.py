@@ -488,6 +488,11 @@ def test_compare_Hedlund_results_with_model_output():
         + "Ex_15_third percentile_climate impacts.csv",
         index_col=0,
     )
+    # drop empty columns
+    hedlund.dropna(axis=1, how="all", inplace=True)
+    print("Hedlund")
+    print(hedlund.shape)
+    print("Hedlund")
 
     # Remove the countries which don't have ISIMIP data, as
     # Johanna Hedlund did in her analysis for determining the global threshold
