@@ -187,13 +187,8 @@ class PyTradeShifts:
         countries_to_keep = [
             country for country in self.trade_matrix.index if country not in self.countries_to_remove
         ]
-        self.trade_matrix = self.trade_matrix.loc[countries_to_keep, :]# countries_to_keep]
+        self.trade_matrix = self.trade_matrix.loc[countries_to_keep, countries_to_keep]
         # Now also remove the columns from the trade matrix which have no trade anymore
-
-        # Now also remove the columns from the trade matrix which have no trade anymore
-        col_sums = self.trade_matrix.sum(axis=0)
-        b_filter = ~(col_sums.eq(0))
-        self.trade_matrix = self.trade_matrix.loc[:, b_filter]
 
         self.production_data = self.production_data.loc[countries_to_keep]
 
@@ -224,11 +219,7 @@ class PyTradeShifts:
         keep = [
             country for country in self.trade_matrix.index if country in self.countries_to_keep
         ]
-        self.trade_matrix = self.trade_matrix.loc[keep, :]
-        # Now also remove the columns from the trade matrix which have no trade anymore
-        col_sums = self.trade_matrix.sum(axis=0)
-        b_filter = ~(col_sums.eq(0))
-        self.trade_matrix = self.trade_matrix.loc[:, b_filter]
+        self.trade_matrix = self.trade_matrix.loc[keep, keep]
     
         self.production_data = self.production_data.loc[keep]
 
