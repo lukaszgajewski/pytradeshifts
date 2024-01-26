@@ -11,7 +11,7 @@ from scipy.spatial.distance import squareform, pdist
 from geopy.distance import geodesic
 from math import isclose
 from src.preprocessing import main as preprocessing_main
-from src.utils import plot_winkel_tripel_map
+from src.utils import plot_winkel_tripel_map, prepare_centroids
 
 plt.style.use(
     "https://raw.githubusercontent.com/allfed/ALLFED-matplotlib-style-sheet/main/ALLFED.mplstyle"
@@ -403,80 +403,6 @@ class PyTradeShifts:
         mat[range(n), range(n)] = 0
         return pd.DataFrame(mat, index=df_matrix.index, columns=df_matrix.columns)
 
-    def _prepare_centroids(self) -> pd.DataFrame:
-        """
-        Prepares a DataFrame containing coordinates of centroids for each region.
-        A centroid is the geometric centre of a region
-        (also the centre of mass assuming uniform mass distribution).
-        This method should be considered private and is used internally for the
-        computation of the distance matrix between regions.
-
-        Arguments:
-            None
-
-        Returns:
-            pd.DataFrame
-        """
-        # https://github.com/gavinr/world-countries-centroids
-        centroids_a = pd.read_csv("data/country_centroid_locations.csv")
-        # convert whatever names data sets have to one format so that we can
-        # merge all data convieniently later
-        centroids_a["name"] = [
-            str(c) for c in coco.convert(centroids_a["COUNTRY"], to="name_short")
-        ]
-        # we need this for Taiwan
-        centroids_b = gpd.read_file(gpd.datasets.get_path("naturalearth_lowres"))
-        centroids_b["name"] = [
-            str(c) for c in coco.convert(centroids_b["name"], to="name_short")
-        ]
-        # we use natural earth data to compute centroids
-        # https://gis.stackexchange.com/questions/372564/userwarning-when-trying-to-get-centroid-from-a-polygon-geopandas
-        centroids_b["centroid"] = centroids_b.to_crs("+proj=cea").centroid.to_crs(
-            centroids_b.crs
-        )
-        centroids_b["lon"] = centroids_b["centroid"].x
-        centroids_b["lat"] = centroids_b["centroid"].y
-        # filter out unneeded columns
-        centroids_b = centroids_b[["lon", "lat", "name"]]
-        # need to add some regions manually; values taken from Google maps
-        centroids_b = pd.concat(
-            [
-                centroids_b,
-                pd.DataFrame(
-                    [
-                        [113.54474590904003, 22.198228394900145, "Macau"],
-                        [114.17506394778538, 22.32788145032773, "Hong Kong"],
-                    ],
-                    columns=["lon", "lat", "name"],
-                ),
-            ]
-        )
-        # merge the centroid data sets
-        centroids = centroids_a.merge(centroids_b, how="outer", on="name")
-        # filter out the regions that aren't in the trade matrix
-        centroids = (
-            centroids.merge(
-                pd.DataFrame(
-                    [
-                        str(c)
-                        for c in coco.convert(self.trade_matrix.index, to="name_short")
-                    ],
-                    columns=["name"],
-                ),
-                how="inner",
-                on="name",
-            )
-            .sort_values("name")
-            .reset_index(drop=True)
-        )
-        # fill missing values from data set 'a' with values from data set 'b'
-        centroids.loc[:, "longitude"].fillna(centroids["lon"], inplace=True)
-        centroids.loc[:, "latitude"].fillna(centroids["lat"], inplace=True)
-        # filter out unneeded columns and remove duplicates
-        centroids = centroids[["longitude", "latitude", "name"]]
-        centroids = centroids.drop_duplicates()
-        return centroids
-
     def apply_distance_cost(self) -> None:
         """
         Modifies the trade matrix to simulate transport costs.
@@ -495,7 +421,7 @@ class PyTradeShifts:
             None
         """
         # get central point for each region
-        centroids = self._prepare_centroids()
+        centroids = prepare_centroids(self.trade_matrix.index)
         # compute the distance matrix using a geodesic
         # on an ellipsoidal model of the Earth
         # https://doi.org/10.1007%2Fs00190-012-0578-z
