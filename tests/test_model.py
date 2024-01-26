@@ -542,8 +542,6 @@ def test_compare_Hedlund_results_with_model_output():
     # Remove countries
     Wheat2018.remove_countries()
 
-    Wheat2018.set_diagonal_to_zero()
-
     cc = coco.CountryConverter()
 
     # Assert that index in the Hedlund data is the same as in the model

@@ -41,8 +41,10 @@ class PyTradeShifts:
             or not.
         countries_to_remove (list, optional): A list of countries to remove
             from the trade matrix. All other countries are kept.
+            Mutually exclusive with countires_to_keep; takes priority.
         countries_to_keep (list, optional): A list of countries to keep in
             the trade matrix. All other countries are removed.
+            Mutually exclusive with countries_to_remove; yields priority.
         keep_singletons (bool, optional): Whether to keep the communities
             with only one country or not. If False, these communities are
             removed.
@@ -65,7 +67,7 @@ class PyTradeShifts:
         countries_to_keep=None,
         keep_singletons=False,
         beta=0.0,
-    ):
+    ) -> None:
         # Save the arguments
         self.crop = crop
         self.base_year = "Y" + str(base_year)
@@ -91,40 +93,43 @@ class PyTradeShifts:
 
         # Don't run the methods if we are testing, so we can test them individually
         if not testing:
-            if with_preprocessing:
-                preprocessing_main(self.crop, self.base_year, self.region)
-            # Read in the data
-            self.load_data()
-            # Remove countries with all zeroes in trade and production
-            self.remove_net_zero_countries()
-            # Prebalance the trade matrix
-            self.prebalance()
-            # Remove re-exports
-            self.correct_reexports()
-            # Set the diagonal to zero
-            self.set_diagonal_to_zero()
-            # Remove countries
-            if self.countries_to_remove is not None:
-                self.remove_countries()
-            if self.countries_to_keep is not None:
-                self.remove_countries_except()
-            # Remove countries with low trade
-            self.remove_below_percentile()
-            # apply the distance cost only if beta != 0
-            # for beta==0 there is no change in values
-            # so there's no point in computing them
-            if not isclose(self.beta, 0):
-                self.apply_distance_cost()
-            if scenario_name is not None:
-                self.apply_scenario()
-            # Build the graph
-            self.build_graph()
-            # Find the trade communities
-            self.find_trade_communities()
-            # Plot the trade communities
-            self.plot_trade_communities()
+            self.run(with_preprocessing)
 
-    def load_data(self):
+    def run(self, with_preprocessing: bool) -> None:
+        if with_preprocessing:
+            preprocessing_main(self.crop, self.base_year, self.region)
+        # Read in the data
+        self.load_data()
+        # Remove countries with all zeroes in trade and production
+        self.remove_net_zero_countries()
+        # Prebalance the trade matrix
+        self.prebalance()
+        # Remove re-exports
+        self.correct_reexports()
+        # Set diagonal to zero
+        np.fill_diagonal(self.trade_matrix.values, 0)
+        # Remove countries
+        if self.countries_to_remove is not None:
+            self.remove_countries()
+        elif self.countries_to_keep is not None:
+            self.remove_countries_except()
+        # Remove countries with low trade
+        self.remove_below_percentile()
+        # apply the distance cost only if beta != 0
+        # for beta==0 there is no change in values
+        # so there's no point in computing them
+        if not isclose(self.beta, 0):
+            self.apply_distance_cost()
+        if self.scenario_name is not None:
+            self.apply_scenario()
+        # Build the graph
+        self.build_graph()
+        # Find the trade communities
+        self.find_trade_communities()
+        # Plot the trade communities
+        self.plot_trade_communities()
+
+    def load_data(self) -> None:
         """
         Loads the data into a pandas dataframe and cleans it
         of countries with trade below a certain percentile.
@@ -172,9 +177,11 @@ class PyTradeShifts:
         self.trade_matrix = trade_matrix
         self.production_data = production_data
 
-    def remove_countries(self):
+    def remove_net_zero_countries(self) -> None:
         """
-        Removes countries from the trade matrix and production data.
+        Return production and trading data with "all zero" countries removed.
+        "All zero" countries are such states that has production = 0 and sum of rows
+        in trade matrix = 0, and sum of columns = 0.
 
         Arguments:
             None
@@ -182,101 +189,20 @@ class PyTradeShifts:
         Returns:
             None
         """
-        assert self.trade_matrix is not None
-        assert self.production_data is not None
-        assert self.countries_to_remove is not None
-        assert isinstance(self.countries_to_remove, list)
-        # Convert the country names to the same format as in the trade matrix
-        cc = coco.CountryConverter()
-        self.countries_to_remove = cc.pandas_convert(
-            pd.Series(self.countries_to_remove), to="name_short"
-        ).to_list()
-
-        # Take the index of the trade matrix and production data and remove all the countries
-        # in self.countries_to_remove
-        countries_to_keep = [
-            country
-            for country in self.trade_matrix.index
-            if country not in self.countries_to_remove
-        ]
-
-        self.trade_matrix = self.trade_matrix.loc[countries_to_keep, countries_to_keep]
-
-        self.production_data = self.production_data.loc[countries_to_keep]
-
-    def remove_countries_except(self):
-        """
-        Removes all countries from the trade matrix and production data except for the ones
-        in self.countries_to_keep.
-
-        Arguments:
-            None
-
-        Returns:
-            None
-        """
-        assert self.trade_matrix is not None
-        assert self.production_data is not None
-        assert self.countries_to_keep is not None
-        assert isinstance(self.countries_to_keep, list)
-        # Convert the country names to the same format as in the trade matrix
-        cc = coco.CountryConverter()
-        self.countries_to_keep = cc.pandas_convert(
-            pd.Series(self.countries_to_keep), to="name_short"
-        ).to_list()
-
-        # Take the index of the trade matrix and production data and remove all the countries
-        # in self.countries_to_remove
-        keep = [
-            country
-            for country in self.trade_matrix.index
-            if country in self.countries_to_keep
-        ]
-
-        self.trade_matrix = self.trade_matrix.loc[keep, keep]
-
-        self.production_data = self.production_data.loc[keep]
-
-    def remove_below_percentile(self):
-        """
-        Removes countries with trade below a certain percentile.
-
-        Arguments:
-            None
-
-        Returns:
-            None
-        """
-        # Make sure the data is loaded and no threshold is calculated yet
-        assert self.trade_matrix is not None
-        assert self.percentile is not None
-        assert self.threshold is None
-
-        # Calculate the percentile out of all values in the trade matrix. This
-        # only considers the values above 0.
-        threshold = np.percentile(
-            self.trade_matrix.values[self.trade_matrix.values > 0],
-            self.percentile * 100,
-        )
-        # Set all values to 0 which are below the threshold
-        self.trade_matrix[self.trade_matrix < threshold] = 0
+        assert self.no_trade_removed is False
+        self.no_trade_removed = True
 
         # b_ signifies boolean here, these are filtering masks
         row_sums = self.trade_matrix.sum(axis=1)
         col_sums = self.trade_matrix.sum(axis=0)
 
-        b_filter = ~(row_sums.eq(0) & col_sums.eq(0))
-        # Filter out the countries with all zeroes in trade
+        b_filter = ~(row_sums.eq(0) & col_sums.eq(0) & (self.production_data == 0))
+
+        # Filter out the countries with all zeroes
+        self.production_data = self.production_data[b_filter]
         self.trade_matrix = self.trade_matrix.loc[b_filter, b_filter]
 
-        print(
-            f"Removed countries with trade below the {int(self.percentile*100)}th percentile."
-        )
-
-        # Save threshold for testing purposes
-        self.threshold = threshold
-
-    def prebalance(self, precision=10**-3):
+    def prebalance(self, precision=10**-3) -> None:
         """
         This implementation also includes pre-balancing to ensure that countries don't
         export more than they produce and import.
@@ -312,32 +238,7 @@ class PyTradeShifts:
                 - self.trade_matrix.sum(axis=1)
             )
 
-    def remove_net_zero_countries(self):
-        """
-        Return production and trading data with "all zero" countries removed.
-        "All zero" countries are such states that has production = 0 and sum of rows
-        in trade matrix = 0, and sum of columns = 0.
-
-        Arguments:
-            None
-
-        Returns:
-            None
-        """
-        assert self.no_trade_removed is False
-        self.no_trade_removed = True
-
-        # b_ signifies boolean here, these are filtering masks
-        row_sums = self.trade_matrix.sum(axis=1)
-        col_sums = self.trade_matrix.sum(axis=0)
-
-        b_filter = ~(row_sums.eq(0) & col_sums.eq(0) & (self.production_data == 0))
-
-        # Filter out the countries with all zeroes
-        self.production_data = self.production_data[b_filter]
-        self.trade_matrix = self.trade_matrix.loc[b_filter, b_filter]
-
-    def correct_reexports(self):
+    def correct_reexports(self) -> None:
         """
         Removes re-exports from the trade matrix.
         This is a Python implementation of the R/Matlab code from:
@@ -365,7 +266,7 @@ class PyTradeShifts:
         self.reexports_corrected = True
 
         # I know that the variable names here are confusing, but this is a conversion
-        # by the original R code from Johanna Hedlung/Croft et al.. The variable names are the
+        # of the original R code from Johanna Hedlung/Croft et al.. The variable names are the
         # same as in the R code and we leave them this way, so we can more easily
         # compare the two pieces of code if something goes wrong.
         self.trade_matrix = self.trade_matrix.T
@@ -385,10 +286,9 @@ class PyTradeShifts:
             R, index=self.trade_matrix.index, columns=self.trade_matrix.columns
         )
 
-    def set_diagonal_to_zero(self):
+    def remove_countries(self) -> None:
         """
-        Sets the diagonal of the trade matrix to zero.
-        This is needed for the scenario analysis.
+        Removes countries from the trade matrix and production data.
 
         Arguments:
             None
@@ -396,12 +296,91 @@ class PyTradeShifts:
         Returns:
             None
         """
-        assert self.trade_matrix is not None
-        # Set the diagonal to zero
-        mat = self.trade_matrix.values
-        n = mat.shape[0]
-        mat[range(n), range(n)] = 0
-        return pd.DataFrame(mat, index=df_matrix.index, columns=df_matrix.columns)
+        assert isinstance(self.countries_to_remove, list)
+        # Convert the country names to the same format as in the trade matrix
+        cc = coco.CountryConverter()
+        self.countries_to_remove = cc.pandas_convert(
+            pd.Series(self.countries_to_remove), to="name_short"
+        ).to_list()
+
+        # Take the index of the trade matrix and production data and remove all the countries
+        # in self.countries_to_remove
+        countries_to_keep = [
+            country
+            for country in self.trade_matrix.index
+            if country not in self.countries_to_remove
+        ]
+
+        self.trade_matrix = self.trade_matrix.loc[countries_to_keep, countries_to_keep]
+
+        self.production_data = self.production_data.loc[countries_to_keep]
+
+    def remove_countries_except(self) -> None:
+        """
+        Removes all countries from the trade matrix and production data except for the ones
+        in self.countries_to_keep.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        assert isinstance(self.countries_to_keep, list)
+        # Convert the country names to the same format as in the trade matrix
+        cc = coco.CountryConverter()
+        self.countries_to_keep = cc.pandas_convert(
+            pd.Series(self.countries_to_keep), to="name_short"
+        ).to_list()
+
+        # Take the index of the trade matrix and production data and remove all the countries
+        # in self.countries_to_remove
+        keep = [
+            country
+            for country in self.trade_matrix.index
+            if country in self.countries_to_keep
+        ]
+
+        self.trade_matrix = self.trade_matrix.loc[keep, keep]
+
+        self.production_data = self.production_data.loc[keep]
+
+    def remove_below_percentile(self) -> None:
+        """
+        Removes countries with trade below a certain percentile.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        # Make sure no threshold is calculated yet
+        assert self.threshold is None
+
+        # Calculate the percentile out of all values in the trade matrix. This
+        # only considers the values above 0.
+        threshold = np.percentile(
+            self.trade_matrix.values[self.trade_matrix.values > 0],
+            self.percentile * 100,
+        )
+        # Set all values to 0 which are below the threshold
+        self.trade_matrix[self.trade_matrix < threshold] = 0
+
+        # b_ signifies boolean here, these are filtering masks
+        row_sums = self.trade_matrix.sum(axis=1)
+        col_sums = self.trade_matrix.sum(axis=0)
+
+        b_filter = ~(row_sums.eq(0) & col_sums.eq(0))
+        # Filter out the countries with all zeroes in trade
+        self.trade_matrix = self.trade_matrix.loc[b_filter, b_filter]
+
+        print(
+            f"Removed countries with trade below the {int(self.percentile*100)}th percentile."
+        )
+
+        # Save threshold for testing purposes
+        self.threshold = threshold
 
     def apply_distance_cost(self) -> None:
         """
@@ -440,7 +419,7 @@ class PyTradeShifts:
         # diagonal will often be NaN here, so fill it with zeroes
         np.fill_diagonal(self.trade_matrix.values, 0)
 
-    def apply_scenario(self):
+    def apply_scenario(self) -> None:
         """
         Loads the scenario files unifies the names and applies the scenario to the trade matrix.
         by multiplying the trade matrix with the scenario scalar.
@@ -473,8 +452,7 @@ class PyTradeShifts:
 
         assert isinstance(scenario_data, pd.Series)
 
-        # Make sure that all the values are below -100 and +100, as this is a percentage change
-        assert scenario_data.max() <= 100
+        # Make sure that all the values are above -100, as this is a percentage change
         assert scenario_data.min() >= -100
 
         # Convert the percentage change to a scalar, so we can multiply the trade matrix with it
@@ -509,7 +487,7 @@ class PyTradeShifts:
         # Multiply all the columns with the scenario data
         self.trade_matrix = self.trade_matrix.mul(scenario_data.values, axis=0)
 
-    def build_graph(self):
+    def build_graph(self) -> None:
         """
         Builds a directed and weighted graph from the trade matrix.
 
@@ -527,33 +505,13 @@ class PyTradeShifts:
         assert self.threshold is not None
 
         # Build the graph
-        # Initialize a directed graph
-        trade_graph = nx.DiGraph()
-
-        # Iterate over the dataframe to add nodes and edges
-        for source_country in self.trade_matrix.index:
-            for destination_country in self.trade_matrix.columns:
-                # Don't add self-loops
-                if source_country == destination_country:
-                    continue
-                # Get the trade amount
-                trade_amount = self.trade_matrix.loc[
-                    source_country, destination_country
-                ]
-
-                # Add nodes if not already in the graph
-                trade_graph.add_node(source_country)
-                trade_graph.add_node(destination_country)
-
-                # Add edge if trade amount is non-zero
-                if trade_amount != 0:
-                    trade_graph.add_edge(
-                        source_country, destination_country, weight=trade_amount
-                    )
+        trade_graph = nx.from_pandas_adjacency(
+            self.trade_matrix, create_using=nx.DiGraph
+        )
 
         self.trade_graph = trade_graph
 
-    def find_trade_communities(self):
+    def find_trade_communities(self) -> None:
         """
         Finds the trade communities in the trade graph using the Louvain algorithm.
 
@@ -572,19 +530,19 @@ class PyTradeShifts:
         if self.keep_singletons:
             print("Keeping communities with only one country.")
         else:
-            for community in list(trade_communities):
+            for community in trade_communities:
                 if len(community) == 1:
                     trade_communities.remove(community)
                     print(f"Removed community {community} with only one country.")
 
         self.trade_communities = trade_communities
 
-    def plot_trade_communities(self):
+    def plot_trade_communities(self) -> None:
         """
         Plots the trade communities in the trade graph on a world map.
 
         Arguments:
-            save (bool, optional): Whether to save the plot or not.
+            None
 
         Returns:
             None
