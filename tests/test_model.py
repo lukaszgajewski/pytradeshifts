@@ -582,5 +582,103 @@ def test_compare_Hedlund_results_with_model_output():
     assert (hedlund == Wheat2018.trade_matrix).all(axis=None)
 
 
+def test_apply_distance_cost():
+    """
+    Applies the gravity law of trade modification to simulate higher transport costs
+    for three cases: beta==0, beta<0, beta>0.
+    Checks if the trade matrix format
+    remains unchanged, and if the values post transformation are unchanged, lower
+    or higher, respectively.
+    """
+    Wheat2018 = PyTradeShifts("Wheat", 2018, region="Global", testing=True, beta=0)
+
+    # Load the data
+    Wheat2018.load_data()
+
+    # Remove countries with zero trade
+    Wheat2018.remove_net_zero_countries()
+
+    # Run the prebalancing
+    Wheat2018.prebalance()
+
+    # Reexport
+    Wheat2018.correct_reexports()
+
+    # Set the diagonal to zero
+    np.fill_diagonal(Wheat2018.trade_matrix.values, 0)
+
+    pre_apply_matrix = Wheat2018.trade_matrix.copy()
+    Wheat2018.apply_distance_cost()
+
+    # beta = 0 so nothing should have happened
+    assert (pre_apply_matrix == Wheat2018.trade_matrix).all(axis=None)
+
+    Wheat2018 = PyTradeShifts("Wheat", 2018, region="Global", testing=True, beta=2)
+
+    # Load the data
+    Wheat2018.load_data()
+
+    # Remove countries with zero trade
+    Wheat2018.remove_net_zero_countries()
+
+    # Run the prebalancing
+    Wheat2018.prebalance()
+
+    # Reexport
+    Wheat2018.correct_reexports()
+
+    # Set the diagonal to zero
+    np.fill_diagonal(Wheat2018.trade_matrix.values, 0)
+
+    pre_apply_matrix = Wheat2018.trade_matrix.copy()
+    Wheat2018.apply_distance_cost()
+
+    # check that index remains unchanged
+    # if it changed it means we're missing some regions in the distance matrix
+    assert (pre_apply_matrix.index == Wheat2018.trade_matrix.index).all(axis=None), set(
+        pre_apply_index
+    ).difference(Wheat2018.trade_matrix.index)
+    # check that the shape didn't change
+    assert pre_apply_matrix.shape == Wheat2018.trade_matrix.shape, (
+        pre_apply_shape,
+        Wheat2018.trade_matrix.shape,
+    )
+    # beta = 2 so all values should be <= than before
+    assert (pre_apply_matrix >= Wheat2018.trade_matrix).all(axis=None)
+
+    Wheat2018 = PyTradeShifts("Wheat", 2018, region="Global", testing=True, beta=-2)
+
+    # Load the data
+    Wheat2018.load_data()
+
+    # Remove countries with zero trade
+    Wheat2018.remove_net_zero_countries()
+
+    # Run the prebalancing
+    Wheat2018.prebalance()
+
+    # Reexport
+    Wheat2018.correct_reexports()
+
+    # Set the diagonal to zero
+    np.fill_diagonal(Wheat2018.trade_matrix.values, 0)
+
+    pre_apply_matrix = Wheat2018.trade_matrix.copy()
+    Wheat2018.apply_distance_cost()
+
+    # check that index remains unchanged
+    # if it changed it means we're missing some regions in the distance matrix
+    assert (pre_apply_matrix.index == Wheat2018.trade_matrix.index).all(axis=None), set(
+        pre_apply_index
+    ).difference(Wheat2018.trade_matrix.index)
+    # check that the shape didn't change
+    assert pre_apply_matrix.shape == Wheat2018.trade_matrix.shape, (
+        pre_apply_shape,
+        Wheat2018.trade_matrix.shape,
+    )
+    # beta = -2 so all values should be >= than before
+    assert (pre_apply_matrix <= Wheat2018.trade_matrix).all(axis=None)
+
+
 if __name__ == "__main__":
     test_removing_low_trade_countries()

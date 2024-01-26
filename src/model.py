@@ -7,8 +7,11 @@ import geopandas as gpd
 import country_converter as coco
 from matplotlib.colors import ListedColormap
 import seaborn as sns
+from scipy.spatial.distance import squareform, pdist
+from geopy.distance import geodesic
+from math import isclose
 from src.preprocessing import main as preprocessing_main
-from src.utils import plot_winkel_tripel_map
+from src.utils import plot_winkel_tripel_map, prepare_centroids
 
 plt.style.use(
     "https://raw.githubusercontent.com/allfed/ALLFED-matplotlib-style-sheet/main/ALLFED.mplstyle"
@@ -61,6 +64,7 @@ class PyTradeShifts:
         countries_to_remove=None,
         countries_to_keep=None,
         keep_singletons=False,
+        beta=0.0,
     ):
         # Save the arguments
         self.crop = crop
@@ -72,6 +76,7 @@ class PyTradeShifts:
         self.countries_to_remove = countries_to_remove
         self.countries_to_keep = countries_to_keep
         self.keep_singletons = keep_singletons
+        self.beta = beta
         # State variables to keep track of the progress
         self.prebalanced = False
         self.reexports_corrected = False
@@ -105,6 +110,11 @@ class PyTradeShifts:
                 self.remove_countries_except()
             # Remove countries with low trade
             self.remove_below_percentile()
+            # apply the distance cost only if beta != 0
+            # for beta==0 there is no change in values
+            # so there's no point in computing them
+            if not isclose(self.beta, 0):
+                self.apply_distance_cost()
             if scenario_name is not None:
                 self.apply_scenario()
             # Build the graph
@@ -392,6 +402,43 @@ class PyTradeShifts:
         n = mat.shape[0]
         mat[range(n), range(n)] = 0
         return pd.DataFrame(mat, index=df_matrix.index, columns=df_matrix.columns)
+
+    def apply_distance_cost(self) -> None:
+        """
+        Modifies the trade matrix to simulate transport costs.
+        This stemms from the gravity law of trade where T ~ r^(-a).
+        We modify the trade matrix by multiplying by r^(-b), effectively
+        altering the parameter 'a' to be (a+b). 'a' is now going to be whatever
+        follows from the data and 'b' is our control parameter (PyTradeShifts.beta).
+        When b == 0, there is no change to trade.
+        When b > 0, the farther the two regions are the less trade between them
+        When b < 0, the farther the two regions are the more trade between them
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        # get central point for each region
+        centroids = prepare_centroids(self.trade_matrix.index)
+        # compute the distance matrix using a geodesic
+        # on an ellipsoidal model of the Earth
+        # https://doi.org/10.1007%2Fs00190-012-0578-z
+        distance_matrix = pd.DataFrame(
+            squareform(
+                pdist(
+                    centroids.loc[:, ["latitude", "longitude"]],
+                    metric=lambda lat, lon: geodesic(lat, lon).km,
+                )
+            ),
+            columns=self.trade_matrix.columns,
+            index=self.trade_matrix.index,
+        )
+        # apply the modification of the gravity law of trade
+        self.trade_matrix = self.trade_matrix.multiply(distance_matrix.pow(-self.beta))
+        # diagonal will often be NaN here, so fill it with zeroes
+        np.fill_diagonal(self.trade_matrix.values, 0)
 
     def apply_scenario(self):
         """
