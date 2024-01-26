@@ -331,6 +331,9 @@ def test_removing_low_trade_countries():
     # Reexport
     Wheat2018.correct_reexports()
 
+    # Set diagonal to zero
+    np.fill_diagonal(Wheat2018.trade_matrix.values, 0)
+
     # Remove countries
     Wheat2018.remove_countries()
 
@@ -418,6 +421,9 @@ def test_find_communities():
 
     # Remove countries with low trade
     Wheat2018.remove_below_percentile()
+
+    # Set diagonal to zero
+    np.fill_diagonal(Wheat2018.trade_matrix.values, 0)
 
     # Build the graph
     Wheat2018.build_graph()
@@ -542,7 +548,8 @@ def test_compare_Hedlund_results_with_model_output():
     # Remove countries
     Wheat2018.remove_countries()
 
-    Wheat2018.set_diagonal_to_zero()
+    # Set diagonal to zero
+    np.fill_diagonal(Wheat2018.trade_matrix.values, 0)
 
     cc = coco.CountryConverter()
 
