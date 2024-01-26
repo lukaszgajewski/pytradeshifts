@@ -605,7 +605,7 @@ def test_apply_distance_cost():
     Wheat2018.correct_reexports()
 
     # Set the diagonal to zero
-    Wheat2018.set_diagonal_to_zero()
+    np.fill_diagonal(Wheat2018.trade_matrix.values, 0)
 
     pre_apply_matrix = Wheat2018.trade_matrix.copy()
     Wheat2018.apply_distance_cost()
@@ -628,7 +628,7 @@ def test_apply_distance_cost():
     Wheat2018.correct_reexports()
 
     # Set the diagonal to zero
-    Wheat2018.set_diagonal_to_zero()
+    np.fill_diagonal(Wheat2018.trade_matrix.values, 0)
 
     pre_apply_matrix = Wheat2018.trade_matrix.copy()
     Wheat2018.apply_distance_cost()
@@ -661,7 +661,7 @@ def test_apply_distance_cost():
     Wheat2018.correct_reexports()
 
     # Set the diagonal to zero
-    Wheat2018.set_diagonal_to_zero()
+    np.fill_diagonal(Wheat2018.trade_matrix.values, 0)
 
     pre_apply_matrix = Wheat2018.trade_matrix.copy()
     Wheat2018.apply_distance_cost()
