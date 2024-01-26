@@ -13,6 +13,7 @@ dependencies:
   - networkx
   - geopandas
   - seaborn
+  - geopy
   
 
 
