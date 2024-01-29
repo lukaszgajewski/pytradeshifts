@@ -524,7 +524,7 @@ class PyTradeShifts:
         assert self.trade_graph is not None
         assert self.trade_communities is None
         # Find the communities
-        trade_communities = nx.community.louvain_communities(self.trade_graph, seed=1)
+        trade_communities = nx.community.louvain_communities(self.trade_graph, seed=2)
         # Remove all the communities with only one country and print the names of the
         # communities that are removed
         if self.keep_singletons:
