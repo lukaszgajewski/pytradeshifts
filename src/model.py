@@ -118,10 +118,10 @@ class PyTradeShifts:
         # apply the distance cost only if beta != 0
         # for beta==0 there is no change in values
         # so there's no point in computing them
-        if not isclose(self.beta, 0):
-            self.apply_distance_cost()
         if self.scenario_name is not None:
             self.apply_scenario()
+        if not isclose(self.beta, 0):
+            self.apply_distance_cost()
         # Build the graph
         self.build_graph()
         # Find the trade communities
