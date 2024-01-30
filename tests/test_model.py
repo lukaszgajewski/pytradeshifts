@@ -3,7 +3,7 @@ import pandas as pd
 import os
 import numpy as np
 from src.preprocessing import rename_countries
-import pytest
+import country_converter as coco
 
 
 def loading(region):
@@ -212,7 +212,6 @@ def reexport(region):
         assert (wheat2018_from_R == trade_matrix_sorted).all(axis=None)
 
 
-@pytest.mark.skipif(os.getenv('GITHUB_ACTIONS') == 'true', reason='Skipping test for Github Actions')
 def test_reexport_oceania():
     """
     Runs the model with prebalancing and compares the results with the
@@ -220,7 +219,7 @@ def test_reexport_oceania():
     """
     reexport("Oceania")
 
-@pytest.mark.skipif(os.getenv('GITHUB_ACTIONS') == 'true', reason='Skipping test for Github Actions')
+
 def test_reexport_global():
     """
     Runs the model with prebalancing and compares the results with the
