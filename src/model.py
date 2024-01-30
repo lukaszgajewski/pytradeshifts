@@ -48,6 +48,11 @@ class PyTradeShifts:
         keep_singletons (bool, optional): Whether to keep the communities
             with only one country or not. If False, these communities are
             removed.
+        beta (float, optional): The parameter to use for the distance cost.
+            If 0, no distance cost is applied.
+        make_plot (bool, optional): Whether to make the plot or not.
+        shade_removed_countries (bool, optional): Whether to shade the countries
+            that are removed from the trade matrix or not.
 
     Returns:
         None
@@ -67,6 +72,8 @@ class PyTradeShifts:
         countries_to_keep=None,
         keep_singletons=False,
         beta=0.0,
+        make_plot=True,
+        shade_removed_countries=True,
     ) -> None:
         # Save the arguments
         self.crop = crop
@@ -79,6 +86,8 @@ class PyTradeShifts:
         self.countries_to_keep = countries_to_keep
         self.keep_singletons = keep_singletons
         self.beta = beta
+        self.make_plot = make_plot
+        self.shade_removed_countries = shade_removed_countries
         # State variables to keep track of the progress
         self.prebalanced = False
         self.reexports_corrected = False
@@ -126,8 +135,9 @@ class PyTradeShifts:
         self.build_graph()
         # Find the trade communities
         self.find_trade_communities()
-        # Plot the trade communities
-        self.plot_trade_communities()
+        if self.make_plot:
+            # Plot the trade communities
+            self.plot_trade_communities()
 
     def load_data(self) -> None:
         """
@@ -192,6 +202,8 @@ class PyTradeShifts:
         assert self.no_trade_removed is False
         self.no_trade_removed = True
 
+        shape_before = self.trade_matrix.shape[0]
+
         # b_ signifies boolean here, these are filtering masks
         row_sums = self.trade_matrix.sum(axis=1)
         col_sums = self.trade_matrix.sum(axis=0)
@@ -201,6 +213,12 @@ class PyTradeShifts:
         # Filter out the countries with all zeroes
         self.production_data = self.production_data[b_filter]
         self.trade_matrix = self.trade_matrix.loc[b_filter, b_filter]
+
+        # print the number of countries removed
+        print(
+            f"Removed {shape_before - self.trade_matrix.shape[0]} countries with no trade or production."
+        )
+
 
     def prebalance(self, precision=10**-3) -> None:
         """
@@ -237,6 +255,8 @@ class PyTradeShifts:
                 + self.trade_matrix.sum(axis=0)
                 - self.trade_matrix.sum(axis=1)
             )
+
+        print("Prebalanced trade matrix.")
 
     def correct_reexports(self) -> None:
         """
@@ -286,6 +306,8 @@ class PyTradeShifts:
             R, index=self.trade_matrix.index, columns=self.trade_matrix.columns
         )
 
+        print("Corrected re-exports.")
+
     def remove_countries(self) -> None:
         """
         Removes countries from the trade matrix and production data.
@@ -314,6 +336,11 @@ class PyTradeShifts:
         self.trade_matrix = self.trade_matrix.loc[countries_to_keep, countries_to_keep]
 
         self.production_data = self.production_data.loc[countries_to_keep]
+
+        # print the number of countries removed
+        print(
+            f"Removed {len(self.countries_to_remove)} countries from the trade matrix."
+        )
 
     def remove_countries_except(self) -> None:
         """
@@ -344,6 +371,11 @@ class PyTradeShifts:
         self.trade_matrix = self.trade_matrix.loc[keep, keep]
 
         self.production_data = self.production_data.loc[keep]
+
+        # print the number of countries retained
+        print(
+            f"Retained {len(self.countries_to_keep)} countries from the trade matrix"
+        )
 
     def remove_below_percentile(self) -> None:
         """
@@ -419,6 +451,8 @@ class PyTradeShifts:
         # diagonal will often be NaN here, so fill it with zeroes
         np.fill_diagonal(self.trade_matrix.values, 0)
 
+        print(f"Applied distance cost with beta={self.beta}.")
+
     def apply_scenario(self) -> None:
         """
         Loads the scenario files unifies the names and applies the scenario to the trade matrix.
@@ -487,6 +521,8 @@ class PyTradeShifts:
         # Multiply all the columns with the scenario data
         self.trade_matrix = self.trade_matrix.mul(scenario_data.values, axis=0)
 
+        print(f"Applied scenario {self.scenario_name}.")
+
     def build_graph(self) -> None:
         """
         Builds a directed and weighted graph from the trade matrix.
@@ -511,6 +547,8 @@ class PyTradeShifts:
 
         self.trade_graph = trade_graph
 
+        print("Built trade graph.")
+
     def find_trade_communities(self) -> None:
         """
         Finds the trade communities in the trade graph using the Louvain algorithm.
@@ -525,6 +563,8 @@ class PyTradeShifts:
         assert self.trade_communities is None
         # Find the communities
         trade_communities = nx.community.louvain_communities(self.trade_graph, seed=2)
+        # print number of communities found
+        print(f"Found {len(trade_communities)} trade communities.")
         # Remove all the communities with only one country and print the names of the
         # communities that are removed
         if self.keep_singletons:
@@ -595,7 +635,7 @@ class PyTradeShifts:
         plot_winkel_tripel_map(ax)
         # Add the countries which were removed from the trade matrix as shaded
         # countries
-        if self.countries_to_remove is not None:
+        if self.countries_to_remove is not None and self.shade_removed_countries:
             # Convert the country names to the same format as in the trade matrix
             self.countries_to_remove = cc.pandas_convert(
                 pd.Series(self.countries_to_remove), to="name_short"
