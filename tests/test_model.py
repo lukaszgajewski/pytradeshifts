@@ -3,7 +3,6 @@ import pandas as pd
 import os
 import numpy as np
 from src.preprocessing import rename_countries
-import country_converter as coco
 
 
 def loading(region):
