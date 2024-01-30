@@ -74,11 +74,11 @@ def serialise_faostat_bulk(faostat_zip: str) -> None:
     """
     data = read_faostat_bulk(faostat_zip)
     print("Starting to convert zip to pickle")
-    data.to_pickle(
-        f"data{os.sep}temp_files{os.sep}{faostat_zip[faostat_zip.rfind('/') + 1:].replace(
-            'zip', 'pkl'
-        )}"
-    )
+    base_path = "data" + os.sep + "temp_files" + os.sep
+    formatted_filename = faostat_zip[faostat_zip.rfind('/') + 1:].replace('zip', 'pkl')
+    full_path = f"{base_path}{formatted_filename}"
+
+    data.to_pickle(full_path)
     print("Finished converting zip to pickle")
     return None
 
