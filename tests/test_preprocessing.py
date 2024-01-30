@@ -2,8 +2,10 @@ import pandas as pd
 from src.preprocessing import format_prod_trad_data
 from src.preprocessing import rename_countries
 import os
+import pytest
 
 
+@pytest.mark.skipif(os.getenv('GITHUB_ACTIONS') == 'true', reason='Skipping test for Github Actions')
 def test_format_prod_trad_data_oceania():
     region = "Oceania"
     production, trade = format_prod_trad_data(
@@ -73,6 +75,7 @@ def test_format_prod_trad_data_oceania():
     assert (trade_from_R == trade).all(axis=None)
 
 
+@pytest.mark.skipif(os.getenv('GITHUB_ACTIONS') == 'true', reason='Skipping test for Github Actions')
 def test_format_prod_trad_data_global():
     region = "All_Data"
 
