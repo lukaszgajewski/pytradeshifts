@@ -310,7 +310,9 @@ def test_removing_low_trade_countries():
     """
     # Remove the countries which don't have ISIMIP data, as
     # Johanna Hedlund did in her analysis for determining the global threshold
-    ISIMIP = pd.read_csv("data/scenario_files/ISIMIP_climate/ISIMIP_wheat_Hedlung.csv", index_col=0)
+    ISIMIP = pd.read_csv(
+        "data/scenario_files/ISIMIP_climate/ISIMIP_wheat_Hedlung.csv", index_col=0
+    )
     # Get only those countries with NaNs in the ISIMIP data
     nan_indices = ISIMIP.index[ISIMIP.iloc[:, 0].isnull()].tolist()
 
