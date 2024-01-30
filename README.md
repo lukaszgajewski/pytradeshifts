@@ -31,9 +31,13 @@ The interface of the model is the class [PyTradeShifts in `model.py`](https://gi
 
 As you can see there are only two parameters that don't have default values. The crop you want to look at ("Wheat" in this case) and the base year you want to use (2018 in this case). This means every instance you create ia for a specific crop. The crops that are available is everything that is tracked in the [FAO database](http://www.fao.org/faostat/en/#data/TM) (though you likely want to stick with the bigger crops, to have more reliable results). The base year can be any year from 1961 (when the FAO started tracking) until today (if you have downloaded the most recent data). As trade partners tend to be sticky, changing this by a few years does not make a big difference in most cases. However, in general you want to use the most recent base year to better represent the present world. 
 
+## Getting the data
 
+The repository already comes with pretty recent version of the FAO data, but if it is important to have the most recent one, you can download the data from the FAO: 1) [trade](http://www.fao.org/faostat/en/#data/TM) 2) [production](http://www.fao.org/faostat/en/#data/QC)
 
-If you encounter any issues, feel free to open an issue in the repository.
+## Having problems?
+
+If you encounter any issues, feel free to open an issue in the repository or contact florian@allfed.info
 
 
 
