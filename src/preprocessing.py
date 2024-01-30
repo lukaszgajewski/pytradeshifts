@@ -53,7 +53,7 @@ def read_faostat_bulk(faostat_zip: str) -> pd.DataFrame:
     print("Finished unzipping file")
     print("Reading csv from zip")
     df = pd.read_csv(
-        zip_file.open(faostat_zip[faostat_zip.rfind("/") + 1 :].replace("zip", "csv")),
+        zip_file.open(faostat_zip[faostat_zip.rfind("/") + 1:].replace("zip", "csv")),
         encoding="latin1",
         low_memory=False,
     )
@@ -75,7 +75,7 @@ def serialise_faostat_bulk(faostat_zip: str) -> None:
     data = read_faostat_bulk(faostat_zip)
     print("Starting to convert zip to pickle")
     base_path = "data" + os.sep + "temp_files" + os.sep
-    formatted_filename = faostat_zip[faostat_zip.rfind("/") + 1 :].replace("zip", "pkl")
+    formatted_filename = faostat_zip[faostat_zip.rfind("/") + 1:].replace("zip", "pkl")
     full_path = f"{base_path}{formatted_filename}"
 
     data.to_pickle(full_path)
