@@ -1,13 +1,15 @@
-# pytradeshifts
+# PyTradeShifts
+---
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![Testing](https://github.com/allfed/pytradeshifts/actions/workflows/testing.yml/badge.svg)
+---
+PyTradeShifts is using a network model to simulate how trade communities might shift due to changes in yield. This is based on the model presented in [Hedlung et al. (2022)](https://iopscience.iop.org/article/10.1088/1748-9326/aca68b). To make it possible to directly use yield reductions to change the trade flows, re-exports have to be accounted for. This is done using the re-export algorithm from [Croft et al. (2018)](https://www.sciencedirect.com/science/article/pii/S0959652618326180), as implemented in Hedlung et al. (2022). 
 
-Simulating how trade communities are affected by catastrophic yield reductions
-
-
+---
 
 ## Installation
 To install the pytradeshifts Model package, we recommend setting up a virtual environment. This will ensure that the package and its dependencies are isolated from other projects on your machine, which can prevent conflicts and make it easier to manage your dependencies. Here are the steps to follow:
 
-* Create a virtual environment using either conda by running the command `conda env create -f environment.yml`. This will create an environment called "pytradeshifts". A virtual environment is like a separate Python environment, which you can think of as a separate "room" for your project to live in, it's own space which is isolated from the rest of the system, and it will have it's own set of packages and dependencies, that way you can work on different projects with different versions of packages without interfering with each other.
+* Create a virtual environment using conda by running the command `conda env create -f environment.yml`. This will create an environment called "pytradeshifts". A virtual environment is like a separate Python environment, which you can think of as a separate "room" for your project to live in, it's own space which is isolated from the rest of the system, and it will have it's own set of packages and dependencies, that way you can work on different projects with different versions of packages without interfering with each other.
 
 * Activate the environment by running `conda activate pytradeshifts`. This command will make the virtual environment you just created the active one, so that when you run any python command or install any package, it will do it within the environment.
 
@@ -20,10 +22,4 @@ To install the pytradeshifts Model package, we recommend setting up a virtual en
 You can now use the kernel "pytradeshifts" to run the example notebook or play around with the model yourself. If you are using the kernel and it fails due an import error for the model package, you might have to rerun: `pip install -e .`
 
 If you encounter any issues, feel free to open an issue in the repository.
-
-WIP
-
-
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-
 
