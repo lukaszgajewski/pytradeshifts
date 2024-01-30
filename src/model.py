@@ -373,9 +373,7 @@ class PyTradeShifts:
         self.production_data = self.production_data.loc[keep]
 
         # print the number of countries retained
-        print(
-            f"Retained {len(self.countries_to_keep)} countries from the trade matrix"
-        )
+        print(f"Retained {len(self.countries_to_keep)} countries from the trade matrix")
 
     def remove_below_percentile(self) -> None:
         """
