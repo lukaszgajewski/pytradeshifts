@@ -406,7 +406,7 @@ class PyTradeShifts:
         self.trade_matrix = self.trade_matrix.loc[b_filter, b_filter]
 
         print(
-            f"Removed countries with trade below the {int(self.percentile*100)}th percentile."
+            f"Removed countries with trade below the {int(self.percentile * 100)}th percentile."
         )
 
         # Save threshold for testing purposes
