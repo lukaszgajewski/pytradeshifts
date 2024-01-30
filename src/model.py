@@ -219,7 +219,6 @@ class PyTradeShifts:
             f"Removed {shape_before - self.trade_matrix.shape[0]} countries with no trade or production."
         )
 
-
     def prebalance(self, precision=10**-3) -> None:
         """
         This implementation also includes pre-balancing to ensure that countries don't
@@ -373,9 +372,7 @@ class PyTradeShifts:
         self.production_data = self.production_data.loc[keep]
 
         # print the number of countries retained
-        print(
-            f"Retained {len(self.countries_to_keep)} countries from the trade matrix"
-        )
+        print(f"Retained {len(self.countries_to_keep)} countries from the trade matrix")
 
     def remove_below_percentile(self) -> None:
         """
