@@ -25,6 +25,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
+          git lfs fetch
           python -m pip install --upgrade pip
           pip install -e .
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
