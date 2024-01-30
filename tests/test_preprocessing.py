@@ -165,5 +165,5 @@ def test_format_prod_trad_data_global():
 
 
 if __name__ == "__main__":
-    test_format_prod_trad_data_oceania()
     test_format_prod_trad_data_global()
+    test_format_prod_trad_data_oceania()
