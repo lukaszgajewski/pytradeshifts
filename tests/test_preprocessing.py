@@ -6,11 +6,22 @@ import os
 
 def test_format_prod_trad_data_oceania():
     region = "Oceania"
-    production, trade = format_prod_trad_data(
-        f"data{os.sep}temp_files{os.sep}Production_Crops_Livestock_E_Oceania.pkl",
-        f"data{os.sep}temp_files{os.sep}Trade_DetailedTradeMatrix_E_Oceania.pkl",
-        item="Wheat",
-    )
+    try:
+        production = pd.read_csv(
+            f"data{os.sep}preprocessed_data{os.sep}Wheat_Y2018_Oceania_production.csv",
+            index_col=0,
+        ).squeeze()
+        trade = pd.read_csv(
+            f"data{os.sep}preprocessed_data{os.sep}Wheat_Y2018_Oceania_trade.csv",
+            index_col=0,
+        )
+    except FileNotFoundError:
+        print("Files not found, loading from pickle files to redo preprocessing")
+        production, trade = format_prod_trad_data(
+            f"data{os.sep}temp_files{os.sep}Production_Crops_Livestock_E_Oceania.pkl",
+            f"data{os.sep}temp_files{os.sep}Trade_DetailedTradeMatrix_E_Oceania.pkl",
+            item="Wheat",
+        )
     production_from_R = pd.read_csv(
         f"data{os.sep}validation_data_from_Hedlung_2022{os.sep}"
         f"{region}{os.sep}NEW_production_wheat_2018.csv"
@@ -38,16 +49,13 @@ def test_format_prod_trad_data_oceania():
     production_from_R = rename_countries(
         production_from_R, region, "Production_Crops_Livestock_E", "Area Code"
     )
-    trade = rename_countries(
-        trade,
-        region,
-        "Trade_DetailedTradeMatrix_E",
-    )
+    trade = rename_countries(trade, region, "Trade_DetailedTradeMatrix_E", "Area")
     production = rename_countries(
-        production,
-        region,
-        "Production_Crops_Livestock_E",
+        production, region, "Production_Crops_Livestock_E", "Area"
     )
+    trade.rename(index={"China; Taiwan Province of": "Taiwan"}, inplace=True)
+    trade.rename(columns={"China; Taiwan Province of": "Taiwan"}, inplace=True)
+    production.rename(index={"China; Taiwan Province of": "Taiwan"}, inplace=True)
 
     trade.sort_index(inplace=True)
     production.sort_index(inplace=True)
@@ -157,5 +165,5 @@ def test_format_prod_trad_data_global():
 
 
 if __name__ == "__main__":
-    test_format_prod_trad_data_oceania()
     test_format_prod_trad_data_global()
+    test_format_prod_trad_data_oceania()

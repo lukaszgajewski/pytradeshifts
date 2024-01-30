@@ -243,7 +243,6 @@ def rename_countries(
         region (str): The region of the data.
         filename (str): The filename for the country codes CSV file.
         code_type (str): The type of country code to be used.
-        after_union (bool): Whether the index/columns of the data are already unified.
 
     Returns:
         pd.Series | pd.DataFrame: The data with country codes replaced by country names.
