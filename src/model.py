@@ -216,7 +216,8 @@ class PyTradeShifts:
 
         # print the number of countries removed
         print(
-            f"Removed {shape_before - self.trade_matrix.shape[0]} countries with no trade or production."
+            f"Removed {shape_before - self.trade_matrix.shape[0]} "
+            f"countries with no trade or production."
         )
 
     def prebalance(self, precision=10**-3) -> None:
