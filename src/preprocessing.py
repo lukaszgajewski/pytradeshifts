@@ -30,7 +30,7 @@ def rename_item(item: str) -> str:
     """
     item_renames = {
         "Maize (corn)": "Maize",
-        "Rice, paddy (rice milled equivalent)": "Rice"
+        "Rice, paddy (rice milled equivalent)": "Rice",
     }
     return item_renames.get(item, item)
 
@@ -53,7 +53,7 @@ def read_faostat_bulk(faostat_zip: str) -> pd.DataFrame:
     print("Finished unzipping file")
     print("Reading csv from zip")
     df = pd.read_csv(
-        zip_file.open(faostat_zip[faostat_zip.rfind("/") + 1:].replace("zip", "csv")),
+        zip_file.open(faostat_zip[faostat_zip.rfind("/") + 1 :].replace("zip", "csv")),
         encoding="latin1",
         low_memory=False,
     )
@@ -75,7 +75,7 @@ def serialise_faostat_bulk(faostat_zip: str) -> None:
     data = read_faostat_bulk(faostat_zip)
     print("Starting to convert zip to pickle")
     base_path = "data" + os.sep + "temp_files" + os.sep
-    formatted_filename = faostat_zip[faostat_zip.rfind('/') + 1:].replace('zip', 'pkl')
+    formatted_filename = faostat_zip[faostat_zip.rfind("/") + 1 :].replace("zip", "pkl")
     full_path = f"{base_path}{formatted_filename}"
 
     data.to_pickle(full_path)
@@ -118,7 +118,9 @@ def _prep_trade_matrix(
     print("Finished filtering trade matrix")
     print("Pivot trade matrix")
     trad = trad.pivot(
-        columns="Partner Country Code (M49)", index="Reporter Country Code (M49)", values=year
+        columns="Partner Country Code (M49)",
+        index="Reporter Country Code (M49)",
+        values=year,
     )
     print("Finished pivoting trade matrix")
 
@@ -129,7 +131,7 @@ def _prep_trade_matrix(
 
 
 def _prep_production_vector(
-        production_pkl: str, item="Wheat", unit="t", year="Y2018"
+    production_pkl: str, item="Wheat", unit="t", year="Y2018"
 ) -> pd.DataFrame:
     """
     Return properly formatted production vector.
@@ -181,7 +183,9 @@ def _unify_indices(
             with unified indices/columns.
     """
     print("Unify indices")
-    index = trade_matrix.index.union(trade_matrix.columns).union(production_vector.index)
+    index = trade_matrix.index.union(trade_matrix.columns).union(
+        production_vector.index
+    )
     index = index.sort_values()
     trade_matrix = trade_matrix.reindex(index=index, columns=index).fillna(0)
     production_vector = production_vector.reindex(index=index).fillna(0)
@@ -221,7 +225,9 @@ def format_prod_trad_data(
         in another.
     """
     print("Started to format production data")
-    production_vector = _prep_production_vector(production_pkl, item, production_unit, year)
+    production_vector = _prep_production_vector(
+        production_pkl, item, production_unit, year
+    )
     print("Finished formatting production data\n")
     print("Started to format trade data")
     trade_matrix = _prep_trade_matrix(trade_pkl, item, trade_unit, element, year)
@@ -230,10 +236,10 @@ def format_prod_trad_data(
 
 
 def rename_countries(
-        data: pd.Series | pd.DataFrame,
-        region: str,
-        filename: str,
-        code_type: str = "M49 Code",
+    data: pd.Series | pd.DataFrame,
+    region: str,
+    filename: str,
+    code_type: str = "M49 Code",
 ) -> pd.Series | pd.DataFrame:
     """
     Rename country codes with country names in either production or trade data.
@@ -267,7 +273,9 @@ def rename_countries(
 
     codes_dict = dict(zip(codes[code_type], codes_area_short))
 
-    print(f"Replacing country codes with country names in {filename.split('_')[0]} data")
+    print(
+        f"Replacing country codes with country names in {filename.split('_')[0]} data"
+    )
     data.rename(index=codes_dict, inplace=True)
 
     if isinstance(data, pd.DataFrame):
@@ -276,7 +284,9 @@ def rename_countries(
     return data
 
 
-def remove_entries_from_data(data: pd.Series | pd.DataFrame) -> pd.Series | pd.DataFrame:
+def remove_entries_from_data(
+    data: pd.Series | pd.DataFrame,
+) -> pd.Series | pd.DataFrame:
     """
     Removes a bunch of entries from the data, which do not actually represent countries
     or where no trade data is available.
@@ -344,8 +354,12 @@ def main(
 ) -> None:
     try:
         print(f"Reading in data for {item} in {region}...")
-        production_pkl = f"data{os.sep}temp_files{os.sep}Production_Crops_Livestock_E_{region}.pkl"
-        trade_pkl = f"data{os.sep}temp_files{os.sep}Trade_DetailedTradeMatrix_E_{region}.pkl"
+        production_pkl = (
+            f"data{os.sep}temp_files{os.sep}Production_Crops_Livestock_E_{region}.pkl"
+        )
+        trade_pkl = (
+            f"data{os.sep}temp_files{os.sep}Trade_DetailedTradeMatrix_E_{region}.pkl"
+        )
         production, trade_matrix = format_prod_trad_data(
             production_pkl,
             trade_pkl,
@@ -359,8 +373,12 @@ def main(
         print(
             f"Data for {item} in {region} in pickle format not found. Reading zip to create pickle"
         )
-        production_zip = f"data{os.sep}data_raw{os.sep}Production_Crops_Livestock_E_{region}.zip"
-        trade_zip = f"data{os.sep}data_raw{os.sep}Trade_DetailedTradeMatrix_E_{region}.zip"
+        production_zip = (
+            f"data{os.sep}data_raw{os.sep}Production_Crops_Livestock_E_{region}.zip"
+        )
+        trade_zip = (
+            f"data{os.sep}data_raw{os.sep}Trade_DetailedTradeMatrix_E_{region}.zip"
+        )
         serialise_faostat_bulk(production_zip)
         serialise_faostat_bulk(trade_zip)
         print(f"Pickles created. Reading in data for {item} in {region}...")
@@ -396,8 +414,12 @@ def main(
         region = "Global"
 
     # Save to CSV
-    production.to_csv(f"data{os.sep}preprocessed_data{os.sep}{item}_{year}_{region}_production.csv")
-    trade_matrix.to_csv(f"data{os.sep}preprocessed_data{os.sep}{item}_{year}_{region}_trade.csv")
+    production.to_csv(
+        f"data{os.sep}preprocessed_data{os.sep}{item}_{year}_{region}_production.csv"
+    )
+    trade_matrix.to_csv(
+        f"data{os.sep}preprocessed_data{os.sep}{item}_{year}_{region}_trade.csv"
+    )
 
 
 if __name__ == "__main__":
