@@ -48,6 +48,11 @@ class PyTradeShifts:
         keep_singletons (bool, optional): Whether to keep the communities
             with only one country or not. If False, these communities are
             removed.
+        beta (float, optional): The parameter to use for the distance cost.
+            If 0, no distance cost is applied.
+        make_plot (bool, optional): Whether to make the plot or not.
+        shade_removed_countries (bool, optional): Whether to shade the countries
+            that are removed from the trade matrix or not.
 
     Returns:
         None
@@ -67,6 +72,8 @@ class PyTradeShifts:
         countries_to_keep=None,
         keep_singletons=False,
         beta=0.0,
+        make_plot=True,
+        shade_removed_countries=True,
     ) -> None:
         # Save the arguments
         self.crop = crop
@@ -79,6 +86,8 @@ class PyTradeShifts:
         self.countries_to_keep = countries_to_keep
         self.keep_singletons = keep_singletons
         self.beta = beta
+        self.make_plot = make_plot
+        self.shade_removed_countries = shade_removed_countries
         # State variables to keep track of the progress
         self.prebalanced = False
         self.reexports_corrected = False
@@ -126,8 +135,9 @@ class PyTradeShifts:
         self.build_graph()
         # Find the trade communities
         self.find_trade_communities()
-        # Plot the trade communities
-        self.plot_trade_communities()
+        if self.make_plot:
+            # Plot the trade communities
+            self.plot_trade_communities()
 
     def load_data(self) -> None:
         """
@@ -625,7 +635,7 @@ class PyTradeShifts:
         plot_winkel_tripel_map(ax)
         # Add the countries which were removed from the trade matrix as shaded
         # countries
-        if self.countries_to_remove is not None:
+        if self.countries_to_remove is not None and self.shade_removed_countries:
             # Convert the country names to the same format as in the trade matrix
             self.countries_to_remove = cc.pandas_convert(
                 pd.Series(self.countries_to_remove), to="name_short"
