@@ -341,9 +341,9 @@ def test_removing_low_trade_countries():
 
     # Calculate the threshold
     threshold = np.percentile(
-            Wheat2018.trade_matrix.values[Wheat2018.trade_matrix.values > 0],
-            Wheat2018.percentile * 100,
-        )
+        Wheat2018.trade_matrix.values[Wheat2018.trade_matrix.values > 0],
+        Wheat2018.percentile * 100,
+    )
 
     # Remove countries with low trade
     Wheat2018.remove_below_percentile()
