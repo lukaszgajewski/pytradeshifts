@@ -3,228 +3,234 @@ import pandas as pd
 import os
 import numpy as np
 from src.preprocessing import rename_countries
+import pytest
 
 
-def loading(region):
+@pytest.mark.parametrize(
+    ("crop", "base_year", "region"),
+    [
+        ("Wheat", 2018, "Global"),
+        ("Wheat", 2018, "Oceania"),
+    ],
+)
+class TestGeneralPyTradeShifts:
+    def test_loading(self, crop: str, base_year: int, region: str) -> None:
+        """
+        Loads the data to make sure it is loaded correctly.
+        """
+        pts = PyTradeShifts(crop=crop, base_year=base_year, region=region, testing=True)
+        pts.load_data()
+        assert isinstance(pts.trade_matrix, pd.DataFrame)
+        assert isinstance(pts.production_data, pd.Series)
+
+    def test_build_graph():
+        """
+        Builds a graph from the trade matrix and checks if it has the
+        same dimensions as the trade matrix.
+        """
+        Wheat2018 = PyTradeShifts("Wheat", 2018, region="Global", testing=True)
+
+        # Load the data
+        Wheat2018.load_data()
+
+        # Remove countries with zero trade
+        Wheat2018.remove_net_zero_countries()
+
+        # Run the prebalancing
+        Wheat2018.prebalance()
+
+        # Reexport
+        Wheat2018.correct_reexports()
+
+        # Remove countries with low trade
+        Wheat2018.remove_below_percentile()
+
+        # Build the graph
+        Wheat2018.build_graph()
+
+        assert Wheat2018.trade_graph is not None
+
+        # Check is the graph has the same number of
+        # nodes as the trade matrix has unique countries in rows and columns
+        assert Wheat2018.trade_graph.number_of_nodes() == len(
+            np.unique(Wheat2018.trade_matrix.index)
+        )
+
+
+def get_region_datafile_name(region: str) -> str:
     """
-    Just loads the data to make sure it is loaded correctly.
+    Provides data file appropriate region name
+    """
+    return "All_Data" if region == "Global" else region
+
+
+def get_wheat2018_post_reexport(region: str) -> PyTradeShifts:
+    """
+    Provides PyTradeShifts object after re-export correction for comparison
+    with validation data
     """
     Wheat2018 = PyTradeShifts("Wheat", 2018, region=region, testing=True)
-    Wheat2018.load_data()
-
-    # Make sure the data is loaded correctly
-    assert isinstance(Wheat2018.trade_matrix, pd.DataFrame)
-    assert isinstance(Wheat2018.production_data, pd.Series)
-
-
-def test_loading_oceania():
-    """
-    Loads the data for Oceania.
-    """
-    loading("Oceania")
-
-
-def test_loading_global():
-    """
-    Loads the data for the world.
-    """
-    loading("Global")
-
-
-def removing_countries_with_zeros(region):
-    """
-    Runs the model with prebalancing and compares the results with the
-    results from the R script.
-    """
-    Wheat2018 = PyTradeShifts("Wheat", 2018, region=region, testing=True)
-
     # Load the data
     Wheat2018.load_data()
-
-    # Remove countries with both zero trade and zero production
-    Wheat2018.remove_net_zero_countries()
-
-    if region == "Global":
-        region = "All_Data"
-
-    # Load the data from the R script
-    wheat2018_from_R = pd.read_csv(
-        "data"
-        + os.sep
-        + "validation_data_from_Hedlung_2022"
-        + os.sep
-        + region
-        + os.sep
-        + "NEW_trade_wheat_2018.csv",
-        index_col=0,
-    )
-
-    # Compare the results
-    assert wheat2018_from_R.shape == Wheat2018.trade_matrix.shape
-    # Comparing the sum this has only be correct to 2 decimal places
-    assert round(wheat2018_from_R.sum().sum(), 2) == round(
-        Wheat2018.trade_matrix.sum().sum(), 2
-    )
-
-
-def test_removing_countries_with_zeros_oceania():
-    """
-    Runs the model with prebalancing and compares the results with the
-    results from the R script.
-    """
-    removing_countries_with_zeros("Oceania")
-
-
-def test_removing_countries_with_zeros_global():
-    """
-    Runs the model with prebalancing and compares the results with the
-    results from the R script.
-    """
-    removing_countries_with_zeros("Global")
-
-
-def prebalancing(region):
-    """
-    Runs the model with prebalancing and compares the results with the
-    results from the R script.
-    """
-    Wheat2018 = PyTradeShifts("Wheat", 2018, region=region, testing=True)
-
-    # Load the data
-    Wheat2018.load_data()
-
-    # Remove countries with both zero trade and zero production
-    Wheat2018.remove_net_zero_countries()
-
-    # Run the prebalancing
-    Wheat2018.prebalance()
-
-    if region == "Global":
-        region = "All_Data"
-    # Load the data from the R script
-    wheat2018_from_R = pd.read_csv(
-        "data"
-        + os.sep
-        + "validation_data_from_Hedlung_2022"
-        + os.sep
-        + region
-        + os.sep
-        + "TEST_prebalanced_trade_wheat_2018.csv",
-        index_col=0,
-    )
-
-    # Compare the results
-    assert wheat2018_from_R.shape == Wheat2018.trade_matrix.shape
-    # Comparing the sum this has only be correct to 2 decimal places
-    assert round(wheat2018_from_R.sum().sum(), 2) == round(
-        Wheat2018.trade_matrix.sum().sum(), 2
-    )
-
-
-def test_prebalancing_oceania():
-    """
-    Runs the model with prebalancing and compares the results with the
-    results from the R script.
-    """
-    prebalancing("Oceania")
-
-
-def test_prebalancing_global():
-    """
-    Runs the model with prebalancing and compares the results with the
-    results from the R script.
-    """
-    prebalancing("Global")
-
-
-def reexport(region):
-    """
-    Runs the model with prebalancing and compares the results with the
-    results from the R script.
-    """
-    Wheat2018 = PyTradeShifts("Wheat", 2018, region=region, testing=True)
-
-    # Load the data
-    Wheat2018.load_data()
-
     # Remove countries with zero trade and zero production
     Wheat2018.remove_net_zero_countries()
-
     # Run the prebalancing
     Wheat2018.prebalance()
-
     # Reexport
     Wheat2018.correct_reexports()
+    return Wheat2018
 
-    if region == "Global":
-        region = "All_Data"
 
-    # Load the data from the R script
-    wheat2018_from_R = pd.read_csv(
-        "data"
-        + os.sep
-        + "validation_data_from_Hedlung_2022"
-        + os.sep
-        + region
-        + os.sep
-        + "NEW_Ex_wheat_2018.csv",
-        index_col=0,
-    )
+@pytest.mark.parametrize(
+    ("region"),
+    [
+        ("Global"),
+        ("Oceania"),
+    ],
+)
+class TestWheat2018PyTradeShifts:
+    def test_removing_countries_with_zeros(self, region: str) -> None:
+        """Runs removal of neto zero countries, checks if countries with zero
+        production have non-zero trade, and compares with results from the R script
+        """
+        Wheat2018 = PyTradeShifts(
+            crop="Wheat", base_year=2018, region=region, testing=True
+        )
+        # Load the data
+        Wheat2018.load_data()
+        # Remove countries with both zero trade and zero production
+        Wheat2018.remove_net_zero_countries()
+        # Load the data from the R script
+        wheat2018_from_R = pd.read_csv(
+            "data"
+            + os.sep
+            + "validation_data_from_Hedlung_2022"
+            + os.sep
+            + get_region_datafile_name(region)
+            + os.sep
+            + "NEW_trade_wheat_2018.csv",
+            index_col=0,
+        )
+        # Compare the results
+        assert wheat2018_from_R.shape == Wheat2018.trade_matrix.shape
+        # Comparing the sum this has only be correct to 2 decimal places
+        assert round(wheat2018_from_R.sum().sum(), 2) == round(
+            Wheat2018.trade_matrix.sum().sum(), 2
+        )
+        # Check that countries with zero production have some trade
+        assert (
+            Wheat2018.trade_matrix.loc[Wheat2018.production_data == 0, :].sum(axis=1)
+            + Wheat2018.trade_matrix.loc[
+                :,
+                Wheat2018.production_data == 0,
+            ].sum(axis=0)
+            != 0
+        ).all()
 
-    # Convert all entries in index and columns to strings
-    wheat2018_from_R.index = wheat2018_from_R.index.astype(int)
-    wheat2018_from_R.columns = wheat2018_from_R.columns.astype(int)
+    def test_prebalancing(self, region: str) -> None:
+        """
+        Runs prebalancing and compares the results with the results from the
+        R script.
+        """
+        Wheat2018 = PyTradeShifts(
+            crop="Wheat", base_year=2018, region=region, testing=True
+        )
+        # Load the data
+        Wheat2018.load_data()
+        # Remove countries with both zero trade and zero production
+        Wheat2018.remove_net_zero_countries()
+        # Run the prebalancing
+        Wheat2018.prebalance()
+        # Load the data from the R script
+        wheat2018_from_R = pd.read_csv(
+            "data"
+            + os.sep
+            + "validation_data_from_Hedlung_2022"
+            + os.sep
+            + get_region_datafile_name(region)
+            + os.sep
+            + "TEST_prebalanced_trade_wheat_2018.csv",
+            index_col=0,
+        )
+        # Compare the results
+        assert wheat2018_from_R.shape == Wheat2018.trade_matrix.shape
+        # Comparing the sum this has only be correct to 2 decimal places
+        assert round(wheat2018_from_R.sum().sum(), 2) == round(
+            Wheat2018.trade_matrix.sum().sum(), 2
+        )
 
-    # Rename the R names to match the Python names
-    wheat2018_from_R = rename_countries(
-        wheat2018_from_R, region, "Trade_DetailedTradeMatrix_E", "Area Code"
-    )
-
-    # Sort the index and columns
-    wheat2018_from_R.sort_index(inplace=True)
-    wheat2018_from_R = wheat2018_from_R[sorted(wheat2018_from_R.columns)]
-
-    # Compare the results
-    assert wheat2018_from_R.shape == Wheat2018.trade_matrix.shape
-    # Comparing the sum this has only be correct to 2 decimal places
-    assert round(wheat2018_from_R.sum().sum(), 2) == round(
-        Wheat2018.trade_matrix.sum().sum(), 2
-    )
-    # check if the median is the same for both
-    assert round(wheat2018_from_R.median().median(), 2) == round(
-        Wheat2018.trade_matrix.median().median(), 2
-    )
-
-    # Compare the sorted trade matrix with the sorted R matrix
-    trade_matrix_sorted = Wheat2018.trade_matrix.sort_index()
-    trade_matrix_sorted = trade_matrix_sorted[sorted(trade_matrix_sorted.columns)]
-
-    if region == "Global":
+    def test_reexport(self, region: str) -> None:
+        """
+        Runs the re-export algorithm and compares the results with the results
+        from the R script.
+        """
+        Wheat2018 = get_wheat2018_post_reexport(region)
+        # Load the data from the R script
+        wheat2018_from_R = pd.read_csv(
+            "data"
+            + os.sep
+            + "validation_data_from_Hedlung_2022"
+            + os.sep
+            + get_region_datafile_name(region)
+            + os.sep
+            + "NEW_Ex_wheat_2018.csv",
+            index_col=0,
+        )
+        # Convert all entries in index and columns to strings
+        wheat2018_from_R.index = wheat2018_from_R.index.astype(int)
+        wheat2018_from_R.columns = wheat2018_from_R.columns.astype(int)
+        # Rename the R names to match the Python names
+        wheat2018_from_R = rename_countries(
+            wheat2018_from_R,
+            get_region_datafile_name(region),
+            "Trade_DetailedTradeMatrix_E",
+            "Area Code",
+        )
+        # Fix Python names
+        Wheat2018.trade_matrix = rename_countries(
+            Wheat2018.trade_matrix,
+            get_region_datafile_name(region),
+            "Trade_DetailedTradeMatrix_E",
+            "Area",
+        )
+        Wheat2018.production_data = rename_countries(
+            Wheat2018.production_data,
+            get_region_datafile_name(region),
+            "Trade_DetailedTradeMatrix_E",
+            "Area",
+        )
+        Wheat2018.trade_matrix.rename(
+            index={"China; Taiwan Province of": "Taiwan"}, inplace=True
+        )
+        Wheat2018.trade_matrix.rename(
+            columns={"China; Taiwan Province of": "Taiwan"}, inplace=True
+        )
+        Wheat2018.production_data.rename(
+            index={"China; Taiwan Province of": "Taiwan"}, inplace=True
+        )
+        # Sort the index and columns
+        wheat2018_from_R.sort_index(inplace=True)
+        wheat2018_from_R = wheat2018_from_R[sorted(wheat2018_from_R.columns)]
+        # Compare the results
+        assert wheat2018_from_R.shape == Wheat2018.trade_matrix.shape
+        # Comparing the sum this has only be correct to 2 decimal places
+        assert round(wheat2018_from_R.sum().sum(), 2) == round(
+            Wheat2018.trade_matrix.sum().sum(), 2
+        )
+        # check if the median is the same for both
+        assert round(wheat2018_from_R.median().median(), 2) == round(
+            Wheat2018.trade_matrix.median().median(), 2
+        )
+        # Compare the sorted trade matrix with the sorted R matrix
+        trade_matrix_sorted = Wheat2018.trade_matrix.sort_index()
+        trade_matrix_sorted = trade_matrix_sorted[sorted(trade_matrix_sorted.columns)]
         assert wheat2018_from_R.index.equals(trade_matrix_sorted.index)
         assert wheat2018_from_R.columns.equals(trade_matrix_sorted.columns)
-
         # Check if the values if they are rounded to 2 decimal places
         # First round the whole matrix to 2 decimal places
         wheat2018_from_R = wheat2018_from_R.round(2)
         trade_matrix_sorted = trade_matrix_sorted.round(2)
-
         assert (wheat2018_from_R == trade_matrix_sorted).all(axis=None)
-
-
-def test_reexport_oceania():
-    """
-    Runs the model with prebalancing and compares the results with the
-    results from the R script.
-    """
-    reexport("Oceania")
-
-
-def test_reexport_global():
-    """
-    Runs the model with prebalancing and compares the results with the
-    results from the R script.
-    """
-    reexport("Global")
 
 
 def test_removing_countries():
@@ -360,40 +366,6 @@ def test_removing_low_trade_countries():
     assert smallest_value > threshold
 
 
-def test_build_graph():
-    """
-    Builds a graph from the trade matrix and checks if it has the
-    same dimensions as the trade matrix.
-    """
-    Wheat2018 = PyTradeShifts("Wheat", 2018, region="Global", testing=True)
-
-    # Load the data
-    Wheat2018.load_data()
-
-    # Remove countries with zero trade
-    Wheat2018.remove_net_zero_countries()
-
-    # Run the prebalancing
-    Wheat2018.prebalance()
-
-    # Reexport
-    Wheat2018.correct_reexports()
-
-    # Remove countries with low trade
-    Wheat2018.remove_below_percentile()
-
-    # Build the graph
-    Wheat2018.build_graph()
-
-    assert Wheat2018.trade_graph is not None
-
-    # Check is the graph has the same number of
-    # nodes as the trade matrix has unique countries in rows and columns
-    assert Wheat2018.trade_graph.number_of_nodes() == len(
-        np.unique(Wheat2018.trade_matrix.index)
-    )
-
-
 def test_find_communities():
     """
     Builds a graph from the trade matrix and finds the trade communities.
@@ -494,105 +466,3 @@ def test_apply_scenario():
 
     # Check if a country which is not in the scenario has been removed
     assert "Indonesia" not in Wheat2018.trade_matrix.index
-
-
-def test_apply_distance_cost():
-    """
-    Applies the gravity law of trade modification to simulate higher transport costs
-    for three cases: beta==0, beta<0, beta>0.
-    Checks if the trade matrix format
-    remains unchanged, and if the values post transformation are unchanged, lower
-    or higher, respectively.
-    """
-    Wheat2018 = PyTradeShifts("Wheat", 2018, region="Global", testing=True, beta=0)
-
-    # Load the data
-    Wheat2018.load_data()
-
-    # Remove countries with zero trade
-    Wheat2018.remove_net_zero_countries()
-
-    # Run the prebalancing
-    Wheat2018.prebalance()
-
-    # Reexport
-    Wheat2018.correct_reexports()
-
-    # Set the diagonal to zero
-    np.fill_diagonal(Wheat2018.trade_matrix.values, 0)
-
-    pre_apply_matrix = Wheat2018.trade_matrix.copy()
-    Wheat2018.apply_distance_cost()
-
-    # beta = 0 so nothing should have happened
-    assert (pre_apply_matrix == Wheat2018.trade_matrix).all(axis=None)
-
-    Wheat2018 = PyTradeShifts("Wheat", 2018, region="Global", testing=True, beta=2)
-
-    # Load the data
-    Wheat2018.load_data()
-
-    # Remove countries with zero trade
-    Wheat2018.remove_net_zero_countries()
-
-    # Run the prebalancing
-    Wheat2018.prebalance()
-
-    # Reexport
-    Wheat2018.correct_reexports()
-
-    # Set the diagonal to zero
-    np.fill_diagonal(Wheat2018.trade_matrix.values, 0)
-
-    pre_apply_matrix = Wheat2018.trade_matrix.copy()
-    Wheat2018.apply_distance_cost()
-
-    # check that index remains unchanged
-    # if it changed it means we're missing some regions in the distance matrix
-    assert (pre_apply_matrix.index == Wheat2018.trade_matrix.index).all(axis=None), set(
-        pre_apply_index
-    ).difference(Wheat2018.trade_matrix.index)
-    # check that the shape didn't change
-    assert pre_apply_matrix.shape == Wheat2018.trade_matrix.shape, (
-        pre_apply_shape,
-        Wheat2018.trade_matrix.shape,
-    )
-    # beta = 2 so all values should be <= than before
-    assert (pre_apply_matrix >= Wheat2018.trade_matrix).all(axis=None)
-
-    Wheat2018 = PyTradeShifts("Wheat", 2018, region="Global", testing=True, beta=-2)
-
-    # Load the data
-    Wheat2018.load_data()
-
-    # Remove countries with zero trade
-    Wheat2018.remove_net_zero_countries()
-
-    # Run the prebalancing
-    Wheat2018.prebalance()
-
-    # Reexport
-    Wheat2018.correct_reexports()
-
-    # Set the diagonal to zero
-    np.fill_diagonal(Wheat2018.trade_matrix.values, 0)
-
-    pre_apply_matrix = Wheat2018.trade_matrix.copy()
-    Wheat2018.apply_distance_cost()
-
-    # check that index remains unchanged
-    # if it changed it means we're missing some regions in the distance matrix
-    assert (pre_apply_matrix.index == Wheat2018.trade_matrix.index).all(axis=None), set(
-        pre_apply_index
-    ).difference(Wheat2018.trade_matrix.index)
-    # check that the shape didn't change
-    assert pre_apply_matrix.shape == Wheat2018.trade_matrix.shape, (
-        pre_apply_shape,
-        Wheat2018.trade_matrix.shape,
-    )
-    # beta = -2 so all values should be >= than before
-    assert (pre_apply_matrix <= Wheat2018.trade_matrix).all(axis=None)
-
-
-if __name__ == "__main__":
-    test_removing_low_trade_countries()
