@@ -106,7 +106,11 @@ class PyTradeShifts:
 
     def run(self, with_preprocessing: bool) -> None:
         if with_preprocessing:
-            preprocessing_main(self.crop, self.base_year, self.region)
+            preprocessing_main(
+                "All_Data" if self.region == "Global" else self.region,
+                self.crop,
+                year="Y" + str(self.base_year),
+            )
         # Read in the data
         self.load_data()
         # Remove countries with all zeroes in trade and production
