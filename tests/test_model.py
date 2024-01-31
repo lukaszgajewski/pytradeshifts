@@ -243,28 +243,6 @@ class TestWheat2018PyTradeShifts:
             "Trade_DetailedTradeMatrix_E",
             "Area Code",
         )
-        # Fix Python names
-        Wheat2018.trade_matrix = rename_countries(
-            Wheat2018.trade_matrix,
-            get_region_datafile_name(region),
-            "Trade_DetailedTradeMatrix_E",
-            "Area",
-        )
-        Wheat2018.production_data = rename_countries(
-            Wheat2018.production_data,
-            get_region_datafile_name(region),
-            "Trade_DetailedTradeMatrix_E",
-            "Area",
-        )
-        Wheat2018.trade_matrix.rename(
-            index={"China; Taiwan Province of": "Taiwan"}, inplace=True
-        )
-        Wheat2018.trade_matrix.rename(
-            columns={"China; Taiwan Province of": "Taiwan"}, inplace=True
-        )
-        Wheat2018.production_data.rename(
-            index={"China; Taiwan Province of": "Taiwan"}, inplace=True
-        )
         # Sort the index and columns
         wheat2018_from_R.sort_index(inplace=True)
         wheat2018_from_R = wheat2018_from_R[sorted(wheat2018_from_R.columns)]
