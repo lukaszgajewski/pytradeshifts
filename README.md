@@ -35,7 +35,7 @@ As you can see there are only two parameters that don't have default values. The
 One of the main tasks of this model is to try to understand how trade communities might change if yield is reduced, due to catastrophic events like extreme climate change or a large volcanic eruption. To do so you have to provide the model with a file the specificies how much the yield is reduced (in % reduction). These have to be put in the [scenario files folder](https://github.com/allfed/pytradeshifts/tree/main/data/scenario_files).  [An example](https://github.com/allfed/pytradeshifts/blob/main/data/scenario_files/ISIMIP_climate/ISIMIP_wheat_Hedlung.csv), of a scenario file is the reduction of wheat yields from the ISIMIP project. How to use a scenario is shown in [this Jupyter notebook](https://github.com/allfed/pytradeshifts/blob/main/scripts/ISIMIP_example.ipynb). 
 
 ### Running the model with a long distance trade penality
-
+In addition to the option to run the model with a yield reduction scenario, you can also apply an additional factor [`beta`](https://github.com/allfed/pytradeshifts/blob/main/src/model.py#L51) to specify how much long distance trade should be penalized. This is meant to symbolize the increased difficulties of trade after a catastrophe and follows a gravity model of trade approach.
 
 ## Getting the data
 
