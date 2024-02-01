@@ -3,6 +3,7 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 import os
+import sys
 import geopandas as gpd
 import country_converter as coco
 from matplotlib.colors import ListedColormap
@@ -127,7 +128,10 @@ class PyTradeShifts:
         elif self.countries_to_keep is not None:
             self.remove_countries_except()
         # Remove countries with low trade
-        self.remove_below_percentile()
+        exiting = self.remove_below_percentile()
+        if exiting is not None:
+            print(exiting)
+            return
         # apply the distance cost only if beta != 0
         # for beta==0 there is no change in values
         # so there's no point in computing them
@@ -178,6 +182,34 @@ class PyTradeShifts:
             index_col=0,
         ).squeeze()
 
+        # ensure we do not have duplicates
+        # duplicates are most likely a result of incorrect preprocessing
+        # or lack thereof
+        if not trade_matrix.index.equals(trade_matrix.index.unique()):
+            print("Warning: trade matrix has duplicate indices")
+            trade_entries_to_keep = ~trade_matrix.index.duplicated(keep="first")
+            trade_matrix = trade_matrix.loc[
+                trade_entries_to_keep,
+                trade_entries_to_keep,
+            ]
+        if not production_data.index.equals(production_data.index.unique()):
+            print("Warning: production has duplicate indices")
+            production_data = production_data.loc[
+                ~production_data.index.duplicated(keep="first")
+            ]
+        # remove a "not found" country
+        # this would be a result of a region naming convention that
+        # country_converter failed to handle
+        if "not found" in trade_matrix.index:
+            print("Warning: 'not found' present in trade matrix index")
+            trade_matrix.drop(index="not found", inplace=True)
+        if "not found" in trade_matrix.columns:
+            print("Warning: 'not found' present in trade matrix columns")
+            trade_matrix.drop(columns="not found", inplace=True)
+        if "not found" in production_data.index:
+            print("Warning: 'not found' present in production index")
+            production_data.drop(index="not found", inplace=True)
+
         print(f"Loaded data for {self.crop} in {self.base_year}.")
 
         # Retain only the countries where we have production data and trade data
@@ -186,6 +218,7 @@ class PyTradeShifts:
         production_data = production_data.loc[countries]
         # Make sure this worked
         assert trade_matrix.shape[0] == production_data.shape[0]
+        assert trade_matrix.shape[1] == production_data.shape[0]
 
         # Save the data
         self.trade_matrix = trade_matrix
@@ -379,7 +412,7 @@ class PyTradeShifts:
         # print the number of countries retained
         print(f"Retained {len(self.countries_to_keep)} countries from the trade matrix")
 
-    def remove_below_percentile(self) -> None:
+    def remove_below_percentile(self) -> None | str:
         """
         Removes countries with trade below a certain percentile.
 
@@ -387,17 +420,24 @@ class PyTradeShifts:
             None
 
         Returns:
-            None
+            None | str (upon failure)
         """
         # Make sure no threshold is calculated yet
         assert self.threshold is None
 
         # Calculate the percentile out of all values in the trade matrix. This
         # only considers the values above 0.
-        threshold = np.percentile(
-            self.trade_matrix.values[self.trade_matrix.values > 0],
-            self.percentile * 100,
-        )
+        try:
+            threshold = np.percentile(
+                self.trade_matrix.values[self.trade_matrix.values > 0],
+                self.percentile * 100,
+            )
+        except IndexError:
+            print(
+                "There are no values in trade matrix within the specified percentile: %f"
+                % self.percentile
+            )
+            return "Exiting PyTradeShift.remove_below_percentile()."
         # Set all values to 0 which are below the threshold
         self.trade_matrix[self.trade_matrix < threshold] = 0
 
