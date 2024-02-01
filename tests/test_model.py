@@ -2,7 +2,7 @@ from src.model import PyTradeShifts
 import pandas as pd
 import os
 import numpy as np
-from src.preprocessing import rename_countries, main as preprocessing_main
+from src.preprocessing import rename_countries
 import pytest
 
 
@@ -14,7 +14,18 @@ def get_pytradeshifts_post_reexport(
 ) -> PyTradeShifts:
     """
     Provides PyTradeShifts object after re-export correction for comparison
-    with validation data
+    with validation data.
+
+    Arguments:
+        crop (str): The crop to build the trade matrix for.
+        base_year (int): The base_year to extract data for. The trade communities
+            are built relative to this year.
+        region (str): The region to extract data for.
+        beta (float, optional): The parameter to use for the distance cost.
+            If 0, no distance cost is applied.
+
+    Returns:
+        PyTradeShifts object
     """
     Wheat2018 = PyTradeShifts(
         crop=crop,
@@ -42,9 +53,25 @@ def get_pytradeshifts_post_reexport(
     ],
 )
 class TestGeneralPyTradeShifts:
+    """
+    Testing class containing tests for PyTradeShifts that are parametrisable
+    by crop, base_year and region.
+    """
+
     def test_loading(self, crop: str, base_year: int, region: str) -> None:
         """
         Loads the data to make sure it is loaded correctly.
+
+        Arguments:
+            crop (str): The crop to build the trade matrix for.
+            base_year (int): The base_year to extract data for. The trade communities
+                are built relative to this year.
+            region (str): The region to extract data for.
+            beta (float, optional): The parameter to use for the distance cost.
+                If 0, no distance cost is applied.
+
+        Returns:
+            None
         """
         pts = PyTradeShifts(crop=crop, base_year=base_year, region=region, testing=True)
         pts.load_data()
@@ -55,6 +82,17 @@ class TestGeneralPyTradeShifts:
         """
         Builds a graph from the trade matrix and checks if it has the
         same dimensions as the trade matrix.
+
+        Arguments:
+            crop (str): The crop to build the trade matrix for.
+            base_year (int): The base_year to extract data for. The trade communities
+                are built relative to this year.
+            region (str): The region to extract data for.
+            beta (float, optional): The parameter to use for the distance cost.
+                If 0, no distance cost is applied.
+
+        Returns:
+            None
         """
         pts = get_pytradeshifts_post_reexport(crop, base_year, region, 0.0)
         # Remove countries with low trade
@@ -74,11 +112,21 @@ class TestGeneralPyTradeShifts:
         self, crop: str, base_year: int, region: str
     ) -> None:
         """
-        Applies the gravity law of trade modification to simulate higher transport costs
-        for three cases: beta==0, beta<0, beta>0.
-        Checks if the trade matrix format
-        remains unchanged, and if the values post transformation are unchanged, lower
-        or higher, respectively.
+        Applies the gravity model of trade modification to simulate higher transport
+        costs for beta=0.
+        Checks if the trade matrix format remains unchanged, and if the values
+        post transformation are unchanged.
+
+        Arguments:
+            crop (str): The crop to build the trade matrix for.
+            base_year (int): The base_year to extract data for. The trade communities
+                are built relative to this year.
+            region (str): The region to extract data for.
+            beta (float, optional): The parameter to use for the distance cost.
+                If 0, no distance cost is applied.
+
+        Returns:
+            None
         """
         pts = get_pytradeshifts_post_reexport(crop, base_year, region, 0.0)
         # Set the diagonal to zero
@@ -91,6 +139,23 @@ class TestGeneralPyTradeShifts:
     def test_apply_distance_cost_positive(
         self, crop: str, base_year: int, region: str
     ) -> None:
+        """
+        Applies the gravity model of trade modification to simulate higher transport
+        costs for beta>0.
+        Checks if the trade matrix format remains unchanged, and if the values
+        post transformation are lower.
+
+        Arguments:
+            crop (str): The crop to build the trade matrix for.
+            base_year (int): The base_year to extract data for. The trade communities
+                are built relative to this year.
+            region (str): The region to extract data for.
+            beta (float, optional): The parameter to use for the distance cost.
+                If 0, no distance cost is applied.
+
+        Returns:
+            None
+        """
         pts = get_pytradeshifts_post_reexport(crop, base_year, region, 2.0)
         # Set the diagonal to zero
         np.fill_diagonal(pts.trade_matrix.values, 0)
@@ -112,6 +177,23 @@ class TestGeneralPyTradeShifts:
     def test_apply_distance_cost_negative(
         self, crop: str, base_year: int, region: str
     ) -> None:
+        """
+        Applies the gravity model of trade modification to simulate higher transport
+        costs for beta>0.
+        Checks if the trade matrix format remains unchanged, and if the values
+        post transformation are higher.
+
+        Arguments:
+            crop (str): The crop to build the trade matrix for.
+            base_year (int): The base_year to extract data for. The trade communities
+                are built relative to this year.
+            region (str): The region to extract data for.
+            beta (float, optional): The parameter to use for the distance cost.
+                If 0, no distance cost is applied.
+
+        Returns:
+            None
+        """
         pts = get_pytradeshifts_post_reexport(crop, base_year, region, -2.0)
         # Set the diagonal to zero
         np.fill_diagonal(pts.trade_matrix.values, 0)
@@ -134,6 +216,12 @@ class TestGeneralPyTradeShifts:
 def get_region_datafile_name(region: str) -> str:
     """
     Provides data file appropriate region name
+
+    Arguments:
+        region (str): The region to extract data for.
+
+    Returns:
+        str: region name as found in data files, e.g., "All_Data"
     """
     return "All_Data" if region == "Global" else region
 
@@ -146,9 +234,21 @@ def get_region_datafile_name(region: str) -> str:
     ],
 )
 class TestWheat2018PyTradeShifts:
+    """
+    Testing class containing tests for PyTradeShifts that are parametrisable
+    by region only and are specifically compared against 2018 Wheat yields.
+    """
+
     def test_removing_countries_with_zeros(self, region: str) -> None:
-        """Runs removal of neto zero countries, checks if countries with zero
+        """
+        Runs removal of neto zero countries, checks if countries with zero
         production have non-zero trade, and compares with results from the R script
+
+        Arguments:
+            region (str): The region to extract data for.
+
+        Returns:
+            None
         """
         Wheat2018 = PyTradeShifts(
             crop="Wheat", base_year=2018, region=region, testing=True
@@ -188,6 +288,12 @@ class TestWheat2018PyTradeShifts:
         """
         Runs prebalancing and compares the results with the results from the
         R script.
+
+        Arguments:
+            region (str): The region to extract data for.
+
+        Returns:
+            None
         """
         Wheat2018 = PyTradeShifts(
             crop="Wheat", base_year=2018, region=region, testing=True
@@ -220,6 +326,12 @@ class TestWheat2018PyTradeShifts:
         """
         Runs the re-export algorithm and compares the results with the results
         from the R script.
+
+        Arguments:
+            region (str): The region to extract data for.
+
+        Returns:
+            None
         """
         Wheat2018 = get_pytradeshifts_post_reexport("Wheat", 2018, region, 0.0)
         # Load the data from the R script
@@ -268,7 +380,7 @@ class TestWheat2018PyTradeShifts:
         assert (wheat2018_from_R == trade_matrix_sorted).all(axis=None)
 
 
-def test_removing_countries():
+def test_removing_countries() -> None:
     """
     Runs the model and removes countries to check if this works
     """
@@ -344,7 +456,7 @@ def test_removing_countries_except():
     assert Wheat2018.trade_matrix.shape == (2, 2)
 
 
-def test_removing_low_trade_countries():
+def test_removing_low_trade_countries() -> None:
     """
     Runs the model with prebalancing, prebalancing, removing re-exports
     and removing countries with low trade and check if this worked out.
@@ -452,7 +564,7 @@ def test_find_communities():
     )
 
 
-def test_apply_scenario():
+def test_apply_scenario() -> None:
     """
     Builds a graph from the trade matrix and finds the trade communities.
     """
@@ -501,8 +613,3 @@ def test_apply_scenario():
 
     # Check if a country which is not in the scenario has been removed
     assert "Indonesia" not in Wheat2018.trade_matrix.index
-
-
-if __name__ == "__main__":
-    x = TestGeneralPyTradeShifts()
-    x.test_apply_distance_cost_zero("Wheat", 2018, "Global")
