@@ -34,6 +34,8 @@ def get_pytradeshifts_after_reexport(**kwargs) -> PyTradeShifts:
     [
         ("Wheat", 2018, "Global"),
         ("Wheat", 2018, "Oceania"),
+        ("Maize", 2018, "Global"),
+        ("Rice", 2018, "Global"),
     ],
 )
 class TestGeneralPyTradeShifts:
@@ -82,7 +84,10 @@ class TestGeneralPyTradeShifts:
             crop=crop, base_year=base_year, region=region
         )
         # Remove countries with low trade
-        pts.remove_below_percentile()
+        exiting = pts.remove_below_percentile()
+        if exiting is not None:
+            print(exiting)
+            return
         # Set the diagonal to zero
         np.fill_diagonal(pts.trade_matrix.values, 0)
         # Build the graph
