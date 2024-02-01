@@ -36,6 +36,9 @@ def get_pytradeshifts_after_reexport(**kwargs) -> PyTradeShifts:
         ("Wheat", 2018, "Oceania"),
         ("Maize", 2018, "Global"),
         ("Rice", 2018, "Global"),
+        ("Wheat", 2021, "Global"),
+        ("Rice", 2021, "Global"),
+        ("Maize", 2021, "Global"),
     ],
 )
 class TestGeneralPyTradeShifts:
@@ -105,6 +108,10 @@ class TestGeneralPyTradeShifts:
             (0.0),
             (2.0),
             (-2.0),
+            (-1.0),
+            (1.0),
+            (-0.01),
+            (0.01),
         ],
     )
     def test_apply_distance_cost(
@@ -503,3 +510,8 @@ def test_apply_scenario() -> None:
 
     # Check if a country which is not in the scenario has been removed
     assert "Indonesia" not in Wheat2018.trade_matrix.index
+
+
+if __name__ == "__main__":
+    x = TestGeneralPyTradeShifts()
+    x.test_apply_distance_cost("Wheat", 2021, "Global", 0)
