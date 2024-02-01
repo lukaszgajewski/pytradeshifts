@@ -510,8 +510,3 @@ def test_apply_scenario() -> None:
 
     # Check if a country which is not in the scenario has been removed
     assert "Indonesia" not in Wheat2018.trade_matrix.index
-
-
-if __name__ == "__main__":
-    x = TestGeneralPyTradeShifts()
-    x.test_apply_distance_cost("Wheat", 2021, "Global", 0)
