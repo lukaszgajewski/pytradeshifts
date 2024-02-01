@@ -330,7 +330,16 @@ class PyTradeShifts:
         self.production_data = self.production_data.fillna(0)
 
         x = self.production_data + self.trade_matrix.sum(axis=1)
-        y = np.linalg.inv(np.diag(x))
+        try:
+            y = np.linalg.inv(np.diag(x))
+        except np.linalg.LinAlgError:
+            print("Determinant=0 encountered in PyTradeShifts.correct_reexports().")
+            print("Re-applying PyTradeShifts.remove_net_zero_countries().")
+            self.no_trade_removed = False
+            self.remove_net_zero_countries()
+            print("Attempting to invert the matrix again.")
+            x = self.production_data + self.trade_matrix.sum(axis=1)
+            y = np.linalg.inv(np.diag(x))
         A = self.trade_matrix @ y
         R = np.linalg.inv(np.identity(len(A)) - A) @ np.diag(self.production_data)
         c = np.diag(y @ (x - self.trade_matrix.sum(axis=0)))
@@ -478,16 +487,23 @@ class PyTradeShifts:
         # compute the distance matrix using a geodesic
         # on an ellipsoidal model of the Earth
         # https://doi.org/10.1007%2Fs00190-012-0578-z
-        distance_matrix = pd.DataFrame(
-            squareform(
-                pdist(
-                    centroids.loc[:, ["latitude", "longitude"]],
-                    metric=lambda lat, lon: geodesic(lat, lon).km,
-                )
-            ),
-            columns=self.trade_matrix.columns,
-            index=self.trade_matrix.index,
-        )
+        try:
+            distance_matrix = pd.DataFrame(
+                squareform(
+                    pdist(
+                        centroids.loc[:, ["latitude", "longitude"]],
+                        metric=lambda lat, lon: geodesic(lat, lon).km,
+                    )
+                ),
+                columns=self.trade_matrix.columns,
+                index=self.trade_matrix.index,
+            )
+        except ValueError:
+            print("Cannot find centroids for these regions:")
+            print(self.trade_matrix.index.difference(centroids["name"]))
+            print("Consider running with preprocessing enabled.")
+            print("Distance cost shall not be applied.")
+            return
         # apply the modification of the gravity law of trade
         self.trade_matrix = self.trade_matrix.multiply(distance_matrix.pow(-self.beta))
         # diagonal will often be NaN here, so fill it with zeroes
