@@ -84,11 +84,14 @@ def prepare_centroids(trade_matrix_index: pd.Index) -> pd.DataFrame:
     )
     # merge the centroid data sets
     centroids = centroids_a.merge(centroids_b, how="outer", on="name")
-    # filter out the regions that aren't in the trade matrix
+    # filter out the regions that aren't in the trade matrix or in centroids
+    trade_matrix_corrected_index = [
+        str(c) for c in coco.convert(trade_matrix_index, to="name_short")
+    ]
     centroids = (
         centroids.merge(
             pd.DataFrame(
-                [str(c) for c in coco.convert(trade_matrix_index, to="name_short")],
+                trade_matrix_corrected_index,
                 columns=["name"],
             ),
             how="inner",
@@ -103,4 +106,11 @@ def prepare_centroids(trade_matrix_index: pd.Index) -> pd.DataFrame:
     # filter out unneeded columns and remove duplicates
     centroids = centroids[["longitude", "latitude", "name"]]
     centroids = centroids.drop_duplicates()
+    trade_matrix_index_restoration_dict = {
+        c: cc
+        for c, cc in zip(trade_matrix_corrected_index, trade_matrix_index)
+        if c in centroids.index
+    }
+    centroids["name"].replace(trade_matrix_index_restoration_dict, inplace=True)
+    centroids.sort_values("name", inplace=True)
     return centroids
