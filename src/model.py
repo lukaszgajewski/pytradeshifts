@@ -620,19 +620,18 @@ class PyTradeShifts:
 
         print("Built trade graph.")
 
-    def find_trade_communities(self) -> None:
+    def _get_communities(self) -> list[set[str]]:
         """
-        Finds the trade communities in the trade graph using the Louvain algorithm.
+        Private function containing the appropriate set ups and execution
+        for different community detection algorihthms.
 
         Arguments:
             None
 
         Returns:
-            None
+            list[set[str]]: list containing sets of country names.
+            Each set is a community.
         """
-        assert self.trade_graph is not None
-        assert self.trade_communities is None
-        # Find the communities
         match self.cd_algorithm:
             case "louvain":
                 trade_communities = nx.community.louvain_communities(
@@ -662,8 +661,8 @@ class PyTradeShifts:
                 im.add_networkx_graph(self.trade_graph)
                 # run the algorithm
                 im.run()
-                # extract communities
-                # using set() instead of unique() to comply with other methods'
+                # extract communities; using set() instead of unique()
+                # to comply with other methods'  data types
                 trade_communities = [
                     set(community_df["name"].values)
                     for _, community_df in im.get_dataframe(
@@ -674,6 +673,22 @@ class PyTradeShifts:
                 print("Unrecognised community detection method.")
                 print("Using Louvain algorithm with default parameters.")
                 trade_communities = nx.community.louvain_communities(self.trade_graph)
+        return trade_communities
+
+    def find_trade_communities(self) -> None:
+        """
+        Finds the trade communities in the trade graph.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        assert self.trade_graph is not None
+        assert self.trade_communities is None
+        # Find the communities
+        trade_communities = self._get_communities()
         # print number of communities found
         print(f"Found {len(trade_communities)} trade communities.")
         # Remove all the communities with only one country and print the names of the
