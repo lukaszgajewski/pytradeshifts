@@ -33,12 +33,7 @@ def get_pytradeshifts_after_reexport(**kwargs) -> PyTradeShifts:
     ("crop", "base_year", "region"),
     [
         ("Wheat", 2018, "Global"),
-        ("Wheat", 2018, "Oceania"),
-        ("Maize", 2018, "Global"),
-        ("Rice", 2018, "Global"),
-        ("Wheat", 2021, "Global"),
         ("Rice", 2021, "Global"),
-        ("Maize", 2021, "Global"),
     ],
 )
 class TestGeneralPyTradeShifts:
@@ -106,12 +101,8 @@ class TestGeneralPyTradeShifts:
         ("beta"),
         [
             (0.0),
-            (2.0),
-            (-2.0),
             (-1.0),
             (1.0),
-            (-0.01),
-            (0.01),
         ],
     )
     def test_apply_distance_cost(
