@@ -49,14 +49,6 @@ def test_format_prod_trad_data_oceania():
     production_from_R = rename_countries(
         production_from_R, region, "Production_Crops_Livestock_E", "Area Code"
     )
-    trade = rename_countries(trade, region, "Trade_DetailedTradeMatrix_E", "Area")
-    production = rename_countries(
-        production, region, "Production_Crops_Livestock_E", "Area"
-    )
-    trade.rename(index={"China; Taiwan Province of": "Taiwan"}, inplace=True)
-    trade.rename(columns={"China; Taiwan Province of": "Taiwan"}, inplace=True)
-    production.rename(index={"China; Taiwan Province of": "Taiwan"}, inplace=True)
-
     trade.sort_index(inplace=True)
     production.sort_index(inplace=True)
     trade_from_R.sort_index(inplace=True)
