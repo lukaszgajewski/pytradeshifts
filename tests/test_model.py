@@ -446,6 +446,8 @@ def test_find_communities(cd_algorithm: str):
                 "n_iterations": 10,
                 "weights": "weight",
             }
+        case "infomap":
+            cd_kwargs = {"silent": True, "num_trials": 10}
         case _:
             cd_kwargs = {}
 

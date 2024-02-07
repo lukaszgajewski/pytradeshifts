@@ -14,6 +14,7 @@ from src.preprocessing import main as preprocessing_main
 from src.utils import plot_winkel_tripel_map, prepare_centroids
 import leidenalg as la
 import igraph as ig
+import infomap as imp
 
 plt.style.use(
     "https://raw.githubusercontent.com/allfed/ALLFED-matplotlib-style-sheet/main/ALLFED.mplstyle"
@@ -655,7 +656,20 @@ class PyTradeShifts:
                     for community in trade_communities
                 ]
             case "infomap":
-                raise NotImplementedError
+                # create Infomap object
+                im = imp.Infomap(**self.cd_kwargs)
+                # import netowrkx trade graph
+                im.add_networkx_graph(self.trade_graph)
+                # run the algorithm
+                im.run()
+                # extract communities
+                # using set() instead of unique() to comply with other methods'
+                trade_communities = [
+                    set(community_df["name"].values)
+                    for _, community_df in im.get_dataframe(
+                        columns=["name", "module_id"]
+                    ).groupby("module_id")
+                ]
             case _:
                 print("Unrecognised community detection method.")
                 print("Using Louvain algorithm with default parameters.")
