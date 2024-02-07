@@ -4,6 +4,7 @@ import os
 import numpy as np
 from src.preprocessing import rename_countries
 import pytest
+from leidenalg import ModularityVertexPartition
 
 
 def get_pytradeshifts_after_reexport(**kwargs) -> PyTradeShifts:
@@ -424,14 +425,36 @@ def test_removing_low_trade_countries() -> None:
     assert smallest_value > threshold
 
 
-def test_find_communities():
+@pytest.mark.parametrize(
+    ("cd_algorithm"),
+    [
+        ("louvain"),
+        ("leiden"),
+        ("infomap"),
+        ("incorrect_method_name"),
+    ],
+)
+def test_find_communities(cd_algorithm: str):
     """
     Builds a graph from the trade matrix and finds the trade communities.
     """
+    match cd_algorithm:
+        case "louvain":
+            cd_kwargs = {"seed": 2}
+        case "leiden":
+            cd_kwargs = {
+                "n_iterations": 10,
+                "weights": "weight",
+            }
+        case _:
+            cd_kwargs = {}
+
     Wheat2018 = get_pytradeshifts_after_reexport(
         crop="Wheat",
         base_year=2018,
         region="Global",
+        cd_algorithm=cd_algorithm,
+        cd_kwargs=cd_kwargs,
     )
     # Remove countries with low trade
     Wheat2018.remove_below_percentile()
@@ -451,19 +474,22 @@ def test_find_communities():
     assert isinstance(Wheat2018.trade_communities, list)
     assert isinstance(Wheat2018.trade_communities[0], set)
 
-    # At least one community should contain both Brazil and Chile
-    assert any(
-        {"Brazil", "Chile"} <= community for community in Wheat2018.trade_communities
-    )
-    # Another community should contain both Germany and France
-    assert any(
-        {"Germany", "France"} <= community for community in Wheat2018.trade_communities
-    )
-    # Canada and the US should be in the same community
-    assert any(
-        {"Canada", "United States"} <= community
-        for community in Wheat2018.trade_communities
-    )
+    if cd_algorithm == "louvain":
+        # At least one community should contain both Brazil and Chile
+        assert any(
+            {"Brazil", "Chile"} <= community
+            for community in Wheat2018.trade_communities
+        )
+        # Another community should contain both Germany and France
+        assert any(
+            {"Germany", "France"} <= community
+            for community in Wheat2018.trade_communities
+        )
+        # Canada and the US should be in the same community
+        assert any(
+            {"Canada", "United States"} <= community
+            for community in Wheat2018.trade_communities
+        )
 
 
 def test_apply_scenario() -> None:
