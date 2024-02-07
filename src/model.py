@@ -58,7 +58,7 @@ class PyTradeShifts:
             that are removed from the trade matrix or not.
         cd_algorithm (str, optional): Community detection algorithm name.
         Supported names: `louvain`, `leiden`, `infomap`.
-        cd_kwargs (dict, optional): Community detection algorithm kwargs.
+        cd_kwargs (dict, optional): Community detection algorithm keyworded argument.
         For possible kwargs see:
         `louvain`: https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.community.louvain.louvain_communities.html
         `leiden`: https://leidenalg.readthedocs.io/en/stable/intro.html
