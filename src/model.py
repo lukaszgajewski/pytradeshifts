@@ -3,7 +3,6 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 import os
-import sys
 import geopandas as gpd
 import country_converter as coco
 from matplotlib.colors import ListedColormap
