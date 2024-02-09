@@ -1,4 +1,5 @@
 ```mermaid
+%%{ init: { 'flowchart': { 'curve': 'natural' } } }%%
 flowchart TD
     subgraph id_pre [Pre-processing]
     direction LR
@@ -15,9 +16,12 @@ flowchart TD
         direction LR
         id_mod_6[Filter regions]
         end
-        id_mod_sub_2 --> id_mod_sub_3
+        id_mod_sub_2 -->|optional| id_mod_sub_3
+        id_mod_sub_2 --> id_mod_sub_4
         subgraph id_mod_sub_3 [" "]
-        id_mod_8[Apply scenario] --> id_mod_9[Apply gravity model of trade]
+        id_mod_8[Apply scenario]
+        id_mod_9[Apply gravity model of trade]
+        id_mod_8 --> id_mod_9
         end
         id_mod_sub_3 --> id_mod_sub_4
         subgraph id_mod_sub_4 [" "]
@@ -31,4 +35,14 @@ flowchart TD
     id_pre ==> id_mod
     id_mod ==> id_pos
     id_pos ==o RES((Results))
+
+    style id_pre fill:None,stroke:red,stroke-width:4px,stroke-dasharray: 5 5
+    style id_mod fill:None,stroke:green,stroke-width:4px,stroke-dasharray: 5 5
+    style id_pos fill:None,stroke:blue,stroke-width:4px,stroke-dasharray: 5 5
+    style id_mod_sub_1 fill:None
+    style id_mod_sub_2 fill:None
+    style id_mod_sub_3 fill:None
+    style id_mod_sub_4 fill:None
+    style RES stroke:pink,stroke-width:4px
+    style FAO stroke:yellow,stroke-width:4px
 ```
