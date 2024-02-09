@@ -1,3 +1,4 @@
+from geopandas import base
 import matplotlib.pyplot as plt
 from src.model import PyTradeShifts
 from src.utils import all_equal
@@ -24,13 +25,22 @@ class Postprocessing:
     Arguments:
         scenarios (list): List of scenarios to compare. Each scenario should be an instance
         of PyTradeShifts.
+        base_scenario (int): index of a scenario to plot a difference map against.
+        Accepts values in range: [1, number of scenarios].
 
     Returns:
         None
     """
 
-    def __init__(self, scenarios: list[PyTradeShifts]):
+    def __init__(
+        self,
+        scenarios: list[PyTradeShifts],
+        base_scenario=1,
+        anchor_countries: list[str] = [],
+    ):
         self.scenarios = scenarios
+        self.base_scenario = base_scenario - 1
+        self.anchor_countries = anchor_countries
         # check if community detection is uniform for all objects
         # there might be a case where it is desired so we allow it
         # but most times this is going to be undesirable hence the warning
@@ -44,6 +54,20 @@ class Postprocessing:
         """
         Hidden method to calculate stuff, like comparing scenarios
 
+        """
+        pass
+
+    def arange_communities(self):
+        """
+        TODO: order communities based on anchors such that the colour differences
+        between plots don't seem random like they do now.
+        """
+        pass
+
+    def community_diff(self):
+        """
+        TODO: plot a map showing countries that changed communities.
+        Problem: how to actually detect that? based on anchors? Or by jaccard index?
         """
         pass
 
