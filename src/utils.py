@@ -1,7 +1,9 @@
+from typing import Iterable
 import geopandas as gpd
 import pandas as pd
 import country_converter as coco
 import os
+from itertools import groupby
 
 
 def plot_winkel_tripel_map(ax):
@@ -114,3 +116,18 @@ def prepare_centroids(trade_matrix_index: pd.Index) -> pd.DataFrame:
     centroids["name"].replace(trade_matrix_index_restoration_dict, inplace=True)
     centroids.sort_values("name", inplace=True)
     return centroids
+
+
+def all_equal(iterable: Iterable):
+    """
+    Checks if all the elements are equal to each other.
+    source: https://docs.python.org/3/library/itertools.html#itertools-recipes
+
+    Arguments:
+        iterable (Iterable): a list-like object containing elements to compare.
+
+    Returns:
+        bool: True if all elements are equal, False otherwise.
+    """
+    g = groupby(iterable)
+    return next(g, True) and not next(g, False)

@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+from src.model import PyTradeShifts
+from src.utils import all_equal
 
 plt.style.use(
     "https://raw.githubusercontent.com/allfed/ALLFED-matplotlib-style-sheet/main/ALLFED.mplstyle"
@@ -19,8 +21,15 @@ class Postprocessing:
         None
     """
 
-    def __init__(self, scenarios):
+    def __init__(self, scenarios: list[PyTradeShifts]):
         self.scenarios = scenarios
+        # check if community detection is uniform for all objects
+        # there might be a case where it is desired so we allow it
+        # but most times this is going to be undesirable hence the warning
+        if not all_equal((sc.cd_algorithm for sc in scenarios)):
+            print("Warning: Inconsistent community detection algorithms detected.")
+        if not all_equal((sc.cd_kwargs for sc in scenarios)):
+            print("Warning: Inconsistent community detection parameters detected.")
         self._calculate_stuff()
 
     def _calculate_stuff(self):
