@@ -12,6 +12,9 @@ from geopy.distance import geodesic
 from math import isclose
 from src.preprocessing import main as preprocessing_main
 from src.utils import plot_winkel_tripel_map, prepare_centroids
+import leidenalg as la
+import igraph as ig
+import infomap as imp
 
 plt.style.use(
     "https://raw.githubusercontent.com/allfed/ALLFED-matplotlib-style-sheet/main/ALLFED.mplstyle"
@@ -53,6 +56,13 @@ class PyTradeShifts:
         make_plot (bool, optional): Whether to make the plot or not.
         shade_removed_countries (bool, optional): Whether to shade the countries
             that are removed from the trade matrix or not.
+        cd_algorithm (str, optional): Community detection algorithm name.
+        Supported names: `louvain`, `leiden`, `infomap`.
+        cd_kwargs (dict, optional): Community detection algorithm keyworded argument.
+        For possible kwargs see:
+        `louvain`: https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.community.louvain.louvain_communities.html
+        `leiden`: https://leidenalg.readthedocs.io/en/stable/intro.html
+        `infomap`: https://mapequation.github.io/infomap/python/infomap.html
 
     Returns:
         None
@@ -60,8 +70,8 @@ class PyTradeShifts:
 
     def __init__(
         self,
-        crop,
-        base_year,
+        crop: str,
+        base_year: int,
         percentile=0.75,
         region="Global",
         testing=False,
@@ -74,6 +84,8 @@ class PyTradeShifts:
         beta=0.0,
         make_plot=True,
         shade_removed_countries=True,
+        cd_algorithm="louvain",
+        cd_kwargs=dict(),
     ) -> None:
         # Save the arguments
         self.crop = crop
@@ -88,6 +100,8 @@ class PyTradeShifts:
         self.beta = beta
         self.make_plot = make_plot
         self.shade_removed_countries = shade_removed_countries
+        self.cd_algorithm = cd_algorithm
+        self.cd_kwargs = cd_kwargs
         # State variables to keep track of the progress
         self.prebalanced = False
         self.reexports_corrected = False
@@ -606,9 +620,64 @@ class PyTradeShifts:
 
         print("Built trade graph.")
 
+    def _get_communities(self) -> list[set[str]]:
+        """
+        Private function containing the appropriate set ups and execution
+        for different community detection algorihthms.
+
+        Arguments:
+            None
+
+        Returns:
+            list[set[str]]: list containing sets of country names.
+            Each set is a community.
+        """
+        match self.cd_algorithm:
+            case "louvain":
+                trade_communities = nx.community.louvain_communities(
+                    self.trade_graph, **self.cd_kwargs
+                )
+            case "leiden":
+                # temporary conversion to igraph as leidenalg is built on top of it
+                trade_igraph = ig.Graph.from_networkx(self.trade_graph)
+                # must specify partition type
+                if "partition_type" not in self.cd_kwargs:
+                    print("Partition type for Leiden method not specified.")
+                    print("Using ModularityVertexPartition.")
+                    self.cd_kwargs["partition_type"] = la.ModularityVertexPartition
+                # get communities
+                trade_communities = list(
+                    la.find_partition(trade_igraph, **self.cd_kwargs)
+                )
+                # convert node IDs to country names
+                trade_communities = [
+                    {trade_igraph.vs[node_id]["_nx_name"] for node_id in community}
+                    for community in trade_communities
+                ]
+            case "infomap":
+                # create Infomap object
+                im = imp.Infomap(**self.cd_kwargs)
+                # import netowrkx trade graph
+                im.add_networkx_graph(self.trade_graph)
+                # run the algorithm
+                im.run()
+                # extract communities; using set() instead of unique()
+                # to comply with other methods'  data types
+                trade_communities = [
+                    set(community_df["name"].values)
+                    for _, community_df in im.get_dataframe(
+                        columns=["name", "module_id"]
+                    ).groupby("module_id")
+                ]
+            case _:
+                print("Unrecognised community detection method.")
+                print("Using Louvain algorithm with default parameters.")
+                trade_communities = nx.community.louvain_communities(self.trade_graph)
+        return trade_communities
+
     def find_trade_communities(self) -> None:
         """
-        Finds the trade communities in the trade graph using the Louvain algorithm.
+        Finds the trade communities in the trade graph.
 
         Arguments:
             None
@@ -619,7 +688,7 @@ class PyTradeShifts:
         assert self.trade_graph is not None
         assert self.trade_communities is None
         # Find the communities
-        trade_communities = nx.community.louvain_communities(self.trade_graph, seed=2)
+        trade_communities = self._get_communities()
         # print number of communities found
         print(f"Found {len(trade_communities)} trade communities.")
         # Remove all the communities with only one country and print the names of the
