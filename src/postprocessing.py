@@ -1,6 +1,14 @@
 import matplotlib.pyplot as plt
 from src.model import PyTradeShifts
 from src.utils import all_equal
+import numpy as np
+import geopandas as gpd
+import os
+import country_converter as coco
+from matplotlib.colors import ListedColormap
+import seaborn as sns
+import pandas as pd
+
 
 plt.style.use(
     "https://raw.githubusercontent.com/allfed/ALLFED-matplotlib-style-sheet/main/ALLFED.mplstyle"
@@ -47,7 +55,10 @@ class Postprocessing:
 
         Not sure if this needs to be a method or could also just be in report.
         """
-        pass
+        _, axs = plt.subplots(len(self.scenarios), 1, sharex=True, tight_layout=True)
+        for ax, sc in zip(axs, self.scenarios):
+            sc._plot_trade_communities(ax)
+        plt.show()
 
     def report(self):
         """
