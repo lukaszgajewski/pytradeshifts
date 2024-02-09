@@ -1,19 +1,27 @@
 flowchart TD
     subgraph id_pre [Pre-processing]
     direction LR
-    id_pre_3[Format trade matrix and production vector] --> id_pre_4[Rename country, item labels]
+    id_pre_3[Format trade matrix and production vector]
     end
     subgraph id_mod [Model]
-    direction LR
-    id_mod_2[Remove ''net zero'' countries] --> id_mod_3[Pre-balance trade matrix]
-    id_mod_3 --> id_mod_4[Correct for re-exports]
-    id_mod_4 --> id_mod_5[Replace trade matrix diagonal with zeroes]
-    id_mod_5 -->  id_mod_6[Filter countries]
-    id_mod_6 --> id_mod_7[Remove countries below certain trade volume]
-    id_mod_7 --> id_mod_8[Apply scenario]
-    id_mod_8 --> id_mod_9[Apply gravity model of trade]
-    id_mod_9 --> id_mod_10[Build graph]
-    id_mod_10 --> id_mod_11[Find communities]
+    direction TB
+        subgraph id_mod_sub_1 [" "]
+        direction LR
+        id_mod_4[Correct for re-exports]
+        end
+        id_mod_sub_1 --> id_mod_sub_2
+        subgraph id_mod_sub_2 [" "]
+        direction LR
+        id_mod_6[Filter regions]
+        end
+        id_mod_sub_2 --> id_mod_sub_3
+        subgraph id_mod_sub_3 [" "]
+        id_mod_8[Apply scenario] --> id_mod_9[Apply gravity model of trade]
+        end
+        id_mod_sub_3 --> id_mod_sub_4
+        subgraph id_mod_sub_4 [" "]
+        id_mod_10[Build graph] --> id_mod_11[Find communities]
+        end
     end
     subgraph id_pos [Post-processing]
     direction LR
