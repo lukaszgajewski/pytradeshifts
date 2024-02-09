@@ -60,7 +60,8 @@ class PyTradeShifts:
         Supported names: `louvain`, `leiden`, `infomap`.
         cd_kwargs (dict, optional): Community detection algorithm keyworded argument.
         For possible kwargs see:
-        `louvain`: https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.community.louvain.louvain_communities.html
+        `louvain`: https://networkx.org/documentation/stable/reference/algorithms/
+                   generated/networkx.algorithms.community.louvain.louvain_communities.html
         `leiden`: https://leidenalg.readthedocs.io/en/stable/intro.html
         `infomap`: https://mapequation.github.io/infomap/python/infomap.html
 
