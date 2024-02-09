@@ -4,7 +4,6 @@ import os
 import numpy as np
 from src.preprocessing import rename_countries
 import pytest
-from leidenalg import ModularityVertexPartition
 
 
 def get_pytradeshifts_after_reexport(**kwargs) -> PyTradeShifts:
