@@ -6,6 +6,7 @@ import os
 import geopandas as gpd
 import country_converter as coco
 from matplotlib.colors import ListedColormap
+from matplotlib.axes import Axes
 import seaborn as sns
 from scipy.spatial.distance import squareform, pdist
 from geopy.distance import geodesic
@@ -704,18 +705,11 @@ class PyTradeShifts:
 
         self.trade_communities = trade_communities
 
-    def plot_trade_communities(self) -> None:
+    def _plot_trade_communities(self, ax: Axes) -> None:
         """
-        Plots the trade communities in the trade graph on a world map.
-
-        Arguments:
-            None
-
-        Returns:
-            None
+        TODO
         """
         assert self.trade_communities is not None
-
         # get the world map
         world = gpd.read_file(
             "."
@@ -750,7 +744,6 @@ class PyTradeShifts:
         cmap = ListedColormap(
             sns.color_palette("deep", len(self.trade_communities)).as_hex()
         )
-        fig, ax = plt.subplots(figsize=(10, 6))
         world.plot(
             ax=ax,
             column="community",
@@ -786,6 +779,19 @@ class PyTradeShifts:
                 else ""
             )
         )
+
+    def plot_trade_communities(self) -> None:
+        """
+        Plots the trade communities in the trade graph on a world map.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        _, ax = plt.subplots(figsize=(10, 6))
+        self._plot_trade_communities(ax)
 
         # save the plot
         plt.savefig(
