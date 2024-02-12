@@ -12,7 +12,7 @@ from scipy.spatial.distance import squareform, pdist
 from geopy.distance import geodesic
 from math import isclose
 from src.preprocessing import main as preprocessing_main
-from src.utils import plot_winkel_tripel_map, prepare_centroids
+from src.utils import plot_winkel_tripel_map, prepare_centroids, prepare_world
 import leidenalg as la
 import igraph as ig
 import infomap as imp
@@ -711,19 +711,8 @@ class PyTradeShifts:
         """
         assert self.trade_communities is not None
         # get the world map
-        world = gpd.read_file(
-            "."
-            + os.sep
-            + "data"
-            + os.sep
-            + "geospatial_references"
-            + os.sep
-            + "ne_110m_admin_0_countries"
-            + os.sep
-            + "ne_110m_admin_0_countries.shp"
-        )
-        world = world.to_crs("+proj=wintri")  # Change projection to Winkel Tripel
-
+        world = prepare_world()
+        cc = coco.CountryConverter()
         # Create a dictionary with the countries and which community they belong to
         # The communities are numbered from 0 to n
         country_community = {}
@@ -731,11 +720,6 @@ class PyTradeShifts:
             for country in community:
                 # Convert to standard short names
                 country_community[country] = i
-
-        cc = coco.CountryConverter()
-        world["names_short"] = cc.pandas_convert(
-            pd.Series(world["ADMIN"]), to="name_short"
-        )
 
         # Join the country_community dictionary to the world dataframe
         world["community"] = world["names_short"].map(country_community)

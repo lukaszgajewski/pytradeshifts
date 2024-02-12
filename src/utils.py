@@ -140,3 +140,56 @@ def jaccard_index(iterable_A: Iterable, iterable_B: Iterable) -> float:
     A = set(iterable_A)
     B = set(iterable_B)
     return len(A.intersection(B)) / len(A.union(B))
+
+
+def prepare_world() -> gpd.GeoDataFrame:
+    # get the world map
+    world = gpd.read_file(
+        "."
+        + os.sep
+        + "data"
+        + os.sep
+        + "geospatial_references"
+        + os.sep
+        + "ne_110m_admin_0_countries"
+        + os.sep
+        + "ne_110m_admin_0_countries.shp"
+    )
+    # Change projection to Winkel Tripel
+    world = world.to_crs("+proj=wintri")
+
+    cc = coco.CountryConverter()
+    world["names_short"] = cc.pandas_convert(pd.Series(world["ADMIN"]), to="name_short")
+    return world
+
+
+def plot_jaccard_map(ax, scenario, jaccard) -> None:
+    """
+    TODO
+    """
+    assert scenario.trade_communities is not None
+    world = prepare_world()
+
+    # Join the country_community dictionary to the world dataframe
+    world["jaccard_index"] = world["names_short"].map(jaccard)
+    world["jaccard_distance"] = 1 - world["jaccard_index"]
+
+    world.plot(
+        ax=ax,
+        column="jaccard_distance",
+        missing_kwds={"color": "lightgrey"},
+        legend=True,
+        legend_kwds={"label": "Jaccard distance"},
+    )
+
+    plot_winkel_tripel_map(ax)
+
+    # Add a title with self.scenario_name if applicable
+    ax.set_title(
+        f"Difference vs. base scenario for {scenario.crop} with base year {scenario.base_year[1:]}"
+        + (
+            f" in scenario: {scenario.scenario_name}"
+            if scenario.scenario_name is not None
+            else " (no scenario)"
+        )
+    )
