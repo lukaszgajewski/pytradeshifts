@@ -131,3 +131,12 @@ def all_equal(iterable: Iterable):
     """
     g = groupby(iterable)
     return next(g, True) and not next(g, False)
+
+
+def jaccard_index(iterable_A: Iterable, iterable_B: Iterable) -> float:
+    """
+    TODO: https://en.wikipedia.org/wiki/Jaccard_index
+    """
+    A = set(iterable_A)
+    B = set(iterable_B)
+    return len(A.intersection(B)) / len(A.union(B))

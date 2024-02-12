@@ -1,7 +1,7 @@
 from geopandas import base
 import matplotlib.pyplot as plt
 from src.model import PyTradeShifts
-from src.utils import all_equal
+from src.utils import all_equal, jaccard_index, plot_winkel_tripel_map
 import numpy as np
 import geopandas as gpd
 import os
@@ -36,11 +36,13 @@ class Postprocessing:
     def __init__(
         self,
         scenarios: list[PyTradeShifts],
-        base_scenario=1,
         anchor_countries: list[str] = [],
     ):
         self.scenarios = scenarios
-        self.base_scenario = base_scenario - 1  # 0-index the list, 1-index for UX
+        # we could make this user-specified but it's going to make the interface
+        # and the code more complicated, let's just inform in the docs
+        # that the first passed scenario is considered the base
+        self.base_scenario = 0
         self.anchor_countries = anchor_countries
         # check if community detection is uniform for all objects
         # there might be a case where it is desired so we allow it
@@ -86,12 +88,108 @@ class Postprocessing:
         for scenario in self.scenarios:
             scenario.trade_communities = self._find_new_order(scenario)
 
-    def community_diff(self):
+    def _find_community_diff(self) -> dict[int, dict[str, list[set[str]]]]:
+        jaccard_indices = {
+            scenario_idx: {}
+            for scenario_idx, _ in enumerate(self.scenarios)
+            if scenario_idx != self.base_scenario
+        }
+        base_scenario_country_list = self.scenarios[
+            self.base_scenario
+        ].production_data.index
+        for scenario_idx, scenario in enumerate(self.scenarios):
+            if scenario_idx == self.base_scenario:
+                continue
+            for country in base_scenario_country_list:
+                new_community = None
+                for comm in scenario.trade_communities:
+                    if country in comm:
+                        new_community = comm
+                        break
+                if new_community is None:
+                    continue
+                old_community = None
+                for comm in self.scenarios[self.base_scenario].trade_communities:
+                    if country in comm:
+                        old_community = comm
+                        break
+                jaccard_indices[scenario_idx][country] = jaccard_index(
+                    new_community, old_community
+                )
+        return jaccard_indices
+
+    def _plot_jaccard_map(self, ax, scenario, jaccard) -> None:
         """
-        TODO: plot a map showing countries that changed communities.
-        Problem: how to actually detect that? based on anchors? Or by jaccard index?
+        TODO: move to util
         """
-        pass
+        assert scenario.trade_communities is not None
+        # get the world map
+        world = gpd.read_file(
+            "."
+            + os.sep
+            + "data"
+            + os.sep
+            + "geospatial_references"
+            + os.sep
+            + "ne_110m_admin_0_countries"
+            + os.sep
+            + "ne_110m_admin_0_countries.shp"
+        )
+        world = world.to_crs("+proj=wintri")  # Change projection to Winkel Tripel
+
+        cc = coco.CountryConverter()
+        world["names_short"] = cc.pandas_convert(
+            pd.Series(world["ADMIN"]), to="name_short"
+        )
+
+        # Join the country_community dictionary to the world dataframe
+        world["jaccard_index"] = world["names_short"].map(jaccard)
+        world["jaccard_distance"] = 1 - world["jaccard_index"]
+
+        world.plot(
+            ax=ax,
+            column="jaccard_distance",
+            missing_kwds={"color": "lightgrey"},
+            legend=True,
+            # TODO: shrink doesn't work as well for more than two scenarios
+            legend_kwds={"shrink": 0.35, "label": "Jaccard distance"},
+        )
+
+        plot_winkel_tripel_map(ax)
+
+        # Add a title with self.scenario_name if applicable
+        ax.set_title(
+            f"Difference vs. base scenario for {scenario.crop} with base year {scenario.base_year[1:]}"
+            + (
+                f" in scenario: {scenario.scenario_name}"
+                if scenario.scenario_name is not None
+                else " (no scenario)"
+            )
+        )
+
+    def plot_community_diff(self):
+        """
+        TODO
+        """
+        jaccard_indices = self._find_community_diff()
+        _, axs = plt.subplots(
+            len(self.scenarios) - 1, 1, sharex=True, tight_layout=True
+        )
+        # if there are only two scenarios axs will be just an ax object
+        # convert to a list to comply with other cases
+        try:
+            len(axs)
+        except TypeError:
+            axs = [axs]
+        non_base_scenarios = [
+            (idx, sc)
+            for idx, sc in enumerate(self.scenarios)
+            if idx != self.base_scenario
+        ]
+
+        for ax, (idx, sc) in zip(axs, non_base_scenarios):
+            self._plot_jaccard_map(ax, sc, jaccard_indices[idx])
+        plt.show()
 
     def plot(self):
         """
