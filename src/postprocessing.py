@@ -1,15 +1,8 @@
-from geopandas import base
 from networkx import to_numpy_array as nx_to_numpy_array
 import matplotlib.pyplot as plt
 from src.model import PyTradeShifts
 from src.utils import all_equal, jaccard_index, plot_jaccard_map
 import numpy as np
-import geopandas as gpd
-import os
-import country_converter as coco
-from matplotlib.colors import ListedColormap
-import seaborn as sns
-import pandas as pd
 from operator import itemgetter
 
 
