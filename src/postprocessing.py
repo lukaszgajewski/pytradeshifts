@@ -1,7 +1,7 @@
 from geopandas import base
 import matplotlib.pyplot as plt
 from src.model import PyTradeShifts
-from src.utils import all_equal, jaccard_index, plot_winkel_tripel_map
+from src.utils import all_equal, jaccard_index, plot_jaccard_map
 import numpy as np
 import geopandas as gpd
 import os
@@ -104,68 +104,19 @@ class Postprocessing:
                 new_community = None
                 for comm in scenario.trade_communities:
                     if country in comm:
-                        new_community = comm
+                        new_community = comm - {country}
                         break
                 if new_community is None:
                     continue
                 old_community = None
                 for comm in self.scenarios[self.base_scenario].trade_communities:
                     if country in comm:
-                        old_community = comm
+                        old_community = comm - {country}
                         break
                 jaccard_indices[scenario_idx][country] = jaccard_index(
                     new_community, old_community
                 )
         return jaccard_indices
-
-    def _plot_jaccard_map(self, ax, scenario, jaccard) -> None:
-        """
-        TODO: move to util
-        """
-        assert scenario.trade_communities is not None
-        # get the world map
-        world = gpd.read_file(
-            "."
-            + os.sep
-            + "data"
-            + os.sep
-            + "geospatial_references"
-            + os.sep
-            + "ne_110m_admin_0_countries"
-            + os.sep
-            + "ne_110m_admin_0_countries.shp"
-        )
-        world = world.to_crs("+proj=wintri")  # Change projection to Winkel Tripel
-
-        cc = coco.CountryConverter()
-        world["names_short"] = cc.pandas_convert(
-            pd.Series(world["ADMIN"]), to="name_short"
-        )
-
-        # Join the country_community dictionary to the world dataframe
-        world["jaccard_index"] = world["names_short"].map(jaccard)
-        world["jaccard_distance"] = 1 - world["jaccard_index"]
-
-        world.plot(
-            ax=ax,
-            column="jaccard_distance",
-            missing_kwds={"color": "lightgrey"},
-            legend=True,
-            # TODO: shrink doesn't work as well for more than two scenarios
-            legend_kwds={"label": "Jaccard distance"},
-        )
-
-        plot_winkel_tripel_map(ax)
-
-        # Add a title with self.scenario_name if applicable
-        ax.set_title(
-            f"Difference vs. base scenario for {scenario.crop} with base year {scenario.base_year[1:]}"
-            + (
-                f" in scenario: {scenario.scenario_name}"
-                if scenario.scenario_name is not None
-                else " (no scenario)"
-            )
-        )
 
     def plot_community_diff(self):
         """
@@ -188,7 +139,7 @@ class Postprocessing:
         ]
 
         for ax, (idx, sc) in zip(axs, non_base_scenarios):
-            self._plot_jaccard_map(ax, sc, jaccard_indices[idx])
+            plot_jaccard_map(ax, sc, jaccard_indices[idx])
         plt.show()
 
     def plot(self):
