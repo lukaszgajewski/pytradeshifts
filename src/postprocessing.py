@@ -152,7 +152,7 @@ class Postprocessing:
             missing_kwds={"color": "lightgrey"},
             legend=True,
             # TODO: shrink doesn't work as well for more than two scenarios
-            legend_kwds={"shrink": 0.35, "label": "Jaccard distance"},
+            legend_kwds={"label": "Jaccard distance"},
         )
 
         plot_winkel_tripel_map(ax)
