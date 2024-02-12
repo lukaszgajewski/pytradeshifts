@@ -52,13 +52,6 @@ class Postprocessing:
         if anchor_countries:
             self.arrange_communities()
 
-    def _calculate_stuff(self):
-        """
-        Hidden method to calculate stuff, like comparing scenarios
-
-        """
-        pass
-
     def _find_new_order(self, scenario) -> list[set[str]]:
         # make sure there are communities computed
         assert scenario.trade_communities is not None
@@ -83,7 +76,6 @@ class Postprocessing:
         assert len(new_order) == len(scenario.trade_communities)
         assert len(new_order) == len(set(new_order))
         # get communities in the new order
-        print(new_order)
         return list(itemgetter(*new_order)(scenario.trade_communities))
 
     def arrange_communities(self) -> None:
