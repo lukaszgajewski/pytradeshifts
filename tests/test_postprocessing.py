@@ -28,7 +28,7 @@ def test_init():
         cd_kwargs={"seed": 2},
         make_plot=False,
     )
-    pp = Postprocessing([Wheat2018, ISIMIP])
+    pp = Postprocessing([Wheat2018, ISIMIP], anchor_countries=["China", "Russia"])
     pp.plot()
 
 

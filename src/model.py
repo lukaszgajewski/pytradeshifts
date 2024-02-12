@@ -87,7 +87,7 @@ class PyTradeShifts:
         make_plot=True,
         shade_removed_countries=True,
         cd_algorithm="louvain",
-        cd_kwargs=dict(),
+        cd_kwargs={},
     ) -> None:
         # Save the arguments
         self.crop = crop
