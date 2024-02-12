@@ -1,4 +1,7 @@
-from networkx import to_numpy_array as nx_to_numpy_array
+from networkx import (
+    to_numpy_array as nx_to_numpy_array,
+    to_pandas_adjacency as nx_to_pandas_adjacency,
+)
 import matplotlib.pyplot as plt
 from src.model import PyTradeShifts
 from src.utils import all_equal, jaccard_index, plot_jaccard_map
@@ -48,6 +51,7 @@ class Postprocessing:
         if anchor_countries:
             self.arrange_communities()
         self._compute_frobenius_distance()
+        self._compute_entropy_rate()
 
     def _compute_frobenius_distance(self) -> None:
         """
@@ -70,6 +74,26 @@ class Postprocessing:
                 self.scenarios[1:], elligible_countries
             )
         ]
+
+    def _compute_entropy_rate(self) -> None:
+        """
+        TODO: this is yanked from an old project and is likely to be incorrect
+        """
+        for scenario in self.scenarios:
+            right_stochastic_matrix = nx_to_pandas_adjacency(scenario.trade_graph)
+            right_stochastic_matrix = right_stochastic_matrix.div(
+                right_stochastic_matrix.sum(axis=0)
+            )
+            right_stochastic_matrix.fillna(0, inplace=True)
+            x = right_stochastic_matrix.values
+            y = np.linalg.eig(x.T)
+            _, z = min(zip(y[0], y[1].T), key=lambda v: abs(v[0] - 1.0))
+            z /= np.sum(z)
+            # equivalent to -np.sum(z*np.sum(np.nan_to_num(x * np.log(x)), axis=0))
+            entropy_rate = -np.sum(x * z * np.nan_to_num(np.log(x)))
+            print(entropy_rate)
+
+        # transition_matrix.div(transition_matrix.sum(axis="columns"), axis="rows")
 
     def _find_new_order(self, scenario) -> list[set[str]]:
         # make sure there are communities computed
