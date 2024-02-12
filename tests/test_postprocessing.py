@@ -29,9 +29,9 @@ def test_init():
         make_plot=False,
     )
     pp = Postprocessing(
-        [Wheat2018, ISIMIP, ISIMIP], anchor_countries=["China", "Russia"]
+        [Wheat2018, Wheat2018, ISIMIP], anchor_countries=["China", "Russia"]
     )
-    pp.plot()
+    print(pp.frobenius)
 
 
 if __name__ == "__main__":

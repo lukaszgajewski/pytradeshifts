@@ -1,4 +1,5 @@
 from geopandas import base
+from networkx import to_numpy_array as nx_to_numpy_array
 import matplotlib.pyplot as plt
 from src.model import PyTradeShifts
 from src.utils import all_equal, jaccard_index, plot_jaccard_map
@@ -42,7 +43,7 @@ class Postprocessing:
         # we could make this user-specified but it's going to make the interface
         # and the code more complicated, let's just inform in the docs
         # that the first passed scenario is considered the base
-        self.base_scenario = 0
+        self.base_scenario = 0  # TODO refactor this
         self.anchor_countries = anchor_countries
         # check if community detection is uniform for all objects
         # there might be a case where it is desired so we allow it
@@ -53,6 +54,29 @@ class Postprocessing:
             print("Warning: Inconsistent community detection parameters detected.")
         if anchor_countries:
             self.arrange_communities()
+        self._compute_frobenius_distance()
+
+    def _compute_frobenius_distance(self) -> None:
+        """
+        TODO
+        """
+        elligible_countries = [
+            set(scenario.trade_graph.nodes()).intersection(
+                self.scenarios[0].trade_graph.nodes()
+            )
+            for scenario in self.scenarios[1:]
+        ]
+        self.frobenius = [
+            np.linalg.norm(
+                nx_to_numpy_array(
+                    self.scenarios[0].trade_graph, nodelist=elligible_nodes
+                )
+                - nx_to_numpy_array(scenario.trade_graph, nodelist=elligible_nodes)
+            )
+            for scenario, elligible_nodes in zip(
+                self.scenarios[1:], elligible_countries
+            )
+        ]
 
     def _find_new_order(self, scenario) -> list[set[str]]:
         # make sure there are communities computed
