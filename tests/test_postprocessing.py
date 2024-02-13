@@ -28,10 +28,22 @@ def test_init():
         cd_kwargs={"seed": 2},
         make_plot=False,
     )
+    ISIMIP2 = PyTradeShifts(
+        crop="Wheat",
+        base_year=2018,
+        scenario_file_name="ISIMIP_climate/ISIMIP_wheat_Hedlung.csv",
+        scenario_name="ISIMIP",
+        # countries_to_remove=nan_indices,
+        cd_kwargs={"seed": 2},
+        make_plot=False,
+    )
     pp = Postprocessing(
-        [Wheat2018, Wheat2018, ISIMIP], anchor_countries=["China", "Russia"]
+        [Wheat2018, Wheat2018, ISIMIP, ISIMIP2],
+        anchor_countries=["China", "Russia"],
+        frobenius="dsa",
     )
     pp.print_distance_metrics()
+    pp.plot_distance_metrics()
 
 
 if __name__ == "__main__":
