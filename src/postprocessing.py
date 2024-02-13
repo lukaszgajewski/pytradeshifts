@@ -276,6 +276,7 @@ class Postprocessing:
 
     def plot(self):
         """
+        TODO
         Plots the results of the scenarios. This could be something like comparing on the
         world map where the scenarios differ or a visual comparison of the stability of
         the graphs of the scenarions.
@@ -289,6 +290,7 @@ class Postprocessing:
 
     def report(self):
         """
+        TODO
         This method generates a report of the results of the scenarios. This could be a
         pdf or a markdown file. This should contain the results of the scenarios and
         the comparison of the scenarios, like with plots or tables.
