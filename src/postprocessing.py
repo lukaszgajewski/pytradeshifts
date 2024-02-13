@@ -1,4 +1,4 @@
-from networkx import to_numpy_array as nx_to_numpy_array, subgraph
+import networkx as nx
 import matplotlib.pyplot as plt
 from src.model import PyTradeShifts
 from src.utils import (
@@ -8,6 +8,7 @@ from src.utils import (
     get_right_stochastic_matrix,
     get_stationary_probability_vector,
     get_entropy_rate,
+    get_dict_min_max,
 )
 import numpy as np
 from operator import itemgetter
@@ -67,6 +68,7 @@ class Postprocessing:
         self._compute_frobenius_distance()
         self._compute_entropy_rate()
         self._compute_stationary_markov_distance()
+        self._compute_centrality_measures()
 
     def _compute_frobenius_distance(self) -> None:
         """
@@ -74,10 +76,10 @@ class Postprocessing:
         """
         self.frobenius = [
             np.linalg.norm(
-                nx_to_numpy_array(
+                nx.to_numpy_array(
                     self.scenarios[0].trade_graph, nodelist=elligible_nodes
                 )
-                - nx_to_numpy_array(scenario.trade_graph, nodelist=elligible_nodes)
+                - nx.to_numpy_array(scenario.trade_graph, nodelist=elligible_nodes)
             )
             for scenario, elligible_nodes in zip(
                 self.scenarios[1:], self.elligible_countries
@@ -90,8 +92,8 @@ class Postprocessing:
         """
         graphs_with_elligible_nodes = [
             (
-                subgraph(self.scenarios[0].trade_graph, nbunch=elligible_nodes),
-                subgraph(scenario.trade_graph, nbunch=elligible_nodes),
+                nx.subgraph(self.scenarios[0].trade_graph, nbunch=elligible_nodes),
+                nx.subgraph(scenario.trade_graph, nbunch=elligible_nodes),
             )
             for scenario, elligible_nodes in zip(
                 self.scenarios[1:], self.elligible_countries
@@ -115,6 +117,18 @@ class Postprocessing:
         entropy_rates = [get_entropy_rate(scenario) for scenario in self.scenarios]
         # compute difference from base scenario
         self.entropy_rate = [er - entropy_rates[0] for er in entropy_rates[1:]]
+
+    def _compute_centrality_measures(self) -> None:
+        """
+        TODO
+        """
+        self.in_degree = [
+            nx.in_degree_centrality(scenario.trade_graph) for scenario in self.scenarios
+        ]
+        self.out_degree = [
+            nx.out_degree_centrality(scenario.trade_graph)
+            for scenario in self.scenarios
+        ]
 
     def _find_new_order(self, scenario) -> list[set[str]]:
         # make sure there are communities computed
