@@ -10,6 +10,7 @@ from src.utils import (
     get_stationary_probability_vector,
     get_entropy_rate,
     get_dict_min_max,
+    plot_degree_map,
 )
 import numpy as np
 import pandas as pd
@@ -185,6 +186,29 @@ class Postprocessing:
             nx.out_degree_centrality(scenario.trade_graph)
             for scenario in self.scenarios
         ]
+
+    def plot_degree_maps(self) -> None:
+        """
+        TODO
+        """
+        _, axs = plt.subplots(
+            2 * len(self.scenarios), 1, sharex=True, tight_layout=True
+        )
+        # if there is only one scenario axs will be just an ax object
+        # convert to a list to comply with other cases
+        try:
+            len(axs)
+        except TypeError:
+            axs = [axs]
+
+        idx = 0
+        for scenario, in_degree, out_degree in zip(
+            self.scenarios, self.in_degree, self.out_degree
+        ):
+            plot_degree_map(axs[idx], scenario, in_degree, label="in-degree")
+            plot_degree_map(axs[idx + 1], scenario, out_degree, label="out-degree")
+            idx += 2
+        plt.show()
 
     def _find_new_order(self, scenario) -> list[set[str]]:
         # make sure there are communities computed
