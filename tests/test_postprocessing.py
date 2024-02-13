@@ -31,7 +31,7 @@ def test_init():
     pp = Postprocessing(
         [Wheat2018, Wheat2018, ISIMIP], anchor_countries=["China", "Russia"]
     )
-    print(pp.markov)
+    print(pp.in_degree)
 
 
 if __name__ == "__main__":

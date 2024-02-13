@@ -1,4 +1,4 @@
-from typing import Iterable
+from typing import Iterable, Any
 import numpy as np
 import geopandas as gpd
 import pandas as pd
@@ -234,3 +234,12 @@ def get_entropy_rate(scenario) -> float:
         print(entropy_rate)
         print("Returning real part only.")
     return np.real(entropy_rate)
+
+
+def get_dict_min_max(iterable: dict) -> tuple[Any, Any, Any, Any]:
+    """
+    TODO
+    """
+    max_key = max(iterable, key=iterable.get)
+    min_key = min(iterable, key=iterable.get)
+    return min_key, iterable[min_key], max_key, iterable[max_key]
