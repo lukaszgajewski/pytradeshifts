@@ -197,6 +197,15 @@ def plot_jaccard_map(ax, scenario, jaccard) -> None:
     )
 
 
+def get_right_stochastic_matrix(trade_graph) -> np.ndarray:
+    right_stochastic_matrix = nx_to_pandas_adjacency(trade_graph)
+    right_stochastic_matrix = right_stochastic_matrix.div(
+        right_stochastic_matrix.sum(axis=0)
+    )
+    right_stochastic_matrix.fillna(0, inplace=True)
+    return right_stochastic_matrix.values
+
+
 def get_stationary_probability_vector(
     right_stochastic_matrix: np.ndarray,
 ) -> np.ndarray:
@@ -212,19 +221,13 @@ def get_stationary_probability_vector(
 
 
 def get_entropy_rate(scenario) -> float:
-    assert scenario.trade_graph is not None
-    right_stochastic_matrix = nx_to_pandas_adjacency(scenario.trade_graph)
-    right_stochastic_matrix = right_stochastic_matrix.div(
-        right_stochastic_matrix.sum(axis=0)
-    )
-    right_stochastic_matrix.fillna(0, inplace=True)
-    # a helper variable
-    P = right_stochastic_matrix.values
+    P = get_right_stochastic_matrix(scenario.trade_graph)
     probability_vector = get_stationary_probability_vector(P)
     # entropy rate in [nat]
-    entropy_rate = np.sum(
-        probability_vector * np.sum(-P * np.nan_to_num(np.log(P)), axis=1)
-    )
+    with np.errstate(divide="ignore"):
+        entropy_rate = np.sum(
+            probability_vector * np.sum(-P * np.nan_to_num(np.log(P)), axis=1)
+        )
     # this should be a real value
     if np.real(entropy_rate) != np.real_if_close(entropy_rate):
         print("Warning: a significant imaginary part encountered in entropy rate:")

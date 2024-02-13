@@ -1,7 +1,14 @@
-from networkx import to_numpy_array as nx_to_numpy_array
+from networkx import to_numpy_array as nx_to_numpy_array, subgraph
 import matplotlib.pyplot as plt
 from src.model import PyTradeShifts
-from src.utils import all_equal, jaccard_index, plot_jaccard_map, get_entropy_rate
+from src.utils import (
+    all_equal,
+    jaccard_index,
+    plot_jaccard_map,
+    get_right_stochastic_matrix,
+    get_stationary_probability_vector,
+    get_entropy_rate,
+)
 import numpy as np
 from operator import itemgetter
 
@@ -45,21 +52,26 @@ class Postprocessing:
             print("Warning: Inconsistent community detection algorithms detected.")
         if not all_equal((sc.cd_kwargs for sc in scenarios)):
             print("Warning: Inconsistent community detection parameters detected.")
-        if anchor_countries:
-            self.arrange_communities()
-        self._compute_frobenius_distance()
-        self._compute_entropy_rate()
 
-    def _compute_frobenius_distance(self) -> None:
-        """
-        TODO
-        """
-        elligible_countries = [
+        # in order to compute matrix distances we need matrices to be
+        # of the same shape, this is a helper member variable that allows that
+        self.elligible_countries = [
             set(scenario.trade_graph.nodes()).intersection(
                 self.scenarios[0].trade_graph.nodes()
             )
             for scenario in self.scenarios[1:]
         ]
+
+        if anchor_countries:
+            self.arrange_communities()
+        self._compute_frobenius_distance()
+        self._compute_entropy_rate()
+        self._compute_stationary_markov_distance()
+
+    def _compute_frobenius_distance(self) -> None:
+        """
+        TODO
+        """
         self.frobenius = [
             np.linalg.norm(
                 nx_to_numpy_array(
@@ -68,9 +80,33 @@ class Postprocessing:
                 - nx_to_numpy_array(scenario.trade_graph, nodelist=elligible_nodes)
             )
             for scenario, elligible_nodes in zip(
-                self.scenarios[1:], elligible_countries
+                self.scenarios[1:], self.elligible_countries
             )
         ]
+
+    def _compute_stationary_markov_distance(self) -> None:
+        """
+        TODO
+        """
+        graphs_with_elligible_nodes = [
+            (
+                subgraph(self.scenarios[0].trade_graph, nbunch=elligible_nodes),
+                subgraph(scenario.trade_graph, nbunch=elligible_nodes),
+            )
+            for scenario, elligible_nodes in zip(
+                self.scenarios[1:], self.elligible_countries
+            )
+        ]
+        vecs = [
+            [
+                get_stationary_probability_vector(
+                    get_right_stochastic_matrix(trade_matrix)
+                )
+                for trade_matrix in trade_matrix_pair
+            ]
+            for trade_matrix_pair in graphs_with_elligible_nodes
+        ]
+        self.markov = [np.linalg.norm(base_vec - vec) for (base_vec, vec) in vecs]
 
     def _compute_entropy_rate(self) -> None:
         """
