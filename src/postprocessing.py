@@ -187,6 +187,57 @@ class Postprocessing:
             for scenario in self.scenarios
         ]
 
+    def print_global_degree_metrics(self) -> None:
+        degree_metrics = []
+        for idx, (in_d, out_d) in enumerate(zip(self.in_degree, self.out_degree)):
+            in_min_max = get_dict_min_max(in_d)
+            out_min_max = get_dict_min_max(out_d)
+            degree_metrics.append([idx, *in_min_max, *out_min_max])
+        df = pd.DataFrame(
+            degree_metrics,
+            columns=[
+                "Scenario ID",
+                "in_min",
+                "in_min_val",
+                "in_max",
+                "in_max_val",
+                "out_min",
+                "out_min_val",
+                "out_max",
+                "out_max_val",
+            ],
+        )
+        print(df.to_markdown(tablefmt="fancy_grid"))
+
+    def print_community_degree_metrics(self) -> None:
+        for scenario_id, scenario in enumerate(self.scenarios):
+            degree_metrics = []
+            for comm_id, community in enumerate(scenario.trade_communities):
+                in_d = self.in_degree[scenario_id]
+                out_d = self.out_degree[scenario_id]
+                in_d = {k: v for k, v in in_d.items() if k in community}
+                out_d = {k: v for k, v in out_d.items() if k in community}
+
+                in_min_max = get_dict_min_max(in_d)
+                out_min_max = get_dict_min_max(out_d)
+                degree_metrics.append([comm_id, *in_min_max, *out_min_max])
+            df = pd.DataFrame(
+                degree_metrics,
+                columns=[
+                    "Community ID",
+                    "in_min",
+                    "in_min_val",
+                    "in_max",
+                    "in_max_val",
+                    "out_min",
+                    "out_min_val",
+                    "out_max",
+                    "out_max_val",
+                ],
+            )
+            print(f"Scenario ID: {scenario_id}")
+            print(df.to_markdown(tablefmt="fancy_grid"))
+
     def plot_degree_maps(self) -> None:
         """
         TODO
