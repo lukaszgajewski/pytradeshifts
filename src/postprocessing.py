@@ -1,5 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import seaborn as sns
 from src.model import PyTradeShifts
 from src.utils import (
     all_equal,
@@ -40,6 +41,7 @@ class Postprocessing:
         self,
         scenarios: list[PyTradeShifts],
         anchor_countries: list[str] = [],
+        frobenius: str | None = "relative",
     ):
         self.scenarios = scenarios
         # we could make this user-specified but it's going to make the interface
@@ -47,6 +49,7 @@ class Postprocessing:
         # that the first passed scenario is considered the base
         self.base_scenario = 0  # TODO refactor this
         self.anchor_countries = anchor_countries
+        self.frobenius_in_plot = frobenius
         # check if community detection is uniform for all objects
         # there might be a case where it is desired so we allow it
         # but most times this is going to be undesirable hence the warning
@@ -69,6 +72,7 @@ class Postprocessing:
         self._compute_frobenius_distance()
         self._compute_entropy_rate_distance()
         self._compute_stationary_markov_distance()
+        self._format_distance_dataframe()
         self._compute_centrality_measures()
 
     def _compute_frobenius_distance(self) -> None:
@@ -119,10 +123,7 @@ class Postprocessing:
         # compute difference from base scenario
         self.entropy_rate = [er - entropy_rates[0] for er in entropy_rates[1:]]
 
-    def print_distance_metrics(self) -> None:
-        """
-        TODO
-        """
+    def _format_distance_dataframe(self) -> None:
         df = pd.DataFrame(
             zip(
                 range(1, len(self.scenarios)),
@@ -130,13 +131,48 @@ class Postprocessing:
                 self.markov,
                 self.entropy_rate,
             ),
-            columns=["scenario ID", "Frobenius", "Markov", "Entropy rate"],
+            columns=["Scenario ID", "Frobenius", "Markov", "Entropy rate"],
         )
-        df.set_index("scenario ID", drop=True, inplace=True)
+        self.distance_df = df
+
+    def print_distance_metrics(self) -> None:
+        """
+        TODO
+        """
+        df = self.distance_df.copy()
+        df.set_index("Scenario ID", drop=True, inplace=True)
         print(
             "***| Distance metrics vs. the base scenario (ID=0 on the list of scenarios) |***"
         )
         print(df.to_markdown(tablefmt="fancy_grid"))
+
+    def plot_distance_metrics(self) -> None:
+        """
+        TODO
+        """
+        df = self.distance_df.copy()
+        match self.frobenius_in_plot:
+            case "relative":
+                df[df.columns[1:]] = df[df.columns[1:]] / df[df.columns[1:]].max()
+            case "ignore":
+                df.drop(columns=["Frobenius"], inplace=True)
+            case None:
+                pass
+            case _:
+                print(
+                    "Unrecognised option for plotting Frobenius, defaulting to 'relative'."
+                )
+                df[df.columns[1:]] = df[df.columns[1:]] / df[df.columns[1:]].max()
+        df = df.melt(id_vars="Scenario ID", value_vars=df.columns[1:])
+        sns.barplot(
+            df,
+            x="Scenario ID",
+            y="value",
+            hue="variable",
+        )
+        plt.ylabel("Distance")
+        plt.title("Distance metrics vs. the base scenario")
+        plt.show()
 
     def _compute_centrality_measures(self) -> None:
         """
