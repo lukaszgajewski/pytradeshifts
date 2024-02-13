@@ -38,12 +38,16 @@ def test_init():
         make_plot=False,
     )
     pp = Postprocessing(
-        [Wheat2018, Wheat2018, ISIMIP, ISIMIP2],
+        [
+            Wheat2018,
+            Wheat2018,
+            ISIMIP,
+            ISIMIP2,
+        ],
         anchor_countries=["China", "Russia"],
         frobenius="dsa",
     )
-    pp.print_distance_metrics()
-    pp.plot_distance_metrics()
+    pp.plot_degree_maps()
 
 
 if __name__ == "__main__":

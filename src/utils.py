@@ -165,6 +165,37 @@ def prepare_world() -> gpd.GeoDataFrame:
     return world
 
 
+def plot_degree_map(ax, scenario, degree, label) -> None:
+    """
+    TODO
+    """
+    assert scenario.trade_communities is not None
+    world = prepare_world()
+
+    # Join the country_community dictionary to the world dataframe
+    world["degree"] = world["names_short"].map(degree)
+
+    world.plot(
+        ax=ax,
+        column="degree",
+        missing_kwds={"color": "lightgrey"},
+        legend=True,
+        legend_kwds={"label": label},
+    )
+
+    plot_winkel_tripel_map(ax)
+
+    # Add a title with self.scenario_name if applicable
+    ax.set_title(
+        f"{label} for {scenario.crop} with base year {scenario.base_year[1:]}"
+        + (
+            f" in scenario: {scenario.scenario_name}"
+            if scenario.scenario_name is not None
+            else " (no scenario)"
+        )
+    )
+
+
 def plot_jaccard_map(ax, scenario, jaccard) -> None:
     """
     TODO
