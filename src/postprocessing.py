@@ -1,3 +1,4 @@
+from matplotlib.figure import figaspect
 import networkx as nx
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -42,7 +43,7 @@ class Postprocessing:
         self,
         scenarios: list[PyTradeShifts],
         anchor_countries: list[str] = [],
-        frobenius: str | None = "relative",
+        frobenius: str | None = None,
     ):
         self.scenarios = scenarios
         # we could make this user-specified but it's going to make the interface
@@ -243,7 +244,11 @@ class Postprocessing:
         TODO
         """
         _, axs = plt.subplots(
-            2 * len(self.scenarios), 1, sharex=True, tight_layout=True
+            2 * len(self.scenarios),
+            1,
+            sharex=True,
+            tight_layout=True,
+            figsize=(5, 2 * len(self.scenarios) * 5),
         )
         # if there is only one scenario axs will be just an ax object
         # convert to a list to comply with other cases
