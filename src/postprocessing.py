@@ -11,6 +11,7 @@ from src.utils import (
     get_dict_min_max,
 )
 import numpy as np
+import pandas as pd
 from operator import itemgetter
 
 
@@ -66,7 +67,7 @@ class Postprocessing:
         if anchor_countries:
             self.arrange_communities()
         self._compute_frobenius_distance()
-        self._compute_entropy_rate()
+        self._compute_entropy_rate_distance()
         self._compute_stationary_markov_distance()
         self._compute_centrality_measures()
 
@@ -110,13 +111,32 @@ class Postprocessing:
         ]
         self.markov = [np.linalg.norm(base_vec - vec) for (base_vec, vec) in vecs]
 
-    def _compute_entropy_rate(self) -> None:
+    def _compute_entropy_rate_distance(self) -> None:
         """
         TODO
         """
         entropy_rates = [get_entropy_rate(scenario) for scenario in self.scenarios]
         # compute difference from base scenario
         self.entropy_rate = [er - entropy_rates[0] for er in entropy_rates[1:]]
+
+    def print_distance_metrics(self) -> None:
+        """
+        TODO
+        """
+        df = pd.DataFrame(
+            zip(
+                range(1, len(self.scenarios)),
+                self.frobenius,
+                self.markov,
+                self.entropy_rate,
+            ),
+            columns=["scenario ID", "Frobenius", "Markov", "Entropy rate"],
+        )
+        df.set_index("scenario ID", drop=True, inplace=True)
+        print(
+            "***| Distance metrics vs. the base scenario (ID=0 on the list of scenarios) |***"
+        )
+        print(df.to_markdown(tablefmt="fancy_grid"))
 
     def _compute_centrality_measures(self) -> None:
         """
