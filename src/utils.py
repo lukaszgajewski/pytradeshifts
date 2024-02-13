@@ -1,9 +1,11 @@
 from typing import Iterable
+import numpy as np
 import geopandas as gpd
 import pandas as pd
 import country_converter as coco
 import os
 from itertools import groupby
+from networkx import to_pandas_adjacency as nx_to_pandas_adjacency
 
 
 def plot_winkel_tripel_map(ax):
@@ -193,3 +195,39 @@ def plot_jaccard_map(ax, scenario, jaccard) -> None:
             else " (no scenario)"
         )
     )
+
+
+def get_stationary_probability_vector(
+    right_stochastic_matrix: np.ndarray,
+) -> np.ndarray:
+    # get eigenvalues and (row) eigenvectors
+    eigenvalues, eigenvectors = np.linalg.eig(right_stochastic_matrix.T)
+    # we want eigenvector associated with eigenvalue = 1
+    _, probability_vector = min(
+        zip(eigenvalues, eigenvectors.T), key=lambda v: abs(v[0] - 1.0)
+    )
+    # normalise, this is a probability distribution
+    probability_vector /= np.sum(probability_vector)
+    return probability_vector
+
+
+def get_entropy_rate(scenario) -> float:
+    assert scenario.trade_graph is not None
+    right_stochastic_matrix = nx_to_pandas_adjacency(scenario.trade_graph)
+    right_stochastic_matrix = right_stochastic_matrix.div(
+        right_stochastic_matrix.sum(axis=0)
+    )
+    right_stochastic_matrix.fillna(0, inplace=True)
+    # a helper variable
+    P = right_stochastic_matrix.values
+    probability_vector = get_stationary_probability_vector(P)
+    # entropy rate in [nat]
+    entropy_rate = np.sum(
+        probability_vector * np.sum(-P * np.nan_to_num(np.log(P)), axis=1)
+    )
+    # this should be a real value
+    if np.real(entropy_rate) != np.real_if_close(entropy_rate):
+        print("Warning: a significant imaginary part encountered in entropy rate:")
+        print(entropy_rate)
+        print("Returning real part only.")
+    return np.real(entropy_rate)

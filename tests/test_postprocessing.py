@@ -31,7 +31,7 @@ def test_init():
     pp = Postprocessing(
         [Wheat2018, Wheat2018, ISIMIP], anchor_countries=["China", "Russia"]
     )
-    print(pp.frobenius)
+    print(pp.entropy_rate)
 
 
 if __name__ == "__main__":
