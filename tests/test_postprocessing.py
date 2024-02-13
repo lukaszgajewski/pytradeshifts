@@ -45,9 +45,9 @@ def test_init():
             ISIMIP2,
         ],
         anchor_countries=["China", "Russia"],
-        frobenius="dsa",
+        frobenius="ignore",
     )
-    pp.plot_degree_maps()
+    pp.print_community_degree_metrics()
 
 
 if __name__ == "__main__":
