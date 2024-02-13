@@ -180,7 +180,7 @@ def plot_degree_map(ax, scenario, degree, label) -> None:
         column="degree",
         missing_kwds={"color": "lightgrey"},
         legend=True,
-        legend_kwds={"label": label},
+        legend_kwds={"label": label, "shrink": 0.15},
     )
 
     plot_winkel_tripel_map(ax)
