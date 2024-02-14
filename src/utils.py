@@ -200,7 +200,7 @@ def plot_degree_map(
             by geopandas' plot function.
 
     Returns:
-        None.
+        None
     """
     assert scenario.trade_communities is not None
     world = prepare_world()
@@ -230,7 +230,9 @@ def plot_degree_map(
     )
 
 
-def plot_jaccard_map(ax: Axes, scenario, jaccard: dict, similarity=False) -> None:
+def plot_jaccard_map(
+    ax: Axes, scenario, jaccard: dict, similarity=False, shrink=1.0, **kwargs
+) -> None:
     """
     Plots world map with countries coloured by their community's Jaccard similarity
     to their original community (in the specified scenario).
@@ -240,11 +242,14 @@ def plot_jaccard_map(ax: Axes, scenario, jaccard: dict, similarity=False) -> Non
         scenario (PyTradeShifts): a PyTradeShifts instance.
         jaccard (dict): dictionary containing the mapping: country->value
         similarity (bool, optional): whether to plot Jaccard index or distance.
-            If True similarity (index) will be used, if False distance (1-index).
+            If True similarity (index) will be used, if False, distance = (1-index).
             Defualt is False.
+        shrink (float, optional): colour bar shrink parameter
+        **kwargs (optional): any additional keyworded arguments recognised
+            by geopandas plot function.
 
     Returns:
-        None.
+        None
     """
     assert scenario.trade_communities is not None
     world = prepare_world()
@@ -258,7 +263,11 @@ def plot_jaccard_map(ax: Axes, scenario, jaccard: dict, similarity=False) -> Non
         column="jaccard_distance" if not similarity else "jaccard_index",
         missing_kwds={"color": "lightgrey"},
         legend=True,
-        legend_kwds={"label": "Jaccard distance"},
+        legend_kwds={
+            "label": "Jaccard_distance" if not similarity else "Jaccard_index",
+            "shrink": shrink,
+        },
+        **kwargs,
     )
 
     plot_winkel_tripel_map(ax)
@@ -324,9 +333,8 @@ def get_entropy_rate(scenario) -> float:
     """
     Compute entropy rate for a given scenario.
     https://en.wikipedia.org/wiki/Entropy_rate
-    This is under the assumption that we are interested in a markovian random
-    walker on the trade graph since the entropy rate is a measure of a process,
-    not structure.
+    This is under the assumption that we are interested in a Markov random
+    walk on the trade graph.
 
     Arguments:
         scenario (PyTradeShifts): a PyTradeShifts object instance.
