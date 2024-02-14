@@ -121,6 +121,16 @@ class PyTradeShifts:
             self.run(with_preprocessing)
 
     def run(self, with_preprocessing: bool) -> None:
+        """
+        Executes the model.
+
+        Arguments:
+            with_preprocessing (bool): Whether to run the preprocessing
+                or not.
+
+        Returns:
+            None
+        """
         if with_preprocessing:
             preprocessing_main(
                 "All_Data" if self.region == "Global" else self.region,
