@@ -58,13 +58,13 @@ class PyTradeShifts:
         shade_removed_countries (bool, optional): Whether to shade the countries
             that are removed from the trade matrix or not.
         cd_algorithm (str, optional): Community detection algorithm name.
-        Supported names: `louvain`, `leiden`, `infomap`.
+            Supported names: `louvain`, `leiden`, `infomap`.
         cd_kwargs (dict, optional): Community detection algorithm keyworded argument.
-        For possible kwargs see:
-        `louvain`: https://networkx.org/documentation/stable/reference/algorithms/
+            For possible kwargs see:
+            `louvain`: https://networkx.org/documentation/stable/reference/algorithms/
                    generated/networkx.algorithms.community.louvain.louvain_communities.html
-        `leiden`: https://leidenalg.readthedocs.io/en/stable/intro.html
-        `infomap`: https://mapequation.github.io/infomap/python/infomap.html
+            `leiden`: https://leidenalg.readthedocs.io/en/stable/intro.html
+            `infomap`: https://mapequation.github.io/infomap/python/infomap.html
 
     Returns:
         None
