@@ -1,4 +1,3 @@
-from matplotlib.figure import figaspect
 import networkx as nx
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -44,6 +43,7 @@ class Postprocessing:
         scenarios: list[PyTradeShifts],
         anchor_countries: list[str] = [],
         frobenius: str | None = None,
+        testing=False,
     ):
         self.scenarios = scenarios
         # we could make this user-specified but it's going to make the interface
@@ -59,6 +59,10 @@ class Postprocessing:
         if not all_equal((sc.cd_kwargs for sc in scenarios)):
             print("Warning: Inconsistent community detection parameters detected.")
 
+        if not testing:
+            self.run()
+
+    def run(self) -> None:
         # in order to compute matrix distances we need matrices to be
         # of the same shape, this is a helper member variable that allows that
         self.elligible_countries = [
@@ -67,7 +71,7 @@ class Postprocessing:
             )
             for scenario in self.scenarios[1:]
         ]
-        if anchor_countries:
+        if self.anchor_countries:
             self._arrange_communities()
         self._find_community_diff()
         self._compute_frobenius_distance()
