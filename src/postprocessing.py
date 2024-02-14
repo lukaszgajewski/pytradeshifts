@@ -1,6 +1,5 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-from scipy.sparse import PytestTester
 import seaborn as sns
 from src.model import PyTradeShifts
 from src.utils import (
@@ -36,12 +35,6 @@ class Postprocessing:
         anchor_countries (list, optional): List of country names to be used as anchores in plotting.
             The expected behaviour here is that the specified countries will retain
             their colour across all community plots.
-        frobenius (str | None, optional): Flag controlling the behaviour of graph difference metrics.
-            If frobenius == "relative" *all* metrics are normalised relative
-            to the highest found value in each category; if "ignore" then
-            frobenius will not be included in the the plot; if None, nothing
-            special happens -- in this case the Frobenius metrics is very likely
-            to completety overshadow other values in the plot.
         testing (bool): Whether to run the methods or not. This is only used for
             testing purposes.
 
@@ -53,7 +46,6 @@ class Postprocessing:
         self,
         scenarios: list[PyTradeShifts],
         anchor_countries: list[str] = [],
-        frobenius: str | None = None,
         testing=False,
     ):
         self.scenarios = scenarios
@@ -61,7 +53,6 @@ class Postprocessing:
         # and the code more complicated, let's just inform in the docs
         # that the first passed scenario is considered the base
         self.anchor_countries = anchor_countries
-        self.frobenius_in_plot = frobenius
         # check if community detection is uniform for all objects
         # there might be a case where it is desired so we allow it
         # but most times this is going to be undesirable hence the warning
@@ -215,8 +206,8 @@ class Postprocessing:
         Prints the graph distance metrics in a neat tabulated form.
 
         Arguments:
-            tablefmt (str): table format as expected by the tabular package.
-            **kwargs: any other keyworded arguments recognised by the tabular package.
+            tablefmt (str): table format as expected by the tabulate package.
+            **kwargs: any other keyworded arguments recognised by the tabulate package.
 
         Returns:
             None
@@ -226,11 +217,17 @@ class Postprocessing:
         print("***| Graph distance to the base scenario |***")
         print(df.to_markdown(tablefmt=tablefmt, **kwargs))
 
-    def plot_distance_metrics(self, **kwargs) -> None:
+    def plot_distance_metrics(self, frobenius: str | None = None, **kwargs) -> None:
         """
         Plots the distance metrics as a bar plot.
 
         Arguments:
+            frobenius (str | None, optional): Flag controlling the behaviour of graph difference metrics.
+                If frobenius == "relative" *all* metrics are normalised relative
+                to the highest found value in each category; if "ignore" then
+                frobenius will not be included in the the plot; if None, nothing
+                special happens -- in this case the Frobenius metrics is very likely
+                to completety overshadow other values in the plot.
             **kwargs: any keyworded arguments recognised by seaborn barplot.
 
         Returns:
@@ -238,7 +235,7 @@ class Postprocessing:
 
         """
         df = self.distance_df.copy()
-        match self.frobenius_in_plot:
+        match frobenius:
             case "relative":
                 df[df.columns[1:]] = df[df.columns[1:]] / df[df.columns[1:]].max()
             case "ignore":
@@ -265,6 +262,7 @@ class Postprocessing:
     def _compute_centrality(self) -> None:
         """
         Computes the in-degree and out-degree centrality for each node in each scenario.
+        TODO: this currently ignores the edge weights which is incorrect.
 
         Arguments:
             None
@@ -303,8 +301,8 @@ class Postprocessing:
         Prints the global centrality metrics in a neat tabulated form.
 
         Arguments:
-            tablefmt (str): table format as expected by the tabular package.
-            **kwargs: any other keyworded arguments recognised by the tabular package.
+            tablefmt (str): table format as expected by the tabulate package.
+            **kwargs: any other keyworded arguments recognised by the tabulate package.
 
         Returns:
             None
@@ -312,15 +310,15 @@ class Postprocessing:
         df = pd.DataFrame(
             self.global_centrality_metrics,
             columns=[
-                "Scenario ID",
-                "Country with the smallest in-degree",
-                "Smallest in-degree",
-                "Country with the largest in-degree",
-                "Largest in-degree",
-                "Country with smallest out-degree",
-                "Smallest out-degree",
-                "Country with largest out-degree",
-                "Largest out-degree",
+                "Scenario\nID",
+                "Smallest\nin-degree\ncountry",
+                "Smallest\nin-degree\nvalue",
+                "Largest\nin-degree\ncountry",
+                "Largest\nin-degree\nvalue",
+                "Smallest\nout-degree\ncountry",
+                "Smallest\nout-degree\nvalue",
+                "Largest\nout-degree\ncountry",
+                "Largest\nout-degree\nvalue",
             ],
         )
         print("***| Degree centrality metrics for each scenario |***")
@@ -361,8 +359,8 @@ class Postprocessing:
         Prints the local centrality metrics (per community) in a neat tabulated form.
 
         Arguments:
-            tablefmt (str): table format as expected by the tabular package.
-            **kwargs: any other keyworded arguments recognised by the tabular package.
+            tablefmt (str): table format as expected by the tabulate package.
+            **kwargs: any other keyworded arguments recognised by the tabulate package.
 
         Returns:
             None
@@ -373,15 +371,15 @@ class Postprocessing:
             df = pd.DataFrame(
                 per_community_centrality_metrics,
                 columns=[
-                    "Community ID",
-                    "Country with the smallest in-degree",
-                    "Smallest in-degree",
-                    "Country with the largest in-degree",
-                    "Largest in-degree",
-                    "Country with smallest out-degree",
-                    "Smallest out-degree",
-                    "Country with largest out-degree",
-                    "Largest out-degree",
+                    "Community\nID",
+                    "Smallest\nin-degree\ncountry",
+                    "Smallest\nin-degree\nvalue",
+                    "Largest\nin-degree\ncountry",
+                    "Largest\nin-degree\nvalue",
+                    "Smallest\nout-degree\ncountry",
+                    "Smallest\nout-degree\nvalue",
+                    "Largest\nout-degree\ncountry",
+                    "Largest\nout-degree\nvalue",
                 ],
             )
             print(
@@ -389,12 +387,12 @@ class Postprocessing:
             )
             print(df.to_markdown(tablefmt=tablefmt, **kwargs))
 
-    def plot_degree_maps(
+    def plot_centrality_maps(
         self, figsize: tuple[float, float] | None = None, shrink=0.15, **kwargs
     ) -> None:
         """
         Plots world maps for each scenario, with each country coloured by their
-        degree in the trade graph.
+        degree centrality in the trade graph.
 
         Arguments:
             figsize (tuple[float, float] | None, optional): the composite figure
@@ -606,7 +604,9 @@ class Postprocessing:
             )
         plt.show()
 
-    def plot_communities(self, figsize: tuple[float, float] | None = None) -> None:
+    def plot_all_trade_communities(
+        self, figsize: tuple[float, float] | None = None
+    ) -> None:
         """
         Plots the trade communities in each of the scenarios.
 
