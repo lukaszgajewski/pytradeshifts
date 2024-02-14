@@ -49,7 +49,6 @@ class Postprocessing:
         # we could make this user-specified but it's going to make the interface
         # and the code more complicated, let's just inform in the docs
         # that the first passed scenario is considered the base
-        self.base_scenario = 0  # TODO refactor this
         self.anchor_countries = anchor_countries
         self.frobenius_in_plot = frobenius
         # check if community detection is uniform for all objects
@@ -68,14 +67,16 @@ class Postprocessing:
             )
             for scenario in self.scenarios[1:]
         ]
-
         if anchor_countries:
-            self.arrange_communities()
+            self._arrange_communities()
+        self._find_community_diff()
         self._compute_frobenius_distance()
         self._compute_entropy_rate_distance()
         self._compute_stationary_markov_distance()
         self._format_distance_dataframe()
-        self._compute_centrality_measures()
+        self._compute_centrality()
+        self._compute_global_centrality_metrics()
+        self._compute_community_centrality_metrics()
 
     def _compute_frobenius_distance(self) -> None:
         """
@@ -176,7 +177,7 @@ class Postprocessing:
         plt.title("Distance metrics vs. the base scenario")
         plt.show()
 
-    def _compute_centrality_measures(self) -> None:
+    def _compute_centrality(self) -> None:
         """
         TODO
         """
@@ -188,14 +189,17 @@ class Postprocessing:
             for scenario in self.scenarios
         ]
 
-    def print_global_degree_metrics(self) -> None:
-        degree_metrics = []
+    def _compute_global_centrality_metrics(self) -> None:
+        centrality_metrics = []
         for idx, (in_d, out_d) in enumerate(zip(self.in_degree, self.out_degree)):
             in_min_max = get_dict_min_max(in_d)
             out_min_max = get_dict_min_max(out_d)
-            degree_metrics.append([idx, *in_min_max, *out_min_max])
+            centrality_metrics.append([idx, *in_min_max, *out_min_max])
+        self.global_centrality_metrics = centrality_metrics
+
+    def print_global_degree_metrics(self) -> None:
         df = pd.DataFrame(
-            degree_metrics,
+            self.global_centrality_metrics,
             columns=[
                 "Scenario ID",
                 "in_min",
@@ -210,9 +214,10 @@ class Postprocessing:
         )
         print(df.to_markdown(tablefmt="fancy_grid"))
 
-    def print_community_degree_metrics(self) -> None:
+    def _compute_community_centrality_metrics(self) -> None:
+        centrality_metrics = []
         for scenario_id, scenario in enumerate(self.scenarios):
-            degree_metrics = []
+            per_community_centrality_metrics = []
             for comm_id, community in enumerate(scenario.trade_communities):
                 in_d = self.in_degree[scenario_id]
                 out_d = self.out_degree[scenario_id]
@@ -221,9 +226,18 @@ class Postprocessing:
 
                 in_min_max = get_dict_min_max(in_d)
                 out_min_max = get_dict_min_max(out_d)
-                degree_metrics.append([comm_id, *in_min_max, *out_min_max])
+                per_community_centrality_metrics.append(
+                    [comm_id, *in_min_max, *out_min_max]
+                )
+            centrality_metrics.append(per_community_centrality_metrics)
+        self.community_centrality_metrics = centrality_metrics
+
+    def print_community_degree_metrics(self) -> None:
+        for scenario_id, per_community_centrality_metrics in enumerate(
+            self.community_centrality_metrics
+        ):
             df = pd.DataFrame(
-                degree_metrics,
+                per_community_centrality_metrics,
                 columns=[
                     "Community ID",
                     "in_min",
@@ -278,8 +292,9 @@ class Postprocessing:
                     break
         # make sure indices are unqiue, they wouldn't be if user passed
         # two or more countries from the same community as anchors
-        # TODO: handle this gracefully
-        assert len(anchor_idx.values()) == len(set(anchor_idx.values()))
+        assert len(anchor_idx.values()) == len(
+            set(anchor_idx.values())
+        ), "Two or more countries from the same community have been passed as anchores."
         # create new arrangement
         new_order = list(anchor_idx.values())
         # append remaining (i.e., un-anchored) community indices
@@ -292,7 +307,7 @@ class Postprocessing:
         # get communities in the new order
         return list(itemgetter(*new_order)(scenario.trade_communities))
 
-    def arrange_communities(self) -> None:
+    def _arrange_communities(self) -> None:
         """
         TODO: order communities based on anchors such that the colour differences
         between plots don't seem random like they do now.
@@ -300,41 +315,63 @@ class Postprocessing:
         for scenario in self.scenarios:
             scenario.trade_communities = self._find_new_order(scenario)
 
-    def _find_community_diff(self) -> dict[int, dict[str, list[set[str]]]]:
+    def _find_community_diff(self) -> None:
+        """
+        TODO
+        """
         jaccard_indices = {
-            scenario_idx: {}
-            for scenario_idx, _ in enumerate(self.scenarios)
-            if scenario_idx != self.base_scenario
+            scenario_idx: {} for scenario_idx, _ in enumerate(self.scenarios[1:], 1)
         }
-        base_scenario_country_list = self.scenarios[
-            self.base_scenario
-        ].production_data.index
-        for scenario_idx, scenario in enumerate(self.scenarios):
-            if scenario_idx == self.base_scenario:
-                continue
-            for country in base_scenario_country_list:
-                new_community = None
-                for comm in scenario.trade_communities:
-                    if country in comm:
-                        new_community = comm - {country}
-                        break
-                if new_community is None:
-                    continue
-                old_community = None
-                for comm in self.scenarios[self.base_scenario].trade_communities:
-                    if country in comm:
-                        old_community = comm - {country}
-                        break
-                jaccard_indices[scenario_idx][country] = jaccard_index(
-                    new_community, old_community
+        for scenario_idx, scenario in enumerate(self.scenarios[1:], 1):
+            for country in self.scenarios[0].trade_matrix.index:
+                # this assumes that a country can be only in one community
+                # i.e. there is no community overlap
+                new_community = next(
+                    filter(
+                        lambda community: country in community,
+                        scenario.trade_communities,
+                    ),
+                    None,
                 )
-        return jaccard_indices
+                if new_community is None:
+                    print(
+                        f"Warning: {country} does not belong to any community in scenario {scenario_idx}."
+                    )
+                    print(
+                        "Skipping community similarity index computation for this country."
+                    )
+                    continue
+                else:
+                    new_community = new_community - {country}
+
+                original_community = next(
+                    filter(
+                        lambda community: country in community,
+                        self.scenarios[0].trade_communities,
+                    ),
+                    None,
+                )
+                if original_community is None:
+                    print(
+                        f"Warning: {country} does not belong to any community in base scenario. Skipping."
+                    )
+                    print(
+                        "Skipping community similarity index computation for this country."
+                    )
+                    continue
+                else:
+                    original_community = original_community - {country}
+
+                jaccard_indices[scenario_idx][country] = jaccard_index(
+                    new_community, original_community
+                )
+        self.jaccard_indices = jaccard_indices
 
     def plot_community_diff(self):
         """
         TODO
         """
-        jaccard_indices = self._find_community_diff()
+        assert len(self.scenarios) > 1
         _, axs = plt.subplots(
             len(self.scenarios) - 1, 1, sharex=True, tight_layout=True
         )
@@ -344,14 +381,8 @@ class Postprocessing:
             len(axs)
         except TypeError:
             axs = [axs]
-        non_base_scenarios = [
-            (idx, sc)
-            for idx, sc in enumerate(self.scenarios)
-            if idx != self.base_scenario
-        ]
-
-        for ax, (idx, sc) in zip(axs, non_base_scenarios):
-            plot_jaccard_map(ax, sc, jaccard_indices[idx])
+        for ax, (idx, scenario) in zip(axs, enumerate(self.scenarios[1:], 1)):
+            plot_jaccard_map(ax, scenario, self.jaccard_indices[idx])
         plt.show()
 
     def plot(self):
