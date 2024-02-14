@@ -309,21 +309,21 @@ class Postprocessing:
         Returns:
             None
         """
-        # TODO: fix column names
         df = pd.DataFrame(
             self.global_centrality_metrics,
             columns=[
                 "Scenario ID",
-                "in_min",
-                "in_min_val",
-                "in_max",
-                "in_max_val",
-                "out_min",
-                "out_min_val",
-                "out_max",
-                "out_max_val",
+                "Country with the smallest in-degree",
+                "Smallest in-degree",
+                "Country with the largest in-degree",
+                "Largest in-degree",
+                "Country with smallest out-degree",
+                "Smallest out-degree",
+                "Country with largest out-degree",
+                "Largest out-degree",
             ],
         )
+        print("***| Degree centrality metrics for each scenario |***")
         print(df.to_markdown(tablefmt=tablefmt, **kwargs))
 
     def _compute_community_centrality_metrics(self) -> None:
@@ -370,22 +370,23 @@ class Postprocessing:
         for scenario_id, per_community_centrality_metrics in enumerate(
             self.community_centrality_metrics
         ):
-            # TODO: fix columns names
             df = pd.DataFrame(
                 per_community_centrality_metrics,
                 columns=[
                     "Community ID",
-                    "in_min",
-                    "in_min_val",
-                    "in_max",
-                    "in_max_val",
-                    "out_min",
-                    "out_min_val",
-                    "out_max",
-                    "out_max_val",
+                    "Country with the smallest in-degree",
+                    "Smallest in-degree",
+                    "Country with the largest in-degree",
+                    "Largest in-degree",
+                    "Country with smallest out-degree",
+                    "Smallest out-degree",
+                    "Country with largest out-degree",
+                    "Largest out-degree",
                 ],
             )
-            print(f"***| Scenario ID: {scenario_id} |***")
+            print(
+                f"***| Degree centrality metrics for the scenario with ID: {scenario_id} |***"
+            )
             print(df.to_markdown(tablefmt=tablefmt, **kwargs))
 
     def plot_degree_maps(
