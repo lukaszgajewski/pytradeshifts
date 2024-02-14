@@ -707,7 +707,13 @@ class PyTradeShifts:
 
     def _plot_trade_communities(self, ax: Axes) -> None:
         """
-        TODO
+        Creates the plot of trading communities on the specified axis.
+
+        Arguments:
+            ax (Axes): the matplotlib axis on which to plot.
+
+        Returns:
+            None
         """
         assert self.trade_communities is not None
         # get the world map
