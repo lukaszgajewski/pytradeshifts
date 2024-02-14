@@ -262,7 +262,9 @@ class Postprocessing:
     def _compute_centrality(self) -> None:
         """
         Computes the in-degree and out-degree centrality for each node in each scenario.
-        TODO: this currently ignores the edge weights which is incorrect.
+        By in/out-degree centrality we understand sum of in/out-coming edge weights
+        to/from a given node, divided by the total in/out-flow of the graph
+        (sum of all in/out-coming edge weights in the graph).
 
         Arguments:
             None
@@ -270,13 +272,21 @@ class Postprocessing:
         Returns:
             None
         """
-        self.in_degree = [
-            nx.in_degree_centrality(scenario.trade_graph) for scenario in self.scenarios
-        ]
-        self.out_degree = [
-            nx.out_degree_centrality(scenario.trade_graph)
-            for scenario in self.scenarios
-        ]
+        self.in_degree = []
+        self.out_degree = []
+        for scenario in self.scenarios:
+            in_degrees = list(scenario.trade_graph.in_degree(weight="weight"))
+            total_in_degrees = sum(map(lambda t: t[1], in_degrees))
+            in_degrees = dict(
+                map(lambda t: (t[0], t[1] / total_in_degrees), in_degrees)
+            )
+            self.in_degree.append(in_degrees)
+            out_degrees = list(scenario.trade_graph.out_degree(weight="weight"))
+            total_out_degrees = sum(map(lambda t: t[1], out_degrees))
+            out_degrees = dict(
+                map(lambda t: (t[0], t[1] / total_out_degrees), out_degrees)
+            )
+            self.out_degree.append(out_degrees)
 
     def _compute_global_centrality_metrics(self) -> None:
         """
