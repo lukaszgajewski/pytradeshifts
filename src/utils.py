@@ -5,7 +5,8 @@ import pandas as pd
 import country_converter as coco
 import os
 from itertools import groupby
-from networkx import to_pandas_adjacency as nx_to_pandas_adjacency
+from networkx import to_pandas_adjacency as nx_to_pandas_adjacency, Graph as nx_Graph
+from matplotlib.axes import Axes
 
 
 def plot_winkel_tripel_map(ax):
@@ -34,7 +35,7 @@ def prepare_centroids(trade_matrix_index: pd.Index) -> pd.DataFrame:
 
     Returns:
         pd.DataFrame: Data frame with columns ["longitude", "latitude", "name"]
-        containing centroid coordinates for each region.
+            containing centroid coordinates for each region.
     """
     # https://github.com/gavinr/world-countries-centroids
     centroids_a = pd.read_csv(
@@ -137,7 +138,16 @@ def all_equal(iterable: Iterable):
 
 def jaccard_index(iterable_A: Iterable, iterable_B: Iterable) -> float:
     """
-    TODO: https://en.wikipedia.org/wiki/Jaccard_index
+    Computes the Jaccard similarity beween two iterables.
+    https://en.wikipedia.org/wiki/Jaccard_index
+    Note: the iterables shall be cast to sets.
+
+    Arguments:
+        iterable_A (Iterable): a list-like object
+        iterable_B (Iterable): a list-like object
+
+    Returns:
+        float: The Jaccard index (similarity) of iterable_A and iterable_B
     """
     A = set(iterable_A)
     B = set(iterable_B)
@@ -145,6 +155,15 @@ def jaccard_index(iterable_A: Iterable, iterable_B: Iterable) -> float:
 
 
 def prepare_world() -> gpd.GeoDataFrame:
+    """
+    Prepares the geospatial Natural Earth (NE) data (to be presumebly used in plotting).
+
+    Arguments:
+        None
+
+    Returns:
+        gpd.GeoDataFrame: NE data projected to Winke Tripel and with converted country names.
+    """
     # get the world map
     world = gpd.read_file(
         "."
@@ -165,9 +184,23 @@ def prepare_world() -> gpd.GeoDataFrame:
     return world
 
 
-def plot_degree_map(ax, scenario, degree, label) -> None:
+def plot_degree_map(
+    ax: Axes, scenario, degree: dict, label: str, shrink=0.15, **kwargs
+) -> None:
     """
-    TODO
+    Plots world map with each country coloured by their degree in the trade graph.
+
+    Arguments:
+        ax (Axes): axis to which the plot is to be committed.
+        scenario (PyTradeShifts): PyTradeShifts instance
+        degree (dict): dictionary containing the mapping: country->value
+        label (str): label to be put on the colour bar and the title (e.g., 'in-degree')
+        shrink (float, optional): colour bar shrink parameter
+        **kwargs (optional): any additional keyworded arguments recognised
+            by geopandas' plot function.
+
+    Returns:
+        None.
     """
     assert scenario.trade_communities is not None
     world = prepare_world()
@@ -180,7 +213,8 @@ def plot_degree_map(ax, scenario, degree, label) -> None:
         column="degree",
         missing_kwds={"color": "lightgrey"},
         legend=True,
-        legend_kwds={"label": label, "shrink": 0.15},
+        legend_kwds={"label": label, "shrink": shrink},
+        **kwargs,
     )
 
     plot_winkel_tripel_map(ax)
@@ -196,9 +230,21 @@ def plot_degree_map(ax, scenario, degree, label) -> None:
     )
 
 
-def plot_jaccard_map(ax, scenario, jaccard) -> None:
+def plot_jaccard_map(ax: Axes, scenario, jaccard: dict, similarity=False) -> None:
     """
-    TODO
+    Plots world map with countries coloured by their community's Jaccard similarity
+    to their original community (in the specified scenario).
+
+    Arguments:
+        ax (Axes): axis on which to plot.
+        scenario (PyTradeShifts): a PyTradeShifts instance.
+        jaccard (dict): dictionary containing the mapping: country->value
+        similarity (bool, optional): whether to plot Jaccard index or distance.
+            If True similarity (index) will be used, if False distance (1-index).
+            Defualt is False.
+
+    Returns:
+        None.
     """
     assert scenario.trade_communities is not None
     world = prepare_world()
@@ -209,7 +255,7 @@ def plot_jaccard_map(ax, scenario, jaccard) -> None:
 
     world.plot(
         ax=ax,
-        column="jaccard_distance",
+        column="jaccard_distance" if not similarity else "jaccard_index",
         missing_kwds={"color": "lightgrey"},
         legend=True,
         legend_kwds={"label": "Jaccard distance"},
@@ -218,8 +264,9 @@ def plot_jaccard_map(ax, scenario, jaccard) -> None:
     plot_winkel_tripel_map(ax)
 
     # Add a title with self.scenario_name if applicable
+    value_plotted_label = "Similarity to" if similarity else "Dissimilarity to"
     ax.set_title(
-        f"Difference vs. base scenario for {scenario.crop} with base year {scenario.base_year[1:]}"
+        f"{value_plotted_label} base scenario for {scenario.crop} with base year {scenario.base_year[1:]}"
         + (
             f" in scenario: {scenario.scenario_name}"
             if scenario.scenario_name is not None
@@ -228,7 +275,17 @@ def plot_jaccard_map(ax, scenario, jaccard) -> None:
     )
 
 
-def get_right_stochastic_matrix(trade_graph) -> np.ndarray:
+def get_right_stochastic_matrix(trade_graph: nx_Graph) -> np.ndarray:
+    """
+    Convert graph's adjacency matrix to a right stochastic matrix (RSM).
+    https://en.wikipedia.org/wiki/Stochastic_matrix
+
+    Arguments:
+        trade_graph (networkx.Graph): the graph object
+
+    Returns:
+        numpy.ndarray: an array representing the RSM.
+    """
     right_stochastic_matrix = nx_to_pandas_adjacency(trade_graph)
     right_stochastic_matrix = right_stochastic_matrix.div(
         right_stochastic_matrix.sum(axis=0)
@@ -240,6 +297,16 @@ def get_right_stochastic_matrix(trade_graph) -> np.ndarray:
 def get_stationary_probability_vector(
     right_stochastic_matrix: np.ndarray,
 ) -> np.ndarray:
+    """
+    Find the stationary probability distribution for a given
+    right stochastic matrix (RMS).
+
+    Arguments:
+        right_stochastic_matrix (numpy.ndarray): an array represnting the RMS.
+
+    Returns:
+        numpy.ndarray: a vector representing the stationary distribution.
+    """
     # get eigenvalues and (row) eigenvectors
     eigenvalues, eigenvectors = np.linalg.eig(right_stochastic_matrix.T)
     # we want eigenvector associated with eigenvalue = 1
@@ -252,6 +319,19 @@ def get_stationary_probability_vector(
 
 
 def get_entropy_rate(scenario) -> float:
+    """
+    Compute entropy rate for a given scenario.
+    https://en.wikipedia.org/wiki/Entropy_rate
+    This is under the assumption that we are interested in a markovian random
+    walker on the trade graph since the entropy rate is a measure of a process,
+    not structure.
+
+    Arguments:
+        scenario (PyTradeShifts): a PyTradeShifts object instance.
+
+    Returns:
+        float: the entropy rate of a random walker on the scnearios' trade graph.
+    """
     P = get_right_stochastic_matrix(scenario.trade_graph)
     probability_vector = get_stationary_probability_vector(P)
     # entropy rate in [nat]
@@ -269,7 +349,15 @@ def get_entropy_rate(scenario) -> float:
 
 def get_dict_min_max(iterable: dict) -> tuple[Any, Any, Any, Any]:
     """
-    TODO
+    Finds minimum and maximum values in a dictionary.
+
+    Arguments:
+        iterable (dict): the dictionary in which the search is performed
+
+    Returns:
+        tuple[Any, Any, Any, Any]: a tuple containing:
+            (key of the smallest value, the smallest value,
+            key of the larges value, the largest value)
     """
     max_key = max(iterable, key=iterable.get)
     min_key = min(iterable, key=iterable.get)
