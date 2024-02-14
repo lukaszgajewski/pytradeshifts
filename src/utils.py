@@ -299,7 +299,7 @@ def get_right_stochastic_matrix(trade_graph: nx_Graph) -> np.ndarray:
     right_stochastic_matrix = nx_to_pandas_adjacency(trade_graph)
     # normalise the matrix such that each row sums up to 1
     right_stochastic_matrix = right_stochastic_matrix.div(
-        right_stochastic_matrix.sum(axis=0)
+        right_stochastic_matrix.sum(axis=1), axis=0
     )
     right_stochastic_matrix.fillna(0, inplace=True)
     return right_stochastic_matrix.values
@@ -329,6 +329,34 @@ def get_stationary_probability_vector(
     return probability_vector
 
 
+def _compute_entropy_rate(
+    right_stochastic_matrix: np.ndarray, stationary_probability_vector: np.ndarray
+) -> float:
+    """
+    Computes the entropy rate in [nat] for a Markov random walk process.
+
+    Arguments:
+        right_stochastic_matrix (numpy.ndarray): the stochastic matrix of the Markov
+            random walk with each row normalised (summing up to 1)
+        stationary_probability_vector: numpy.ndarray): the vector containing stationary
+            probability distribution of the Markov process
+
+    Returns:
+        float: the entropy rate
+    """
+    # we ignore the division warning because 0 x log(0) = 0 in information theory
+    with np.errstate(divide="ignore"):
+        entropy_rate = np.sum(
+            stationary_probability_vector
+            * np.sum(
+                -right_stochastic_matrix
+                * np.nan_to_num(np.log(right_stochastic_matrix)),
+                axis=1,
+            )
+        )
+    return entropy_rate
+
+
 def get_entropy_rate(scenario) -> float:
     """
     Compute entropy rate for a given scenario.
@@ -343,15 +371,9 @@ def get_entropy_rate(scenario) -> float:
         float: the entropy rate of a random walker on the scnearios' trade graph.
     """
     # get the right stochastic matrix and the stationary probabiltiy vector
-    P = get_right_stochastic_matrix(scenario.trade_graph)
-    probability_vector = get_stationary_probability_vector(P)
-    # compute the entropy rate in [nat]
-    # we ignore the division warning because 0 x log(0) = 0 in information theory
-    with np.errstate(divide="ignore"):
-        entropy_rate = np.sum(
-            probability_vector * np.sum(-P * np.nan_to_num(np.log(P)), axis=1)
-        )
-    # this should be a real value
+    stochastic_matrix = get_right_stochastic_matrix(scenario.trade_graph)
+    probability_vector = get_stationary_probability_vector(stochastic_matrix)
+    entropy_rate = _compute_entropy_rate(stochastic_matrix, probability_vector)
     if np.real(entropy_rate) != np.real_if_close(entropy_rate):
         print("Warning: a significant imaginary part encountered in entropy rate:")
         print(entropy_rate)
