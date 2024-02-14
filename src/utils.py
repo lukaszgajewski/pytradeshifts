@@ -286,7 +286,9 @@ def get_right_stochastic_matrix(trade_graph: nx_Graph) -> np.ndarray:
     Returns:
         numpy.ndarray: an array representing the RSM.
     """
+    # extract the adjaceny matrix from the graph
     right_stochastic_matrix = nx_to_pandas_adjacency(trade_graph)
+    # normalise the matrix such that each row sums up to 1
     right_stochastic_matrix = right_stochastic_matrix.div(
         right_stochastic_matrix.sum(axis=0)
     )
@@ -332,9 +334,11 @@ def get_entropy_rate(scenario) -> float:
     Returns:
         float: the entropy rate of a random walker on the scnearios' trade graph.
     """
+    # get the right stochastic matrix and the stationary probabiltiy vector
     P = get_right_stochastic_matrix(scenario.trade_graph)
     probability_vector = get_stationary_probability_vector(P)
-    # entropy rate in [nat]
+    # compute the entropy rate in [nat]
+    # we ignore the division warning because 0 x log(0) = 0 in information theory
     with np.errstate(divide="ignore"):
         entropy_rate = np.sum(
             probability_vector * np.sum(-P * np.nan_to_num(np.log(P)), axis=1)
