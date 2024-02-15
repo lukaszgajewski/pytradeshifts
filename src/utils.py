@@ -264,7 +264,7 @@ def plot_jaccard_map(
         missing_kwds={"color": "lightgrey"},
         legend=True,
         legend_kwds={
-            "label": "Jaccard_distance" if not similarity else "Jaccard_index",
+            "label": "Jaccard distance" if not similarity else "Jaccard index",
             "shrink": shrink,
         },
         **kwargs,
