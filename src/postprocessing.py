@@ -5,12 +5,11 @@ from src.model import PyTradeShifts
 from src.utils import (
     all_equal,
     jaccard_index,
-    plot_jaccard_map,
+    plot_node_metric_map,
     get_right_stochastic_matrix,
     get_stationary_probability_vector,
     get_entropy_rate,
     get_dict_min_max,
-    plot_degree_map,
 )
 import numpy as np
 import pandas as pd
@@ -92,6 +91,8 @@ class Postprocessing:
         self._compute_centrality()
         self._compute_global_centrality_metrics()
         self._compute_community_centrality_metrics()
+        self._compute_community_satisfaction()
+        self._compute_community_satisfaction_difference()
 
     def _compute_frobenius_distance(self) -> None:
         """
@@ -407,7 +408,6 @@ class Postprocessing:
         Arguments:
             figsize (tuple[float, float] | None, optional): the composite figure
                 size as expected by the matplotlib subplots routine.
-            label (str): label to be put on the colour bar and the title (e.g., 'in-degree')
             shrink (float, optional): colour bar shrink parameter
             **kwargs (optional): any additional keyworded arguments recognised
                 by geopandas' plot function.
@@ -433,19 +433,19 @@ class Postprocessing:
         for scenario, in_degree, out_degree in zip(
             self.scenarios, self.in_degree, self.out_degree
         ):
-            plot_degree_map(
+            plot_node_metric_map(
                 axs[idx],
                 scenario,
                 in_degree,
-                label="in-degree",
+                "in-degree",
                 shrink=shrink,
                 **kwargs,
             )
-            plot_degree_map(
+            plot_node_metric_map(
                 axs[idx + 1],
                 scenario,
                 out_degree,
-                label="out-degree",
+                "out-degree",
                 shrink=shrink,
                 **kwargs,
             )
@@ -604,11 +604,15 @@ class Postprocessing:
         except TypeError:
             axs = [axs]
         for ax, (idx, scenario) in zip(axs, enumerate(self.scenarios[1:], 1)):
-            plot_jaccard_map(
+            plot_node_metric_map(
                 ax,
                 scenario,
-                self.jaccard_indices[idx],
-                similarity=similarity,
+                (
+                    self.jaccard_indices[idx]
+                    if similarity
+                    else {k: 1 - v for k, v in self.jaccard_indices[idx].items()}
+                ),
+                metric_name="Jaccard similarity" if similarity else "Jaccard distance",
                 shrink=shrink,
                 **kwargs,
             )
@@ -630,8 +634,95 @@ class Postprocessing:
         _, axs = plt.subplots(
             len(self.scenarios), 1, sharex=True, tight_layout=True, figsize=figsize
         )
-        for ax, sc in zip(axs, self.scenarios):
-            sc._plot_trade_communities(ax)
+        for ax, scenario in zip(axs, self.scenarios):
+            scenario._plot_trade_communities(ax)
+        plt.show()
+
+    def _compute_community_satisfaction(self) -> None:
+        """
+        TODO
+        """
+        self.community_satisfaction = []
+        for scenario in self.scenarios:
+            # get total in-degree
+            in_degrees = dict(scenario.trade_graph.in_degree(weight="weight"))
+            for community in scenario.trade_communities:
+                # get in-degree within the community only
+                community_in_degrees = nx.subgraph(
+                    scenario.trade_graph, nbunch=community
+                ).in_degree(weight="weight")
+                # replace in_degree with satisfaction index
+                for country, c_i_d in dict(community_in_degrees).items():
+                    try:
+                        in_degrees[country] = c_i_d / in_degrees[country]
+                    except ZeroDivisionError:
+                        assert c_i_d == in_degrees[country]
+                        continue
+            self.community_satisfaction.append(in_degrees)
+
+    def _compute_community_satisfaction_difference(self) -> None:
+        """
+        TODO
+        """
+        self.community_satisfaction_difference = [
+            {
+                country: satisfaction - self.community_satisfaction[0][country]
+                for country, satisfaction in community_satisfaction.items()
+            }
+            for community_satisfaction in self.community_satisfaction
+        ]
+
+    def plot_community_satisfaction(
+        self,
+        figsize: tuple[float, float] | None = None,
+        shrink=1.0,
+        **kwargs,
+    ) -> None:
+        """
+        TODO
+        """
+        _, axs = plt.subplots(
+            len(self.scenarios), 1, sharex=True, tight_layout=True, figsize=figsize
+        )
+        for ax, (idx, scenario) in zip(axs, enumerate(self.scenarios)):
+            plot_node_metric_map(
+                ax,
+                scenario,
+                self.community_satisfaction[idx],
+                "Community satisfaction",
+                shrink=shrink,
+                **kwargs,
+            )
+        plt.show()
+
+    def plot_community_satisfaction_difference(
+        self,
+        figsize: tuple[float, float] | None = None,
+        shrink=1.0,
+        **kwargs,
+    ) -> None:
+        """
+        TODO
+        """
+        assert len(self.scenarios) > 1
+        _, axs = plt.subplots(
+            len(self.scenarios) - 1, 1, sharex=True, tight_layout=True, figsize=figsize
+        )
+        # if there are only two scenarios axs will be just an ax object
+        # convert to a list to comply with other cases
+        try:
+            len(axs)
+        except TypeError:
+            axs = [axs]
+        for ax, (idx, scenario) in zip(axs, enumerate(self.scenarios[1:], 1)):
+            plot_node_metric_map(
+                ax,
+                scenario,
+                self.community_satisfaction_difference[idx],
+                "Community satisfaction difference",
+                shrink=shrink,
+                **kwargs,
+            )
         plt.show()
 
     def report(self) -> None:

@@ -184,66 +184,17 @@ def prepare_world() -> gpd.GeoDataFrame:
     return world
 
 
-def plot_degree_map(
-    ax: Axes, scenario, degree: dict, label: str, shrink=0.15, **kwargs
+def plot_node_metric_map(
+    ax: Axes, scenario, metric: dict, metric_name: str, shrink=1.0, **kwargs
 ) -> None:
     """
-    Plots world map with each country coloured by their degree in the trade graph.
-
-    Arguments:
-        ax (Axes): axis to which the plot is to be committed.
-        scenario (PyTradeShifts): PyTradeShifts instance
-        degree (dict): dictionary containing the mapping: country->value
-        label (str): label to be put on the colour bar and the title (e.g., 'in-degree')
-        shrink (float, optional): colour bar shrink parameter
-        **kwargs (optional): any additional keyworded arguments recognised
-            by geopandas' plot function.
-
-    Returns:
-        None
-    """
-    assert scenario.trade_communities is not None
-    world = prepare_world()
-
-    # Join the country_community dictionary to the world dataframe
-    world["degree"] = world["names_short"].map(degree)
-
-    world.plot(
-        ax=ax,
-        column="degree",
-        missing_kwds={"color": "lightgrey"},
-        legend=True,
-        legend_kwds={"label": label, "shrink": shrink},
-        **kwargs,
-    )
-
-    plot_winkel_tripel_map(ax)
-
-    # Add a title with self.scenario_name if applicable
-    ax.set_title(
-        f"{label} for {scenario.crop} with base year {scenario.base_year[1:]}"
-        + (
-            f" in scenario: {scenario.scenario_name}"
-            if scenario.scenario_name is not None
-            else " (no scenario)"
-        )
-    )
-
-
-def plot_jaccard_map(
-    ax: Axes, scenario, jaccard: dict, similarity=False, shrink=1.0, **kwargs
-) -> None:
-    """
-    Plots world map with countries coloured by their community's Jaccard similarity
-    to their original community (in the specified scenario).
+    Plots world map with countries coloured by the specified metric.
 
     Arguments:
         ax (Axes): axis on which to plot.
         scenario (PyTradeShifts): a PyTradeShifts instance.
-        jaccard (dict): dictionary containing the mapping: country->value
-        similarity (bool, optional): whether to plot Jaccard index or distance.
-            If True similarity (index) will be used, if False, distance = (1-index).
-            Defualt is False.
+        metric (dict): dictionary containing the mapping: country->value
+        metric_name (str): the name of the metric
         shrink (float, optional): colour bar shrink parameter
         **kwargs (optional): any additional keyworded arguments recognised
             by geopandas plot function.
@@ -255,16 +206,15 @@ def plot_jaccard_map(
     world = prepare_world()
 
     # Join the country_community dictionary to the world dataframe
-    world["jaccard_index"] = world["names_short"].map(jaccard)
-    world["jaccard_distance"] = 1 - world["jaccard_index"]
+    world[metric_name] = world["names_short"].map(metric)
 
     world.plot(
         ax=ax,
-        column="jaccard_distance" if not similarity else "jaccard_index",
+        column=metric_name,
         missing_kwds={"color": "lightgrey"},
         legend=True,
         legend_kwds={
-            "label": "Jaccard distance" if not similarity else "Jaccard index",
+            "label": metric_name,
             "shrink": shrink,
         },
         **kwargs,
@@ -273,9 +223,8 @@ def plot_jaccard_map(
     plot_winkel_tripel_map(ax)
 
     # Add a title with self.scenario_name if applicable
-    value_plotted_label = "Similarity to" if similarity else "Dissimilarity to"
     ax.set_title(
-        f"{value_plotted_label} base scenario for {scenario.crop} with base year {scenario.base_year[1:]}"
+        f"{metric_name} for {scenario.crop} with base year {scenario.base_year[1:]}"
         + (
             f" in scenario: {scenario.scenario_name}"
             if scenario.scenario_name is not None
