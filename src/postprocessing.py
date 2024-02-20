@@ -14,6 +14,7 @@ from src.utils import (
 import numpy as np
 import pandas as pd
 from operator import itemgetter
+from itertools import chain
 
 
 plt.style.use(
@@ -724,6 +725,50 @@ class Postprocessing:
                 **kwargs,
             )
         plt.show()
+
+    def _compute_efficiency(self, weak=False) -> None:
+        """
+        TODO
+        https://www.nature.com/articles/s42005-021-00612-5
+
+        """
+        self.efficiency = []
+        for scenario in self.scenarios:
+            all_pairs_paths = dict(
+                nx.all_pairs_dijkstra(
+                    scenario.trade_graph,
+                    weight=lambda _, __, attr: (
+                        attr["weight"] ** -1 if attr["weight"] != 0 else np.inf
+                    ),
+                )
+            )
+            cost_matrix = pd.DataFrame(
+                0.0,
+                index=scenario.trade_graph.nodes(),
+                columns=scenario.trade_graph.nodes(),
+            )
+            flow_matrix = pd.DataFrame(
+                0.0,
+                index=scenario.trade_graph.nodes(),
+                columns=scenario.trade_graph.nodes(),
+            )
+            for source, (distances, paths) in all_pairs_paths.items():
+                for target, cost in distances.items():
+                    cost_matrix.loc[source, target] = cost
+                for target, path in paths.items():
+                    flow_matrix.loc[source, target] = nx.path_weight(
+                        scenario.trade_graph, path, weight="weight"
+                    )
+            if weak:
+                ideal_matrix = (
+                    flow_matrix + nx.to_pandas_adjacency(scenario.trade_graph)
+                ) / 2
+            else:
+                ideal_matrix = flow_matrix
+            E = np.sum(1 / cost_matrix.values[cost_matrix != 0])
+            E_ideal = np.sum(ideal_matrix.values)
+            self.efficiency.append(E / E_ideal)
+        print(self.efficiency)
 
     def report(self) -> None:
         """
