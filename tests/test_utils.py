@@ -5,8 +5,8 @@ import networkx as nx
 
 def test_all_equal() -> None:
     random_numbers, all_ones = np.random.random(20), np.ones(20)
-    assert utils.all_equal(random_numbers) == False
-    assert utils.all_equal(all_ones) == True
+    assert utils.all_equal(random_numbers) is False
+    assert utils.all_equal(all_ones) is True
 
 
 def test_jaccard_index() -> None:
