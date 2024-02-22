@@ -44,3 +44,23 @@ def test_entropy_rate() -> None:
     RMS = np.array([[0, 0, 1], [1, 0, 0], [0, 1, 0]])
     SPV = utils.get_stationary_probability_vector(RMS)
     assert np.real(utils._compute_entropy_rate(RMS, SPV)) == 0
+
+
+def test_graph_efficiency() -> None:
+    adj_mat = np.random.random((100, 100))
+    G = nx.DiGraph(adj_mat)
+    weak = utils.get_graph_efficiency(G, "weak")
+    strong = utils.get_graph_efficiency(G, "strong")
+    none = utils.get_graph_efficiency(G, None)
+    wrong = utils.get_graph_efficiency(G, "jibjib")
+    # normalised should all be in range [0, 1]
+    assert weak >= 0 and weak <= 1
+    assert strong >= 0 and weak <= 1
+    # unnormalised should be biggest
+    assert none >= weak and none >= strong
+    # when wrong norm param is given it should default to weak
+    assert wrong == weak
+
+
+if __name__ == "__main__":
+    test_graph_efficiency()
