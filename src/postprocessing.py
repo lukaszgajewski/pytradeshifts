@@ -738,6 +738,30 @@ class Postprocessing:
         ]
         print(self.efficiency)
 
+    def _compute_clustering_coefficient(self) -> None:
+        """
+        TODO
+        """
+        self.clustering = [
+            nx.average_clustering(scenario.trade_graph, weight="weight")
+            for scenario in self.scenarios
+        ]
+
+    def _compute_betweenness_centrality(self) -> None:
+        """
+        TODO
+        """
+        self.betweenness = [
+            nx.betweenness_centrality(scenario.trade_graph, weight="weight")
+            for scenario in self.scenarios
+        ]
+
+    def _compute_network_stability(self) -> None:
+        """
+        TODO, https://www.mdpi.com/2304-8158/12/2/271
+        """
+        raise NotImplementedError
+
     def report(self) -> None:
         """
         TODO
