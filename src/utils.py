@@ -349,7 +349,8 @@ def get_dict_min_max(iterable: dict) -> tuple[Any, Any, Any, Any]:
 
 def get_graph_efficiency(graph: nx.Graph, normalisation: str | None = "weak") -> float:
     """
-    TODO, also a bit slow
+    TODO, https://www.nature.com/articles/s42005-021-00612-5
+    also a bit slow
     """
     all_pairs_paths = dict(
         nx.all_pairs_dijkstra(
