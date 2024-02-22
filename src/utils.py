@@ -5,7 +5,7 @@ import pandas as pd
 import country_converter as coco
 import os
 from itertools import groupby
-from networkx import to_pandas_adjacency as nx_to_pandas_adjacency, Graph as nx_Graph
+import networkx as nx
 from matplotlib.axes import Axes
 
 
@@ -233,7 +233,7 @@ def plot_node_metric_map(
     )
 
 
-def get_right_stochastic_matrix(trade_graph: nx_Graph) -> np.ndarray:
+def get_right_stochastic_matrix(trade_graph: nx.Graph) -> np.ndarray:
     """
     Convert graph's adjacency matrix to a right stochastic matrix (RSM).
     https://en.wikipedia.org/wiki/Stochastic_matrix
@@ -245,7 +245,7 @@ def get_right_stochastic_matrix(trade_graph: nx_Graph) -> np.ndarray:
         numpy.ndarray: an array representing the RSM.
     """
     # extract the adjaceny matrix from the graph
-    right_stochastic_matrix = nx_to_pandas_adjacency(trade_graph)
+    right_stochastic_matrix = nx.to_pandas_adjacency(trade_graph)
     # normalise the matrix such that each row sums up to 1
     right_stochastic_matrix = right_stochastic_matrix.div(
         right_stochastic_matrix.sum(axis=1), axis=0
@@ -345,3 +345,47 @@ def get_dict_min_max(iterable: dict) -> tuple[Any, Any, Any, Any]:
     max_key = max(iterable, key=iterable.get)
     min_key = min(iterable, key=iterable.get)
     return min_key, iterable[min_key], max_key, iterable[max_key]
+
+
+def get_graph_efficiency(graph: nx.Graph, normalisation: str | None = "weak") -> float:
+    """
+    TODO, also a bit slow
+    """
+    all_pairs_paths = dict(
+        nx.all_pairs_dijkstra(
+            graph,
+            weight=lambda _, __, attr: (
+                attr["weight"] ** -1 if attr["weight"] != 0 else np.inf
+            ),
+        )
+    )
+    cost_matrix = pd.DataFrame(
+        0.0,
+        index=graph.nodes(),
+        columns=graph.nodes(),
+    )
+    flow_matrix = pd.DataFrame(
+        0.0,
+        index=graph.nodes(),
+        columns=graph.nodes(),
+    )
+    for source, (distances, paths) in all_pairs_paths.items():
+        for target, cost in distances.items():
+            cost_matrix.loc[source, target] = cost
+        for target, path in paths.items():
+            flow_matrix.loc[source, target] = nx.path_weight(
+                graph, path, weight="weight"
+            )
+    E = np.sum(1 / cost_matrix.values[cost_matrix != 0])
+    match normalisation:
+        case "weak":
+            ideal_matrix = (flow_matrix + nx.to_pandas_adjacency(graph)) / 2
+        case "strong":
+            ideal_matrix = flow_matrix
+        case None:
+            return E
+        case _:
+            print("Unrecognised normalisation option, defaulting to ``weak''.")
+            ideal_matrix = (flow_matrix + nx.to_pandas_adjacency(graph)) / 2
+    E_ideal = np.sum(ideal_matrix.values)
+    return E / E_ideal
