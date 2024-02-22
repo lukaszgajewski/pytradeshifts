@@ -275,9 +275,10 @@ def plot_jaccard_map(
     # Add a title with self.scenario_name if applicable
     value_plotted_label = "Similarity to" if similarity else "Dissimilarity to"
     ax.set_title(
-        f"{value_plotted_label} base scenario for {scenario.crop} with base year {scenario.base_year[1:]}"
+        f"{value_plotted_label} base scenario for {scenario.crop} with base year "
+        f"{scenario.base_year[1:]}"
         + (
-            f" in scenario: {scenario.scenario_name}"
+            f"\nin scenario: {scenario.scenario_name}"
             if scenario.scenario_name is not None
             else " (no scenario)"
         )
