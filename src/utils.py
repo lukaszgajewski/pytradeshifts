@@ -1,4 +1,5 @@
 from typing import Iterable, Any
+from geopy import distance
 import numpy as np
 import geopandas as gpd
 import pandas as pd
@@ -7,6 +8,8 @@ import os
 from itertools import groupby
 import networkx as nx
 from matplotlib.axes import Axes
+from geopy.distance import geodesic
+from scipy.spatial.distance import squareform, pdist
 
 
 def plot_winkel_tripel_map(ax):
@@ -390,3 +393,75 @@ def get_graph_efficiency(graph: nx.Graph, normalisation: str | None = "weak") ->
             ideal_matrix = (flow_matrix + nx.to_pandas_adjacency(graph)) / 2
     E_ideal = np.sum(ideal_matrix.values)
     return E / E_ideal
+
+
+def get_stability_index(
+    index_file="data/government_PRS_stability_index_2016_normalised.csv",
+) -> dict[str, float]:
+    """
+    TODO
+    """
+    stability_index = pd.read_csv(index_file, index_col=0)
+    stability_index.index = coco.convert(stability_index.index, to="name_short")
+    return stability_index.loc[:, stability_index.columns[-1]].to_dict()
+
+
+def get_distance_matrix(index: pd.Index, columns: pd.Index) -> pd.DataFrame | None:
+    """
+    TODO, refactor this from model too
+    """
+    centroids = prepare_centroids(index)
+    try:
+        distance_matrix = pd.DataFrame(
+            squareform(
+                pdist(
+                    centroids.loc[:, ["latitude", "longitude"]],
+                    metric=lambda lat, lon: geodesic(lat, lon).km,
+                )
+            ),
+            columns=columns,
+            index=index,
+        )
+    except ValueError:
+        print("Error building distance matrix.")
+        print("Cannot find centroids for these regions:")
+        print(index.difference(centroids["name"]))
+        return
+    return distance_matrix
+
+
+def get_percolation_eigenvalue(
+    adjacency_matrix: np.ndarray, attack_vector: np.ndarray
+) -> float:
+    """
+    TODO
+    """
+    return np.real(
+        np.linalg.eigvals((adjacency_matrix.T * (1 - attack_vector)).T).max()
+    )
+
+
+def get_percolation_threshold(
+    adjacency_matrix: np.ndarray, node_importance_list: list
+) -> tuple[int, list[int], list[float]]:
+    """
+    TODO
+    https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.100.058701
+    """
+    eigenvalues = []
+    removed_nodes_count = []
+    for node_importance in sorted(node_importance_list, reverse=True):
+        attack_vector = np.fromiter(
+            map(lambda x: x >= node_importance, node_importance_list),
+            dtype=float,
+            count=len(adjacency_matrix),
+        )
+        # largest eigenvalue of a matrix with elements: A_ij * (1-p_i)
+        # where A is the adj. matrix, and p is the attack vector
+        eigenvalues.append(get_percolation_eigenvalue(adjacency_matrix, attack_vector))
+        removed_nodes_count.append(int(attack_vector.sum()))
+    # eigenvalue = 1 is the percolation threshold
+    threshold = removed_nodes_count[
+        len(eigenvalues) - np.searchsorted(eigenvalues[::-1], 1, side="left")
+    ]
+    return threshold, removed_nodes_count, eigenvalues

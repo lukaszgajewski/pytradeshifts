@@ -147,3 +147,31 @@ def test_find_new_order() -> None:
     new_order = pp._find_new_order(pp.scenarios[0])
     assert "China" in new_order[0]
     assert "Russia" in new_order[1]
+
+
+if __name__ == "__main__":
+    ISIMIP = pd.read_csv(
+        "." + "/data/scenario_files/ISIMIP_climate/ISIMIP_wheat_Hedlung.csv",
+        index_col=0,
+    )
+    nan_indices = ISIMIP.index[ISIMIP.iloc[:, 0].isnull()].tolist()
+    Wheat2018 = PyTradeShifts(
+        "Wheat",
+        2018,
+        region="Global",
+        testing=False,
+        countries_to_remove=nan_indices,
+        cd_kwargs={"seed": 2},
+        make_plot=False,
+    )
+    ISIMIP = PyTradeShifts(
+        crop="Wheat",
+        base_year=2018,
+        scenario_file_name="ISIMIP_climate/ISIMIP_wheat_Hedlung.csv",
+        scenario_name="ISIMIP",
+        countries_to_remove=nan_indices,
+        cd_kwargs={"seed": 2},
+        make_plot=False,
+    )
+    pp = Postprocessing([Wheat2018, ISIMIP])
+    pp.plot_attack_resilience()
