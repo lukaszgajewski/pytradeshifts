@@ -173,5 +173,5 @@ if __name__ == "__main__":
         cd_kwargs={"seed": 2},
         make_plot=False,
     )
-    pp = Postprocessing([Wheat2018, ISIMIP])
-    pp.plot_attack_resilience(sigma=5)
+    pp = Postprocessing([Wheat2018, ISIMIP], random_attack_sample_size=2)
+    pp.print_network_metrics()

@@ -56,7 +56,7 @@ class Postprocessing:
             nodes `n`, `m`. Default gamma = 1.0.
         random_attack_sample_size: (int, optional): Specifies the number of times
             to conduct random attack on the network. The higher the number the lower
-            the uncertainty but higher computation time.
+            the uncertainty but higher computation time. Must be >= 2.
         testing (bool, optional): Whether to run the methods or not. This is only used for
             testing purposes.
 
@@ -91,6 +91,7 @@ class Postprocessing:
         self.stability_index_file = stability_index_file
         self.gamma = gamma
         self.random_attack_sample_size = random_attack_sample_size
+        assert self.random_attack_sample_size >= 2
         if not testing:
             self.run()
 
@@ -835,7 +836,13 @@ class Postprocessing:
             None
         """
         self.betweenness = [
-            nx.betweenness_centrality(scenario.trade_graph, weight="weight")
+            np.mean(
+                list(
+                    nx.betweenness_centrality(
+                        scenario.trade_graph, weight="weight"
+                    ).values()
+                )
+            )
             for scenario in self.scenarios
         ]
 
@@ -1195,18 +1202,56 @@ class Postprocessing:
         ax.legend()
         plt.show()
 
-    def print_network_metrics(self) -> None:
+    def print_network_metrics(self, wide=True, tablefmt="fancy_grid", **kwargs) -> None:
         """
-        TODO
+        Prints general graph metrics in a neat tabulated form.
+
+        Arguments:
+            wide (bool, optional): Whether print the table in long or wide format.
+            tablefmt (str, optional): table format as expected by the tabulate package.
+            **kwargs: any other keyworded arguments recognised by the tabulate package.
+
+        Returns:
+            None
         """
-        # summarise those results:
-        # self._compute_efficiency()
-        # self._compute_clustering_coefficient()
-        # self._compute_betweenness_centrality()
-        # remember to handle self.network_stability being None
-        # self._compute_network_stability()
-        # self._compute_percolation_threshold()
-        raise NotImplementedError
+        metrics = [
+            *[
+                (idx, "efficiency", efficiency)
+                for idx, efficiency in enumerate(self.efficiency)
+            ],
+            *[
+                (idx, "clustering", clustering)
+                for idx, clustering in enumerate(self.clustering)
+            ],
+            *[
+                (idx, "betweenness", betweenness)
+                for idx, betweenness in enumerate(self.betweenness)
+            ],
+        ]
+        if self.network_stability is not None:
+            metrics.extend(
+                [
+                    (idx, "stability", stability)
+                    for idx, stability in enumerate(self.network_stability)
+                ],
+            )
+        metrics.extend(
+            [
+                (
+                    idx,
+                    f"{attack}-attack\nthreshold",
+                    threshold if attack != "random" else f"{threshold:.2g} +/- {_:.2g}",
+                )
+                for idx, scenario in enumerate(self.percolation)
+                for attack, (threshold, _, __) in scenario.items()
+            ]
+        )
+        metrics = pd.DataFrame(metrics, columns=["Scenario ID", "Metric", "Value"])
+        if wide:
+            metrics = metrics.pivot(
+                index="Scenario ID", columns="Metric", values="Value"
+            )
+        print(metrics.to_markdown(tablefmt=tablefmt, **kwargs))
 
     def report(self) -> None:
         """
