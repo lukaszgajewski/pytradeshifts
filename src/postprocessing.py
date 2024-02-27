@@ -247,7 +247,7 @@ class Postprocessing:
         Prints the graph distance metrics in a neat tabulated form.
 
         Arguments:
-            tablefmt (str): table format as expected by the tabulate package.
+            tablefmt (str, optional): table format as expected by the tabulate package.
             **kwargs: any other keyworded arguments recognised by the tabulate package.
 
         Returns:
@@ -345,7 +345,7 @@ class Postprocessing:
         Prints the global centrality metrics in a neat tabulated form.
 
         Arguments:
-            tablefmt (str): table format as expected by the tabulate package.
+            tablefmt (str, optional): table format as expected by the tabulate package.
             **kwargs: any other keyworded arguments recognised by the tabulate package.
 
         Returns:
@@ -403,7 +403,7 @@ class Postprocessing:
         Prints the local centrality metrics (per community) in a neat tabulated form.
 
         Arguments:
-            tablefmt (str): table format as expected by the tabulate package.
+            tablefmt (str, optional): table format as expected by the tabulate package.
             **kwargs: any other keyworded arguments recognised by the tabulate package.
 
         Returns:
