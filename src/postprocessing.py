@@ -4,6 +4,7 @@ import seaborn as sns
 from src.model import PyTradeShifts
 from src.utils import (
     all_equal,
+    get_degree_centrality,
     jaccard_index,
     plot_node_metric_map,
     get_right_stochastic_matrix,
@@ -20,6 +21,7 @@ import pandas as pd
 from operator import itemgetter
 from functools import reduce
 import seaborn as sb
+from scipy import stats
 
 
 plt.style.use(
@@ -40,7 +42,22 @@ class Postprocessing:
         anchor_countries (list, optional): List of country names to be used as anchores in plotting.
             The expected behaviour here is that the specified countries will retain
             their colour across all community plots.
-        testing (bool): Whether to run the methods or not. This is only used for
+        normalisation (str | None, optional): The normalisation version in the network efficiency
+            metric. Possible values are `weak`, `strong` and None.
+            If None, the metric is not normalised, `strong` uses an ideal flow matrix
+            as the normalisation factor, and `weak` the mean of actual and ideal flow.
+        stability_index_file (str, optional): Path to file containing stability metric
+            for each country. The format is a two columns .csv file with columns: [country, index].
+            The default points to a 2016 PRS Group stability index file normalised
+            to value range [0, 1] (subject to change in the future).
+        gamma (float, optional): distance scaling factor in node stability computation.
+            Node stability depends on the distances to other nodes.
+            This distance factor is d(n,m)^(-gamma), where d(n, m) is the distance between
+            nodes `n`, `m`. Default gamma = 1.0.
+        random_attack_sample_size: (int, optional): Specifies the number of times
+            to conduct random attack on the network. The higher the number the lower
+            the uncertainty but higher computation time.
+        testing (bool, optional): Whether to run the methods or not. This is only used for
             testing purposes.
 
     Returns:
@@ -51,7 +68,10 @@ class Postprocessing:
         self,
         scenarios: list[PyTradeShifts],
         anchor_countries: list[str] = [],
+        normalisation="weak",
         stability_index_file="data/stability_index/government_PRS_stability_index_2016_normalised.csv",
+        gamma=1.0,
+        random_attack_sample_size=100,
         testing=False,
     ):
         self.scenarios = scenarios
@@ -67,7 +87,10 @@ class Postprocessing:
         if not all_equal((sc.cd_kwargs for sc in scenarios)):
             print("Warning: Inconsistent community detection parameters detected.")
 
+        self.normalisation = normalisation
         self.stability_index_file = stability_index_file
+        self.gamma = gamma
+        self.random_attack_sample_size = random_attack_sample_size
         if not testing:
             self.run()
 
@@ -101,6 +124,9 @@ class Postprocessing:
         self._compute_community_centrality_metrics()
         self._compute_community_satisfaction()
         self._compute_community_satisfaction_difference()
+        self._compute_efficiency()
+        self._compute_clustering_coefficient()
+        self._compute_betweenness_centrality()
         self._compute_node_stability()
         self._compute_node_stability_difference()
         self._compute_network_stability()
@@ -286,22 +312,14 @@ class Postprocessing:
         Returns:
             None
         """
-        self.in_degree = []
-        self.out_degree = []
-        for scenario in self.scenarios:
-            # TODO: refactor those to utils
-            in_degrees = list(scenario.trade_graph.in_degree(weight="weight"))
-            total_in_degrees = sum(map(lambda t: t[1], in_degrees))
-            in_degrees = dict(
-                map(lambda t: (t[0], t[1] / total_in_degrees), in_degrees)
-            )
-            self.in_degree.append(in_degrees)
-            out_degrees = list(scenario.trade_graph.out_degree(weight="weight"))
-            total_out_degrees = sum(map(lambda t: t[1], out_degrees))
-            out_degrees = dict(
-                map(lambda t: (t[0], t[1] / total_out_degrees), out_degrees)
-            )
-            self.out_degree.append(out_degrees)
+        self.in_degree = [
+            get_degree_centrality(scenario.trade_graph, out=False)
+            for scenario in self.scenarios
+        ]
+        self.out_degree = [
+            get_degree_centrality(scenario.trade_graph, out=True)
+            for scenario in self.scenarios
+        ]
 
     def _compute_global_centrality_metrics(self) -> None:
         """
@@ -549,9 +567,6 @@ class Postprocessing:
                     print(
                         f"Warning: {country} does not belong to any community in scenario {scenario_idx}."
                     )
-                    print(
-                        "Skipping community similarity index computation for this country."
-                    )
                     continue
                 else:
                     # we want to compare how the community changed from the perspective
@@ -570,9 +585,6 @@ class Postprocessing:
                 if original_community is None:
                     print(
                         f"Warning: {country} does not belong to any community in base scenario. Skipping."
-                    )
-                    print(
-                        "Skipping community similarity index computation for this country."
                     )
                     continue
                 else:
@@ -654,7 +666,17 @@ class Postprocessing:
 
     def _compute_community_satisfaction(self) -> None:
         """
-        TODO
+        Computes the community satisfaction index for each node.
+        This index quantifies how much of a given country's import is satisfied
+        by its community.
+        The metric is taken from: https://www.mdpi.com/2304-8158/12/2/271, and
+        https://www.sciencedirect.com/science/article/abs/pii/S0196890414000466.
+
+        Arguments:
+            None
+
+        Returns:
+            None
         """
         self.community_satisfaction = []
         for scenario in self.scenarios:
@@ -665,18 +687,28 @@ class Postprocessing:
                 community_in_degrees = nx.subgraph(
                     scenario.trade_graph, nbunch=community
                 ).in_degree(weight="weight")
-                # replace in_degree with satisfaction index
+                # replace in_degree with satisfaction index to save space
                 for country, c_i_d in dict(community_in_degrees).items():
                     try:
                         in_degrees[country] = c_i_d / in_degrees[country]
                     except ZeroDivisionError:
+                        # zero division means no import which is usually fine
+                        # but if c_i_d != 0 at the same time then something
+                        # is wrong
                         assert c_i_d == in_degrees[country]
                         continue
             self.community_satisfaction.append(in_degrees)
 
     def _compute_community_satisfaction_difference(self) -> None:
         """
-        TODO
+        Computes the difference of the community satisfaction index between
+        each scenario and the base scenario.
+
+        Arguments:
+            None
+
+        Returns:
+            None
         """
         self.community_satisfaction_difference = [
             {
@@ -693,7 +725,18 @@ class Postprocessing:
         **kwargs,
     ) -> None:
         """
-        TODO
+        Plots the world map with countries coloured by their community
+        satisfaction index.
+
+        Arguments:
+            figsize (tuple[float, float] | None, optional): the composite figure
+                size as expected by the matplotlib subplots routine.
+            shrink (float, optional): colour bar shrink parameter
+            **kwargs (optional): any additional keyworded arguments recognised
+                by geopandas plot function.
+
+        Returns:
+            None
         """
         _, axs = plt.subplots(
             len(self.scenarios), 1, sharex=True, tight_layout=True, figsize=figsize
@@ -716,7 +759,18 @@ class Postprocessing:
         **kwargs,
     ) -> None:
         """
-        TODO
+        Plots the world map with countries coloured by the difference of their
+        community satisfaction index from the base scenario.
+
+        Arguments:
+            figsize (tuple[float, float] | None, optional): the composite figure
+                size as expected by the matplotlib subplots routine.
+            shrink (float, optional): colour bar shrink parameter
+            **kwargs (optional): any additional keyworded arguments recognised
+                by geopandas plot function.
+
+        Returns:
+            None
         """
         assert len(self.scenarios) > 1
         _, axs = plt.subplots(
@@ -739,20 +793,31 @@ class Postprocessing:
             )
         plt.show()
 
-    def _compute_efficiency(self, normalisation="weak") -> None:
+    def _compute_efficiency(self) -> None:
         """
-        TODO
-        https://www.nature.com/articles/s42005-021-00612-5
+        Compute graph efficiency score for each scenario, based on:
+        https://www.nature.com/articles/s42005-021-00612-5.
 
+        Arguments:
+            None
+
+        Returns:
+            None
         """
         self.efficiency = [
-            get_graph_efficiency(scenario.trade_graph, normalisation)
+            get_graph_efficiency(scenario.trade_graph, self.normalisation)
             for scenario in self.scenarios
         ]
 
     def _compute_clustering_coefficient(self) -> None:
         """
-        TODO
+        Computes the average clustering coefficient for each scenario.
+
+        Arguments:
+            None
+
+        Returns:
+            None
         """
         self.clustering = [
             nx.average_clustering(scenario.trade_graph, weight="weight")
@@ -761,7 +826,13 @@ class Postprocessing:
 
     def _compute_betweenness_centrality(self) -> None:
         """
-        TODO
+        Computes the betweenness centrality for each scenario.
+
+        Arguments:
+            None
+
+        Returns:
+            None
         """
         self.betweenness = [
             nx.betweenness_centrality(scenario.trade_graph, weight="weight")
@@ -770,10 +841,24 @@ class Postprocessing:
 
     def _compute_node_stability(self) -> None:
         """
-        TODO
+        Computes the node stability index for each node and scenario.
+        The metric is taken from: https://www.mdpi.com/2304-8158/12/2/271, and
+        https://www.sciencedirect.com/science/article/abs/pii/S0196890414000466.
+        Note: the values here are somewhat arbitrary as the stability index
+        and distance have unspecified units.
+
+        Arguments:
+            None
+
+        Returns:
+            None
         """
         self.node_stability = []
+        # get the stability index, this is assumed to be provided by a file
         stability_index = get_stability_index(self.stability_index_file)
+        # find the set of all countries across all scenarios
+        # this way we can compute the distance matrix once
+        # instead of for each scenario separately
         country_super_set = reduce(
             pd.Index.union, [sc.trade_matrix.index for sc in self.scenarios]
         )
@@ -785,27 +870,42 @@ class Postprocessing:
             importer_stability_dict = {}
             for importer in scenario.trade_graph:
                 importer_stability = 0
+                # loop over countries with non-zero export
                 for exporter, exporter_centrality in dict(
                     filter(lambda el: el[1] > 0, out_degree.items())
                 ).items():
+                    # one cannot export to oneself
                     if exporter == importer:
                         continue
                     if exporter not in stability_index:
                         print(f"{exporter} not found in stability index.")
-                        print("It will not contribute to node stability computation.")
                         continue
                     importer_stability += (
                         stability_index[exporter]
                         * exporter_centrality
-                        * distance_matrix.loc[importer, exporter]
-                        ** -1  # TODO: replace with gamma
+                        * distance_matrix.loc[importer, exporter] ** -self.gamma
                     )
                 importer_stability_dict[importer] = importer_stability
             self.node_stability.append(importer_stability_dict)
 
     def _compute_node_stability_difference(self) -> None:
         """
-        TODO, relative! because stability values are somewhat arbitrary
+        Computes the node stability index difference between scenario and base scenario,
+        for each node.
+        The metric is taken from: https://www.mdpi.com/2304-8158/12/2/271, and
+        https://www.sciencedirect.com/science/article/abs/pii/S0196890414000466.
+        Note: the values here are somewhat arbitrary as the stability index
+        and distance have unspecified units.
+        Thus, this difference is computed as a relative difference: (y(i, n)-y(0, n))/y(0, n).
+        Where y(0, n) is stability of node `n` in base scenario,
+        and y(i, n) the stability of node `n` in scenario `i`.
+        I.e., it measures the relative change from base scenario to another scenario.
+
+        Arguments:
+            None
+
+        Returns:
+            None
         """
         self.node_stability_difference = [
             {
@@ -823,7 +923,23 @@ class Postprocessing:
         **kwargs,
     ) -> None:
         """
-        TODO, values arbitrary so difference might be more helpful
+        Plots the world map with countries coloured by the their stability index.
+        The metric is taken from: https://www.mdpi.com/2304-8158/12/2/271, and
+        https://www.sciencedirect.com/science/article/abs/pii/S0196890414000466.
+        Note: the values here are somewhat arbitrary as the stability index
+        and distance have unspecified units.
+        Plotting the relative difference might be more useful.
+        See: Postprocessing.plot_node_stability_difference.
+
+        Arguments:
+            figsize (tuple[float, float] | None, optional): the composite figure
+                size as expected by the matplotlib subplots routine.
+            shrink (float, optional): colour bar shrink parameter
+            **kwargs (optional): any additional keyworded arguments recognised
+                by geopandas plot function.
+
+        Returns:
+            None
         """
         _, axs = plt.subplots(
             len(self.scenarios), 1, sharex=True, tight_layout=True, figsize=figsize
@@ -846,7 +962,26 @@ class Postprocessing:
         **kwargs,
     ) -> None:
         """
-        TODO
+        Plots the world map with countries coloured by the difference between
+        each scenario and the base scenario of their stability index.
+        The metric is taken from: https://www.mdpi.com/2304-8158/12/2/271, and
+        https://www.sciencedirect.com/science/article/abs/pii/S0196890414000466.
+        Note: the values here are somewhat arbitrary as the stability index
+        and distance have unspecified units.
+        Thus, this difference is computed as a relative difference: (y(i, n)-y(0, n))/y(0, n).
+        Where y(0, n) is stability of node `n` in base scenario,
+        and y(i, n) the stability of node `n` in scenario `i`.
+        I.e., it measures the relative change from base scenario to another scenario.
+
+        Arguments:
+            figsize (tuple[float, float] | None, optional): the composite figure
+                size as expected by the matplotlib subplots routine.
+            shrink (float, optional): colour bar shrink parameter
+            **kwargs (optional): any additional keyworded arguments recognised
+                by geopandas plot function.
+
+        Returns:
+            None
         """
         assert len(self.scenarios) > 1
         _, axs = plt.subplots(
@@ -871,30 +1006,54 @@ class Postprocessing:
 
     def _compute_network_stability(self) -> None:
         """
-        TODO, https://www.mdpi.com/2304-8158/12/2/271 and https://www.sciencedirect.com/science/article/abs/pii/S0196890414000466
-        currently using outdated PRS Group data (up to 2016) and it might not be relevant in case of nuclear war etc.,
-         might wanna replace it with something like this:
-        https://www.worldbank.org/en/publication/worldwide-governance-indicators
+        Computes the network stability based on the node stability index.
+        It is the sum of node stabilities weighed by the in-degree centrality.
+        The metric is taken from: https://www.mdpi.com/2304-8158/12/2/271, and
+        https://www.sciencedirect.com/science/article/abs/pii/S0196890414000466.
+        Note: the values here are somewhat arbitrary as the stability index
+        and distance used in the node stability index have unspecified units.
+
+        Arguments:
+            None
+
+        Returns:
+            None
         """
-        self.network_stability = []
+        #  node stability can fail to compute so we need to handle such a case
         if not self.node_stability:
+            self.network_stability = None
             return
-        for in_degree, stability in zip(self.in_degree, self.node_stability):
-            total_stability = 0
-            for importer, importer_centrality in in_degree.items():
-                total_stability += importer_centrality * stability[importer]
-            self.network_stability.append(total_stability)
+        self.network_stability = [
+            sum(
+                [
+                    importer_centrality * stability[importer]
+                    for importer, importer_centrality in in_degree.items()
+                ]
+            )
+            for in_degree, stability in zip(self.in_degree, self.node_stability)
+        ]
 
     def _compute_entropic_out_degree(self) -> None:
         """
-        TODO, unidrected version is introduced here:
+        Compute the entropic out-degree for each node, scenario.
+        This is a generalisation of the concept introduced here:
         https://www.sciencedirect.com/science/article/abs/pii/S1874548209000031
+        This metric uses the idea of entropy to calculate an importance of a node.
+
+        Arguments:
+            None
+
+        Returns:
+            None
         """
         self.entropic_out_degree = []
         for scenario in self.scenarios:
             out_degree = scenario.trade_graph.out_degree(weight="weight")
-            entropic_degree = dict()
+            entropic_degree = {}
             for n in scenario.trade_graph:
+                # p_ij is the normalised edge weight between the nodes i,j
+                # by the sum of edge weights at node j
+                # here we only consider outward pointing edges
                 p = np.fromiter(
                     map(
                         lambda x: x[2]["weight"] / out_degree[n],
@@ -903,6 +1062,7 @@ class Postprocessing:
                     dtype=float,
                     count=len(scenario.trade_graph[n]),
                 )
+                # 0 * log(0) = 0 in information theory
                 entropic_degree[n] = (
                     1 - np.sum(p * np.nan_to_num(np.log(p)))
                 ) * out_degree[n]
@@ -910,14 +1070,31 @@ class Postprocessing:
 
     def _compute_percolation_threshold(self) -> None:
         """
-        TODO, random + targeted by out centrality + entropic degree
+        Computes percolation threshold (or the network collapse threshold) using
+        the theory developed in:
+        https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.100.058701.
+        The idea is that we represent the attack strategy by a vector `p`,
+        then given an adjacency matrix A, the largest eigenvalue of the matrix A(1-p)
+        is 1 at the critical percolation point. When this eigenvalue is than 1
+        the network disintegrates.
+        We consider three attack vectors here: random, export-based and entropy-based.
+        In random we remove nodes randomly, in export-based in the order of highest
+        to lowest out-degree centrality, and entropy-based in the order of highest
+        to lowest entropic degree of the nodes.
+
+        Arguments:
+            None
+
+        Returns:
+            None
         """
+        # initialise list of dicts
         self.percolation = [{} for _ in self.scenarios]
         for idx, (scenario, out_degree, entropic_out_degree) in enumerate(
             zip(self.scenarios, self.out_degree, self.entropic_out_degree)
         ):
             adj = nx.to_numpy_array(scenario.trade_graph)
-            adj[adj != 0] = 1  # weights don't matter
+            adj[adj != 0] = 1  # weights don't matter here
             # export based attack
             self.percolation[idx]["export"] = get_percolation_threshold(
                 adj, out_degree.values()
@@ -926,46 +1103,109 @@ class Postprocessing:
             self.percolation[idx]["entropic"] = get_percolation_threshold(
                 adj, entropic_out_degree.values()
             )
-            # random attack, it needs special treatment, i.e., averaging over
-            # multiple realisations
+            # random attack,
+            # it needs special treatment, i.e., averaging over multiple realisations
             # there is probably some clever way of gradually increasing
             # a uniform p_i vector but this is easier and fast enough
-            y = []
-            N = 100
-            t = 0  # TODO: add stanard error for the plot
-            for _ in range(N):
-                threshold, removed_nodes_count, eigenvalues = get_percolation_threshold(
-                    adj, np.random.random(len(adj))
-                )
-                y.append(
+            random_attacks = [
+                get_percolation_threshold(adj, np.random.random(len(adj)))
+                for _ in range(self.random_attack_sample_size)
+            ]
+            random_attacks_df = pd.concat(
+                [
                     pd.DataFrame(
                         np.vstack((removed_nodes_count, eigenvalues)).T,
                         columns=["removed_nodes", "eigenvalue"],
                     )
-                )
-                t += threshold
-            self.percolation[idx]["random"] = (t / N, pd.concat(y))
-
-    def plot_attack_resilience(self) -> None:
-        """
-        TODO
-        """
-        for idx, x in enumerate(self.percolation):
-            t, rn, eig = x["export"]
-            plt.plot(rn, eig, "o-", label=f"Sc. {idx} export t={t}")
-            t, rn, eig = x["entropic"]
-            plt.plot(rn, eig, "o-", label=f"Sc. {idx} entropic t={t}")
-            t, y = x["random"]
-            sb.lineplot(
-                y, x="removed_nodes", y="eigenvalue", label=f"Sc. {idx} random t={t}"
+                    for _, removed_nodes_count, eigenvalues in random_attacks
+                ]
             )
-        plt.axhline(1, color="black", linestyle="dashed", label="network collapse")
+            thresholds_vector = [thr for thr, _, _ in random_attacks]
+            self.percolation[idx]["random"] = (
+                np.mean(thresholds_vector),
+                stats.sem(thresholds_vector),
+                random_attacks_df,
+            )
+
+    def plot_attack_resilience(
+        self,
+        exclude_scenarios=[],
+        exclude_attacks=[],
+        sigma=2.0,
+        figsize: tuple[float, float] | None = None,
+    ) -> None:
+        """
+        Plots the attack resiliencie for each scenario and attack strategy.
+
+        Arguments:
+            exclude_scenarios (list, optional): list of scenario IDs (int) to
+                not be plotted.
+            exclude_attacks (list, optional): list of attack strategies (str) to
+                not be plotted. Possible attack strategies are:
+                `export`, `entropic`, `random`.
+            sigma (float, optional): standard error of the mean scale factor. This
+                is used for error bars in the random attack strategy.
+                sigma=1.0 -> ~68% confidence interval, 2.0->95% CI, etc.
+            figsize (tuple[float, float] | None, optional): the composite figure
+                size as expected by the matplotlib subplots routine.
+
+
+        Returns:
+            None
+        """
+        # this line shows the critical value
+        _, ax = plt.subplots(figsize=figsize, tight_layout=True)
+        ax.axhline(
+            1,
+            color="black",
+            linestyle="dashed",
+            label="network collapse; \n[ID, attack, threshold]:",
+        )
+        for idx, x in enumerate(self.percolation):
+            if idx in exclude_scenarios:
+                continue
+            if "export" not in exclude_attacks:
+                threshold, removed_nodes, eigenvalues = x["export"]
+                ax.plot(
+                    removed_nodes,
+                    eigenvalues,
+                    "-",
+                    label=f"{idx}, export, {threshold}",
+                )
+            if "entropic" not in exclude_attacks:
+                threshold, removed_nodes, eigenvalues = x["entropic"]
+                ax.plot(
+                    removed_nodes,
+                    eigenvalues,
+                    "-",
+                    label=f"{idx}, entropic, {threshold}",
+                )
+            if "random" not in exclude_attacks:
+                threshold, threshold_sem, random_attacks_df = x["random"]
+                sb.lineplot(
+                    random_attacks_df,
+                    x="removed_nodes",
+                    y="eigenvalue",
+                    errorbar=("se", sigma),
+                    label=f"{idx}, random, {threshold:.2g} +/- {sigma*threshold_sem:.2g}",
+                    ax=ax,
+                )
+        ax.set_xlabel("# of removed nodes.")
+        ax.set_ylabel("Max adj. eigenval. post node removal.")
+        ax.legend()
         plt.show()
 
     def print_network_metrics(self) -> None:
         """
         TODO
         """
+        # summarise those results:
+        # self._compute_efficiency()
+        # self._compute_clustering_coefficient()
+        # self._compute_betweenness_centrality()
+        # remember to handle self.network_stability being None
+        # self._compute_network_stability()
+        # self._compute_percolation_threshold()
         raise NotImplementedError
 
     def report(self) -> None:

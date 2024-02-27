@@ -174,4 +174,4 @@ if __name__ == "__main__":
         make_plot=False,
     )
     pp = Postprocessing([Wheat2018, ISIMIP])
-    pp.plot_attack_resilience()
+    pp.plot_attack_resilience(sigma=5)

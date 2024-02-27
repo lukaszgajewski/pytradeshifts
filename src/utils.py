@@ -157,6 +157,18 @@ def jaccard_index(iterable_A: Iterable, iterable_B: Iterable) -> float:
     return len(A.intersection(B)) / len(A.union(B))
 
 
+def get_degree_centrality(graph: nx.DiGraph, out=False) -> dict:
+    """
+    TODO
+    """
+    if out:
+        degrees = list(graph.out_degree(weight="weight"))
+    else:
+        degrees = list(graph.in_degree(weight="weight"))
+    total_degrees = sum(map(lambda t: t[1], degrees))
+    return dict(map(lambda t: (t[0], t[1] / total_degrees), degrees))
+
+
 def prepare_world() -> gpd.GeoDataFrame:
     """
     Prepares the geospatial Natural Earth (NE) data (to be presumebly used in plotting).
@@ -423,7 +435,7 @@ def get_distance_matrix(index: pd.Index, columns: pd.Index) -> pd.DataFrame | No
             index=index,
         )
     except ValueError:
-        print("Error building distance matrix.")
+        print("Error building the distance matrix.")
         print("Cannot find centroids for these regions:")
         print(index.difference(centroids["name"]))
         return
