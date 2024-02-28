@@ -673,7 +673,14 @@ class Postprocessing:
         Computes the community satisfaction index for each node.
         This index quantifies how much of a given country's import is satisfied
         by its community.
-        The metric is taken from: https://www.mdpi.com/2304-8158/12/2/271, and
+        The metric is taken from:
+        Wang, X., Ma, L., Yan, S., Chen, X., & Growe, A. (2023).
+        Trade for food security: The stability of global agricultural trade networks.
+        Foods, 12(2), 271.
+        https://www.mdpi.com/2304-8158/12/2/271, and
+        Ji, Q., Zhang, H. Y., & Fan, Y. (2014).
+        Identification of global oil trade patterns: An empirical research based on complex network theory.
+        Energy Conversion and Management, 85, 856-865.
         https://www.sciencedirect.com/science/article/abs/pii/S0196890414000466.
 
         Arguments:
@@ -800,6 +807,9 @@ class Postprocessing:
     def _compute_efficiency(self) -> None:
         """
         Computes graph efficiency score for each scenario, based on:
+        Bertagnolli, G., Gallotti, R., & De Domenico, M. (2021).
+        Quantifying efficient information exchange in real network flows.
+        Communications Physics, 4(1), 125.
         https://www.nature.com/articles/s42005-021-00612-5.
 
         Arguments:
@@ -852,7 +862,14 @@ class Postprocessing:
     def _compute_node_stability(self) -> None:
         """
         Computes the node stability index for each node and scenario.
-        The metric is taken from: https://www.mdpi.com/2304-8158/12/2/271, and
+        The metric is taken from:
+        Wang, X., Ma, L., Yan, S., Chen, X., & Growe, A. (2023).
+        Trade for food security: The stability of global agricultural trade networks.
+        Foods, 12(2), 271.
+        https://www.mdpi.com/2304-8158/12/2/271, and
+        Ji, Q., Zhang, H. Y., & Fan, Y. (2014).
+        Identification of global oil trade patterns: An empirical research based on complex network theory.
+        Energy Conversion and Management, 85, 856-865.
         https://www.sciencedirect.com/science/article/abs/pii/S0196890414000466.
         Note: the values here are somewhat arbitrary as the stability index
         and distance have unspecified units.
@@ -902,7 +919,14 @@ class Postprocessing:
         """
         Computes the node stability index difference between scenario and base scenario,
         for each node.
-        The metric is taken from: https://www.mdpi.com/2304-8158/12/2/271, and
+        The metric is taken from:
+        Wang, X., Ma, L., Yan, S., Chen, X., & Growe, A. (2023).
+        Trade for food security: The stability of global agricultural trade networks.
+        Foods, 12(2), 271.
+        https://www.mdpi.com/2304-8158/12/2/271, and
+        Ji, Q., Zhang, H. Y., & Fan, Y. (2014).
+        Identification of global oil trade patterns: An empirical research based on complex network theory.
+        Energy Conversion and Management, 85, 856-865.
         https://www.sciencedirect.com/science/article/abs/pii/S0196890414000466.
         Note: the values here are somewhat arbitrary as the stability index
         and distance have unspecified units.
@@ -934,7 +958,14 @@ class Postprocessing:
     ) -> None:
         """
         Plots the world map with countries coloured by the their stability index.
-        The metric is taken from: https://www.mdpi.com/2304-8158/12/2/271, and
+        The metric is taken from:
+        Wang, X., Ma, L., Yan, S., Chen, X., & Growe, A. (2023).
+        Trade for food security: The stability of global agricultural trade networks.
+        Foods, 12(2), 271.
+        https://www.mdpi.com/2304-8158/12/2/271, and
+        Ji, Q., Zhang, H. Y., & Fan, Y. (2014).
+        Identification of global oil trade patterns: An empirical research based on complex network theory.
+        Energy Conversion and Management, 85, 856-865.
         https://www.sciencedirect.com/science/article/abs/pii/S0196890414000466.
         Note: the values here are somewhat arbitrary as the stability index
         and distance have unspecified units.
@@ -974,7 +1005,14 @@ class Postprocessing:
         """
         Plots the world map with countries coloured by the difference between
         each scenario and the base scenario of their stability index.
-        The metric is taken from: https://www.mdpi.com/2304-8158/12/2/271, and
+        The metric is taken from:
+        Wang, X., Ma, L., Yan, S., Chen, X., & Growe, A. (2023).
+        Trade for food security: The stability of global agricultural trade networks.
+        Foods, 12(2), 271.
+        https://www.mdpi.com/2304-8158/12/2/271, and
+        Ji, Q., Zhang, H. Y., & Fan, Y. (2014).
+        Identification of global oil trade patterns: An empirical research based on complex network theory.
+        Energy Conversion and Management, 85, 856-865.
         https://www.sciencedirect.com/science/article/abs/pii/S0196890414000466.
         Note: the values here are somewhat arbitrary as the stability index
         and distance have unspecified units.
@@ -1018,7 +1056,14 @@ class Postprocessing:
         """
         Computes the network stability based on the node stability index.
         It is the sum of node stabilities weighed by the in-degree centrality.
-        The metric is taken from: https://www.mdpi.com/2304-8158/12/2/271, and
+        The metric is taken from:
+        Wang, X., Ma, L., Yan, S., Chen, X., & Growe, A. (2023).
+        Trade for food security: The stability of global agricultural trade networks.
+        Foods, 12(2), 271.
+        https://www.mdpi.com/2304-8158/12/2/271, and
+        Ji, Q., Zhang, H. Y., & Fan, Y. (2014).
+        Identification of global oil trade patterns: An empirical research based on complex network theory.
+        Energy Conversion and Management, 85, 856-865.
         https://www.sciencedirect.com/science/article/abs/pii/S0196890414000466.
         Note: the values here are somewhat arbitrary as the stability index
         and distance used in the node stability index have unspecified units.
@@ -1047,7 +1092,10 @@ class Postprocessing:
         """
         Compute the entropic out-degree for each node, scenario.
         This is a generalisation of the concept introduced here:
-        https://www.sciencedirect.com/science/article/abs/pii/S1874548209000031
+        Bompard, E., Napoli, R., & Xue, F. (2009).
+        Analysis of structural vulnerabilities in power transmission grids.
+        International Journal of Critical Infrastructure Protection, 2(1-2), 5-12.
+        https://www.sciencedirect.com/science/article/abs/pii/S1874548209000031.
         This metric uses the idea of entropy to calculate an importance of a node.
 
         Arguments:
@@ -1065,6 +1113,9 @@ class Postprocessing:
         """
         Computes percolation threshold (or the network collapse threshold) using
         the theory developed in:
+        Restrepo, J. G., Ott, E., & Hunt, B. R. (2008).
+        Weighted percolation on directed networks.
+        Physical review letters, 100(5), 058701.
         https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.100.058701.
         The idea is that we represent the attack strategy by a vector `p`,
         then given an adjacency matrix A, the largest eigenvalue of the matrix A(1-p)

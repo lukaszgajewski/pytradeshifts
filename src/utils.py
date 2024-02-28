@@ -180,7 +180,10 @@ def get_entropic_degree(graph: nx.DiGraph, out=True) -> dict:
     """
     Compute the entropic in-/out-degree for each node in a directed, weighted graph.
     This is a generalisation of the concept introduced here:
-    https://www.sciencedirect.com/science/article/abs/pii/S1874548209000031
+    Bompard, E., Napoli, R., & Xue, F. (2009).
+    Analysis of structural vulnerabilities in power transmission grids.
+    International Journal of Critical Infrastructure Protection, 2(1-2), 5-12.
+    https://www.sciencedirect.com/science/article/abs/pii/S1874548209000031.
     This metric uses the idea of entropy to calculate an importance of a node.
 
     Arguments:
@@ -406,6 +409,9 @@ def get_dict_min_max(iterable: dict) -> tuple[Any, Any, Any, Any]:
 def get_graph_efficiency(graph: nx.Graph, normalisation: str | None = "weak") -> float:
     """
     Computes graph efficiency score for the specified graph, based on:
+    Bertagnolli, G., Gallotti, R., & De Domenico, M. (2021).
+    Quantifying efficient information exchange in real network flows.
+    Communications Physics, 4(1), 125.
     https://www.nature.com/articles/s42005-021-00612-5.
 
     Arguments:
@@ -521,6 +527,9 @@ def get_percolation_eigenvalue(
     Computes the largest eigenvalue of a matrix defined as A_ij*(1-p_i),
     where A is the adjacency matrix of a graph, and p is an attack vector.
     This is described in detail here:
+    Restrepo, J. G., Ott, E., & Hunt, B. R. (2008).
+    Weighted percolation on directed networks.
+    Physical review letters, 100(5), 058701.
     https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.100.058701.
 
     Arguments:
@@ -541,6 +550,9 @@ def get_percolation_threshold(
     """
     Computes percolation threshold (or the network collapse threshold) using
     the theory developed in:
+    Restrepo, J. G., Ott, E., & Hunt, B. R. (2008).
+    Weighted percolation on directed networks.
+    Physical review letters, 100(5), 058701.
     https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.100.058701.
     The idea is that we represent the attack strategy by a vector `p`,
     then given an adjacency matrix A, the largest eigenvalue of the matrix A(1-p)
