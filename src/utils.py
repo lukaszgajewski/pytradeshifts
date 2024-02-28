@@ -195,7 +195,7 @@ def get_entropic_degree(graph: nx.DiGraph, out=True) -> dict:
     """
     if out:
         degree = graph.out_degree(weight="weight")
-    else
+    else:
         degree = graph.in_degree(weight="weight")
     entropic_degree = {}
     for n in graph:
