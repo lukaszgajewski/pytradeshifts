@@ -5,6 +5,7 @@ from src.model import PyTradeShifts
 from src.utils import (
     all_equal,
     get_degree_centrality,
+    get_entropic_degree,
     jaccard_index,
     plot_node_metric_map,
     get_right_stochastic_matrix,
@@ -217,7 +218,9 @@ class Postprocessing:
         Returns:
             None
         """
-        entropy_rates = [get_entropy_rate(scenario) for scenario in self.scenarios]
+        entropy_rates = [
+            get_entropy_rate(scenario.trade_graph) for scenario in self.scenarios
+        ]
         # compute difference from base scenario
         self.entropy_rate = [er - entropy_rates[0] for er in entropy_rates[1:]]
 
@@ -1053,27 +1056,10 @@ class Postprocessing:
         Returns:
             None
         """
-        self.entropic_out_degree = []
-        for scenario in self.scenarios:
-            out_degree = scenario.trade_graph.out_degree(weight="weight")
-            entropic_degree = {}
-            for n in scenario.trade_graph:
-                # p_ij is the normalised edge weight between the nodes i,j
-                # by the sum of edge weights at node j
-                # here we only consider outward pointing edges
-                p = np.fromiter(
-                    map(
-                        lambda x: x[2]["weight"] / out_degree[n],
-                        scenario.trade_graph.out_edges(n, data=True),
-                    ),
-                    dtype=float,
-                    count=len(scenario.trade_graph[n]),
-                )
-                # 0 * log(0) = 0 in information theory
-                entropic_degree[n] = (
-                    1 - np.sum(p * np.nan_to_num(np.log(p)))
-                ) * out_degree[n]
-            self.entropic_out_degree.append(entropic_degree)
+        self.entropic_out_degree = [
+            get_entropic_degree(scenario.trade_graph, out=True)
+            for scenario in self.scenarios
+        ]
 
     def _compute_percolation_threshold(self) -> None:
         """

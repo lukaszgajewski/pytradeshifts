@@ -176,6 +176,39 @@ def get_degree_centrality(graph: nx.DiGraph, out=False) -> dict:
     return dict(map(lambda t: (t[0], t[1] / total_degrees), degrees))
 
 
+def get_entropic_degree(graph: nx.DiGraph, out=True) -> dict:
+    """
+    Compute the entropic in-/out-degree for each node in a directed, weighted graph.
+    This is a generalisation of the concept introduced here:
+    https://www.sciencedirect.com/science/article/abs/pii/S1874548209000031
+    This metric uses the idea of entropy to calculate an importance of a node.
+
+    Arguments:
+        graph (nx.DiGraph): The directed, weighted graph whose nodes are to be evaluated.
+        out (bool, optional): whether to compute the out- or in-degree. Default is out-degree.
+
+    Returns:
+        dict: The mapping of node -> entropic degree.
+    """
+    out_degree = graph.out_degree(weight="weight")
+    entropic_degree = {}
+    for n in graph:
+        # p_ij is the normalised edge weight between the nodes i,j
+        # by the sum of edge weights at node j
+        # here we only consider outward pointing edges
+        p = np.fromiter(
+            map(
+                lambda x: x[2]["weight"] / out_degree[n],
+                graph.out_edges(n, data=True),
+            ),
+            dtype=float,
+            count=len(graph[n]),
+        )
+        # 0 * log(0) = 0 in information theory
+        entropic_degree[n] = (1 - np.sum(p * np.nan_to_num(np.log(p)))) * out_degree[n]
+    return entropic_degree
+
+
 def prepare_world() -> gpd.GeoDataFrame:
     """
     Prepares the geospatial Natural Earth (NE) data (to be presumebly used in plotting).
@@ -328,21 +361,22 @@ def _compute_entropy_rate(
     return entropy_rate
 
 
-def get_entropy_rate(scenario) -> float:
+def get_entropy_rate(graph: nx.Graph) -> float:
     """
-    Compute entropy rate for a given scenario.
+    Compute entropy rate for a given graph.
     https://en.wikipedia.org/wiki/Entropy_rate
     This is under the assumption that we are interested in a Markov random
     walk on the trade graph.
 
     Arguments:
-        scenario (PyTradeShifts): a PyTradeShifts object instance.
+        graph (nx.Graph): The networkx graph object, presumably a trade graph
+            from a PyTradeShifts instance.
 
     Returns:
         float: the entropy rate of a random walker on the scnearios' trade graph.
     """
     # get the right stochastic matrix and the stationary probabiltiy vector
-    stochastic_matrix = get_right_stochastic_matrix(scenario.trade_graph)
+    stochastic_matrix = get_right_stochastic_matrix(graph)
     probability_vector = get_stationary_probability_vector(stochastic_matrix)
     entropy_rate = _compute_entropy_rate(stochastic_matrix, probability_vector)
     if np.real(entropy_rate) != np.real_if_close(entropy_rate):
