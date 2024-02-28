@@ -193,7 +193,10 @@ def get_entropic_degree(graph: nx.DiGraph, out=True) -> dict:
     Returns:
         dict: The mapping of node -> entropic degree.
     """
-    out_degree = graph.out_degree(weight="weight")
+    if out:
+        degree = graph.out_degree(weight="weight")
+    else
+        degree = graph.in_degree(weight="weight")
     entropic_degree = {}
     for n in graph:
         # p_ij is the normalised edge weight between the nodes i,j
@@ -201,14 +204,14 @@ def get_entropic_degree(graph: nx.DiGraph, out=True) -> dict:
         # here we only consider outward pointing edges
         p = np.fromiter(
             map(
-                lambda x: x[2]["weight"] / out_degree[n],
-                graph.out_edges(n, data=True),
+                lambda x: x[2]["weight"] / degree[n],
+                graph.out_edges(n, data=True) if out else graph.in_edges(n, data=True),
             ),
             dtype=float,
             count=len(graph[n]),
         )
         # 0 * log(0) = 0 in information theory
-        entropic_degree[n] = (1 - np.sum(p * np.nan_to_num(np.log(p)))) * out_degree[n]
+        entropic_degree[n] = (1 - np.sum(p * np.nan_to_num(np.log(p)))) * degree[n]
     return entropic_degree
 
 
