@@ -49,8 +49,7 @@ class Postprocessing:
             as the normalisation factor, and `weak` the mean of actual and ideal flow.
         stability_index_file (str, optional): Path to file containing stability metric
             for each country. The format is a two columns .csv file with columns: [country, index].
-            The default points to a 2016 PRS Group stability index file normalised
-            to value range [0, 1] (subject to change in the future).
+            By default it leads to a World Bank data based index we provide in the repository.
         gamma (float, optional): distance scaling factor in node stability computation.
             Node stability depends on the distances to other nodes.
             This distance factor is d(n,m)^(-gamma), where d(n, m) is the distance between
@@ -70,7 +69,7 @@ class Postprocessing:
         scenarios: list[PyTradeShifts],
         anchor_countries: list[str] = [],
         normalisation="weak",
-        stability_index_file="data/stability_index/government_PRS_stability_index_2016_normalised.csv",
+        stability_index_file="data/stability_index/worldbank_governence_indicator_2022_normalised.csv",
         gamma=1.0,
         random_attack_sample_size=100,
         testing=False,

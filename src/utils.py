@@ -472,7 +472,7 @@ def get_graph_efficiency(graph: nx.Graph, normalisation: str | None = "weak") ->
 
 
 def get_stability_index(
-    index_file="data/stability_index/government_PRS_stability_index_2016_normalised.csv",
+    index_file="data/stability_index/worldbank_governence_indicator_2022_normalised.csv",
 ) -> dict[str, float]:
     """
     Reads the government stability index from the specified file.
@@ -480,7 +480,7 @@ def get_stability_index(
 
     Arguments:
         index_file (str, optional): Path to the file. By default it leads to
-            a PRS Group index from 2016, normalised to range [0, 1].
+            a World Bank data based index we provide in the repository.
 
     Returns:
         dict: The mapping of country -> index
