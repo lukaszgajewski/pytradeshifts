@@ -290,7 +290,7 @@ def plot_node_metric_map(
     ax.set_title(
         f"{metric_name} for {scenario.crop} with base year {scenario.base_year[1:]}"
         + (
-            f" in scenario: {scenario.scenario_name}"
+            f"\nin scenario: {scenario.scenario_name}"
             if scenario.scenario_name is not None
             else " (no scenario)"
         )

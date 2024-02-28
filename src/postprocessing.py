@@ -265,7 +265,8 @@ class Postprocessing:
         Plots the distance metrics as a bar plot.
 
         Arguments:
-            frobenius (str | None, optional): Flag controlling the behaviour of graph difference metrics.
+            frobenius (str | None, optional): Flag controlling the behaviour of
+                                                graph difference metrics.
                 If frobenius == "relative" *all* metrics are normalised relative
                 to the highest found value in each category; if "ignore" then
                 frobenius will not be included in the the plot; if None, nothing
@@ -568,7 +569,7 @@ class Postprocessing:
                 )
                 if new_community is None:
                     print(
-                        f"Warning: {country} does not belong to any community in scenario {scenario_idx}."
+                        f"Warning: {country} has no community in scenario {scenario_idx}."
                     )
                     continue
                 else:
@@ -587,7 +588,7 @@ class Postprocessing:
                 )
                 if original_community is None:
                     print(
-                        f"Warning: {country} does not belong to any community in base scenario. Skipping."
+                        f"Warning: {country} has no community in base scenario. Skipping."
                     )
                     continue
                 else:

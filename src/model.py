@@ -136,7 +136,7 @@ class PyTradeShifts:
             preprocessing_main(
                 "All_Data" if self.region == "Global" else self.region,
                 self.crop,
-                year="Y" + str(self.base_year),
+                year=self.base_year,
             )
         # Read in the data
         self.load_data()
