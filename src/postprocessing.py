@@ -796,7 +796,7 @@ class Postprocessing:
 
     def _compute_efficiency(self) -> None:
         """
-        Compute graph efficiency score for each scenario, based on:
+        Computes graph efficiency score for each scenario, based on:
         https://www.nature.com/articles/s42005-021-00612-5.
 
         Arguments:

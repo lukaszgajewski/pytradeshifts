@@ -1,5 +1,4 @@
 from typing import Iterable, Any
-from geopy import distance
 import numpy as np
 import geopandas as gpd
 import pandas as pd
@@ -159,7 +158,15 @@ def jaccard_index(iterable_A: Iterable, iterable_B: Iterable) -> float:
 
 def get_degree_centrality(graph: nx.DiGraph, out=False) -> dict:
     """
-    TODO
+    Provides degree centrality for a directed, weighted graph.
+    Assumes the weight attribute to be `weight`.
+
+    Arguments:
+        graph (nx.DiGraph): Graph on which the degrees are computed.
+        out (bool, optional): Whether to compute out- or in-degree.
+
+    Returns:
+        dict: The mapping of node -> degree centrality.
     """
     if out:
         degrees = list(graph.out_degree(weight="weight"))
@@ -364,8 +371,19 @@ def get_dict_min_max(iterable: dict) -> tuple[Any, Any, Any, Any]:
 
 def get_graph_efficiency(graph: nx.Graph, normalisation: str | None = "weak") -> float:
     """
-    TODO, https://www.nature.com/articles/s42005-021-00612-5
-    also a bit slow
+    Computes graph efficiency score for the specified graph, based on:
+    https://www.nature.com/articles/s42005-021-00612-5.
+
+    Arguments:
+        graph (nx.Graph): The graph for which to compute the efficiency metric.
+        normalisation (str | None, opional): Whether to normalise (and if so how)
+            the efficiency score. If `None` no normalisation occurs, if `strong`
+            the score is divided by the efficiency of an ideal flow graph, if
+            `weak` the division is by the score for the average of the graph
+            and the ideal graph.
+
+    Returns:
+        float: The efficiency score.
     """
     all_pairs_paths = dict(
         nx.all_pairs_dijkstra(
@@ -411,7 +429,15 @@ def get_stability_index(
     index_file="data/government_PRS_stability_index_2016_normalised.csv",
 ) -> dict[str, float]:
     """
-    TODO
+    Reads the government stability index from the specified file.
+    The format is assumed to be a .csv file with columns: [country, index].
+
+    Arguments:
+        index_file (str, optional): Path to the file. By default it leads to
+            a PRS Group index from 2016, normalised to range [0, 1].
+
+    Returns:
+        dict: The mapping of country -> index
     """
     stability_index = pd.read_csv(index_file, index_col=0)
     stability_index.index = coco.convert(stability_index.index, to="name_short")
@@ -420,9 +446,21 @@ def get_stability_index(
 
 def get_distance_matrix(index: pd.Index, columns: pd.Index) -> pd.DataFrame | None:
     """
-    TODO, refactor this from model too
+    Computes the distance matrix amongst the centroids of all country pairs
+    specified by index and columns of a trade matrix.
+
+    Arguments:
+        index (pd.Index): The index of a trade matrix.
+        columns (pd.Index): The columns of a trade matrix.
+
+    Returns:
+        pd.DataFrame | None: The resulting distance matrix or None if unsuccessful.
     """
+    # get central point for each region
     centroids = prepare_centroids(index)
+    # compute the distance matrix using a geodesic
+    # on an ellipsoidal model of the Earth
+    # https://doi.org/10.1007%2Fs00190-012-0578-z
     try:
         distance_matrix = pd.DataFrame(
             squareform(
@@ -446,7 +484,17 @@ def get_percolation_eigenvalue(
     adjacency_matrix: np.ndarray, attack_vector: np.ndarray
 ) -> float:
     """
-    TODO
+    Computes the largest eigenvalue of a matrix defined as A_ij*(1-p_i),
+    where A is the adjacency matrix of a graph, and p is an attack vector.
+    This is described in detail here:
+    https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.100.058701.
+
+    Arguments:
+        adjacency_matrix (np.ndarray): The adjacency matrix A.
+        attack_vector (np.ndarray): The attack vector p.
+
+    Returns:
+        float: The largest eigenvalue of A_ij*(1-p_i).
     """
     return np.real(
         np.linalg.eigvals((adjacency_matrix.T * (1 - attack_vector)).T).max()
@@ -457,8 +505,22 @@ def get_percolation_threshold(
     adjacency_matrix: np.ndarray, node_importance_list: list
 ) -> tuple[int, list[int], list[float]]:
     """
-    TODO
-    https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.100.058701
+    Computes percolation threshold (or the network collapse threshold) using
+    the theory developed in:
+    https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.100.058701.
+    The idea is that we represent the attack strategy by a vector `p`,
+    then given an adjacency matrix A, the largest eigenvalue of the matrix A(1-p)
+    is 1 at the critical percolation point. When this eigenvalue is than 1
+    the network disintegrates.
+
+    Arguments:
+        adjacency_matrix (np.ndarray): The adjacency matrix A.
+        node_importance_list (list): A list of values providing priority to nodes
+            to be removed in the order of highest to lowest priority.
+
+    Returns:
+        tuple: The threshold value (number of nodes needed to collapse the graph),
+            list of consecutive node removals, corresponding eigenvalues list.
     """
     eigenvalues = []
     removed_nodes_count = []
