@@ -199,6 +199,9 @@ def get_entropic_degree(graph: nx.DiGraph, out=True) -> dict:
         degree = graph.in_degree(weight="weight")
     entropic_degree = {}
     for n in graph:
+        if degree[n] == 0:
+            entropic_degree[n] = 0
+            continue
         # p_ij is the normalised edge weight between the nodes i,j
         # by the sum of edge weights at node j
         # here we only consider outward pointing edges
@@ -469,7 +472,7 @@ def get_graph_efficiency(graph: nx.Graph, normalisation: str | None = "weak") ->
 
 
 def get_stability_index(
-    index_file="data/government_PRS_stability_index_2016_normalised.csv",
+    index_file="data/stability_index/government_PRS_stability_index_2016_normalised.csv",
 ) -> dict[str, float]:
     """
     Reads the government stability index from the specified file.

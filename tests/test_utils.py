@@ -1,6 +1,9 @@
+from numpy.random import sample
 import src.utils as utils
 import numpy as np
 import networkx as nx
+import pytest
+import pandas as pd
 
 
 def test_all_equal() -> None:
@@ -62,5 +65,84 @@ def test_graph_efficiency() -> None:
     assert wrong == weak
 
 
-if __name__ == "__main__":
-    test_graph_efficiency()
+@pytest.fixture
+def sample_graph() -> nx.Graph:
+    G = nx.DiGraph()
+    G.add_edge(0, 1, weight=3)
+    G.add_edge(1, 2, weight=1)
+    G.add_edge(0, 3, weight=2)
+    return G
+
+
+def test_degree_centrality(sample_graph) -> None:
+    outs = utils.get_degree_centrality(sample_graph, out=True)
+    ins = utils.get_degree_centrality(sample_graph, out=False)
+    assert np.isclose(outs[0], 5 / 6)
+    assert np.isclose(outs[1], 1 / 6)
+    assert np.isclose(ins[1], 3 / 6)
+    assert np.isclose(ins[2], 1 / 6)
+    assert np.isclose(ins[3], 2 / 6)
+
+
+def test_entropic_degree(sample_graph) -> None:
+    outs = utils.get_entropic_degree(sample_graph, out=True)
+    ins = utils.get_entropic_degree(sample_graph, out=False)
+    assert outs[1] == 1
+    assert ins[1] == 3
+
+
+def test_dict_min_max() -> None:
+    d = {0: 1, 1: 2, 3: 4}
+    mink, minv, maxk, maxv = utils.get_dict_min_max(d)
+    assert mink == 0
+    assert maxk == 3
+    assert minv == 1
+    assert maxv == 4
+
+
+def test_stability_index() -> None:
+    r = utils.get_stability_index()
+    assert isinstance(r, dict)
+
+
+def test_distance_matrix() -> None:
+    d = utils.get_distance_matrix(
+        pd.Index(["China", "Ukraine", "Australia"]),
+        pd.Index(["China", "Ukraine", "Australia"]),
+    )
+    assert d.values.shape == (3, 3)
+    # all non diagonal elements should be non-zero
+    assert np.all(d.values[~np.eye(3, dtype=bool)] != 0)
+    d = utils.get_distance_matrix(
+        pd.Index(["Narnia", "Ukraine", "Australia"]),
+        pd.Index(["Narnia", "Ukraine", "Australia"]),
+    )
+    assert d is None
+
+
+@pytest.fixture
+def percolated_sample_graph(sample_graph) -> nx.Graph:
+    sample_graph.add_edge(2, 3)
+    sample_graph.add_edge(3, 0)
+    return sample_graph
+
+
+def test_percolation_eigenvalue(percolated_sample_graph) -> None:
+    eigv = utils.get_percolation_eigenvalue(
+        nx.to_numpy_array(percolated_sample_graph), np.array([1, 0, 0, 0])
+    )
+    assert eigv == 0
+    eigv = utils.get_percolation_eigenvalue(
+        nx.to_numpy_array(percolated_sample_graph), np.array([0, 0, 0, 0])
+    )
+    assert eigv > 1
+
+
+def test_percolation_threshold(percolated_sample_graph) -> None:
+    t, rn, eigs = utils.get_percolation_threshold(
+        nx.to_numpy_array(percolated_sample_graph),
+        list(range(len(percolated_sample_graph))),
+    )
+    assert t == 1
+    assert rn == [1, 2, 3, 4]
+    assert not all(eigs)
