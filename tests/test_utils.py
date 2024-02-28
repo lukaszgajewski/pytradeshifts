@@ -8,8 +8,8 @@ import pandas as pd
 
 def test_all_equal() -> None:
     random_numbers, all_ones = np.random.random(20), np.ones(20)
-    assert utils.all_equal(random_numbers) == False
-    assert utils.all_equal(all_ones) == True
+    assert utils.all_equal(random_numbers) is False
+    assert utils.all_equal(all_ones) is True
 
 
 def test_jaccard_index() -> None:
@@ -110,6 +110,7 @@ def test_distance_matrix() -> None:
         pd.Index(["China", "Ukraine", "Australia"]),
         pd.Index(["China", "Ukraine", "Australia"]),
     )
+    assert d is not None
     assert d.values.shape == (3, 3)
     # all non diagonal elements should be non-zero
     assert np.all(d.values[~np.eye(3, dtype=bool)] != 0)
