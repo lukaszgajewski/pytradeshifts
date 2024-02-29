@@ -24,6 +24,8 @@ from functools import reduce
 import seaborn as sb
 from scipy import stats
 import os
+from pathlib import Path
+from datetime import datetime, UTC
 
 
 plt.style.use(
@@ -255,15 +257,19 @@ class Postprocessing:
             tablefmt (str, optional): table format as expected by the tabulate package.
             file (str | None, optional): The file to which we print the result.
                 If `None`, prints to standard output.
-            **kwargs: any other keyworded arguments recognised by the tabulate package.
+            **kwargs: any other keyworded arguments recognised by the tabulate package
+                or pandas' `to_html` method if file is specified.
 
         Returns:
             None
         """
         df = self.distance_df.copy()
         df.set_index("Scenario ID", drop=True, inplace=True)
-        print("***| Graph distance to the base scenario |***")
-        print(df.to_markdown(tablefmt=tablefmt, **kwargs), file=file)
+        if file:
+            df.to_html(buf=file, **kwargs)
+        else:
+            print("***| Graph distance to the base scenario |***")
+            print(df.to_markdown(tablefmt=tablefmt, **kwargs))
 
     def plot_distance_metrics(
         self,
@@ -377,7 +383,8 @@ class Postprocessing:
             tablefmt (str, optional): table format as expected by the tabulate package.
             file (str | None, optional): The file to which we print the result.
                 If `None`, prints to standard output.
-            **kwargs: any other keyworded arguments recognised by the tabulate package.
+            **kwargs: any other keyworded arguments recognised by the tabulate package
+                or pandas' `to_html` method if file is specified.
 
         Returns:
             None
@@ -396,8 +403,12 @@ class Postprocessing:
                 "Largest\nout-degree\nvalue",
             ],
         )
-        print("***| Degree centrality metrics for each scenario |***")
-        print(df.to_markdown(tablefmt=tablefmt, **kwargs), file=file)
+        df = df.set_index("Scenario\nID", drop=True)
+        if file:
+            df.to_html(buf=file, **kwargs)
+        else:
+            print("***| Degree centrality metrics for each scenario |***")
+            print(df.to_markdown(tablefmt=tablefmt, **kwargs))
 
     def _compute_community_centrality_metrics(self) -> None:
         """
@@ -437,7 +448,8 @@ class Postprocessing:
             tablefmt (str, optional): table format as expected by the tabulate package.
             file (str | None, optional): The file to which we print the result.
                 If `None`, prints to standard output.
-            **kwargs: any other keyworded arguments recognised by the tabulate package.
+            **kwargs: any other keyworded arguments recognised by the tabulate package
+                or pandas' `to_html` method if file is specified.
 
         Returns:
             None
@@ -459,10 +471,14 @@ class Postprocessing:
                     "Largest\nout-degree\nvalue",
                 ],
             )
-            print(
-                f"***| Degree centrality metrics for the scenario with ID: {scenario_id} |***"
-            )
-            print(df.to_markdown(tablefmt=tablefmt, **kwargs), file=file)
+            df = df.set_index("Community\nID", drop=True)
+            if file:
+                df.to_html(buf=file, **kwargs)
+            else:
+                print(
+                    f"***| Degree centrality metrics for the scenario with ID: {scenario_id} |***"
+                )
+                print(df.to_markdown(tablefmt=tablefmt, **kwargs))
 
     def plot_centrality_maps(
         self,
@@ -1411,29 +1427,30 @@ class Postprocessing:
             tablefmt (str, optional): table format as expected by the tabulate package.
             file (str | None, optional): The file to which we print the result.
                 If `None`, prints to standard output.
-            **kwargs: any other keyworded arguments recognised by the tabulate package.
+            **kwargs: any other keyworded arguments recognised by the tabulate package
+                or pandas' `to_html` method if file is specified.
 
         Returns:
             None
         """
         metrics = [
             *[
-                (idx, "efficiency", efficiency)
+                (idx, "Efficiency", efficiency)
                 for idx, efficiency in enumerate(self.efficiency)
             ],
             *[
-                (idx, "clustering", clustering)
+                (idx, "Clustering", clustering)
                 for idx, clustering in enumerate(self.clustering)
             ],
             *[
-                (idx, "betweenness", betweenness)
+                (idx, "Betweenness", betweenness)
                 for idx, betweenness in enumerate(self.betweenness)
             ],
         ]
         if self.network_stability is not None:
             metrics.extend(
                 [
-                    (idx, "stability", stability)
+                    (idx, "Stability", stability)
                     for idx, stability in enumerate(self.network_stability)
                 ],
             )
@@ -1441,7 +1458,7 @@ class Postprocessing:
             [
                 (
                     idx,
-                    f"{attack}-attack\nthreshold",
+                    f"{attack.title()}-attack\nthreshold",
                     threshold if attack != "random" else f"{threshold:.2g} +/- {_:.2g}",
                 )
                 for idx, scenario in enumerate(self.percolation)
@@ -1452,11 +1469,31 @@ class Postprocessing:
         if wide:
             metrics = metrics.pivot(
                 index="Scenario ID", columns="Metric", values="Value"
-            )
-        print(metrics.to_markdown(tablefmt=tablefmt, **kwargs), file=file)
+            ).rename_axis(None, axis=1)
+        if file:
+            metrics.to_html(buf=file, **kwargs)
+        else:
+            print(metrics.to_markdown(tablefmt=tablefmt, **kwargs))
 
-    def report(self) -> None:
+    def report(self, path=f"results{os.sep}reports", utc=True) -> None:
         """
         TODO
         """
-        raise NotImplementedError
+        time_now = datetime.now(UTC) if utc else datetime.now()
+        time_now = time_now.strftime("%Y-%m-%d_%H:%M:%S")
+        utc_label = "UTC" if utc else ""
+        report_folder = f"{path}{os.sep}report_{time_now}"
+        Path(report_folder).mkdir(parents=True, exist_ok=True)
+        report_file_path = f"{report_folder}{os.sep}index.html"
+        with open(report_file_path, "w") as report_file:
+            report_file.write("""<!DOCTYPE html> <html> <body> """)
+            report_file.write("<p><center>")
+            report_file.write(f"<h1> PyTradeShifts Report {time_now.replace("_", " ")} {utc_label} </h1> </br>")
+            self.print_distance_metrics(file=report_file, justify="center")
+            self.print_global_centrality_metrics(file=report_file, justify="center")
+            self.print_per_community_centrality_metrics(
+                file=report_file, justify="center"
+            )
+            self.print_network_metrics(file=report_file, justify="center")
+            report_file.write("</center></p>")
+            report_file.write("""</body> </html>  """)
