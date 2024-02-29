@@ -36,22 +36,12 @@ class TestPostprocessing:
             cd_kwargs={"seed": 2},
             make_plot=False,
         )
-        ISIMIP2 = PyTradeShifts(
-            crop="Wheat",
-            base_year=2018,
-            scenario_file_name="ISIMIP_climate/ISIMIP_wheat_Hedlung.csv",
-            scenario_name="ISIMIP",
-            # countries_to_remove=nan_indices,
-            cd_kwargs={"seed": 2},
-            make_plot=False,
-        )
         return Postprocessing(
             [
                 Wheat2018,
-                Wheat2018,
                 ISIMIP,
-                ISIMIP2,
             ],
+            random_attack_sample_size=2,
         )
 
     def test_frobenius(self, postprocessing_object) -> None:
@@ -127,6 +117,70 @@ class TestPostprocessing:
                 len(m) == 9
                 for c in postprocessing_object.community_centrality_metrics
                 for m in c
+            ]
+        )
+
+    def test_compute_satisfaction(self, postprocessing_object) -> None:
+        assert postprocessing_object.community_satisfaction is not None
+        assert postprocessing_object.community_satisfaction_difference is not None
+        assert len(postprocessing_object.community_satisfaction) == len(
+            postprocessing_object.scenarios
+        )
+        assert (
+            len(postprocessing_object.community_satisfaction_difference)
+            == len(postprocessing_object.scenarios) - 1
+        )
+        assert all(
+            [
+                isinstance(v, float) or isinstance(v, int)
+                for d in postprocessing_object.community_satisfaction
+                for v in d.values()
+            ],
+        )
+        assert all(
+            [
+                isinstance(v, float) or isinstance(v, int)
+                for d in postprocessing_object.community_satisfaction_difference
+                for v in d.values()
+            ],
+        )
+
+    def test_network_metrics(self, postprocessing_object) -> None:
+        metrics = [
+            *[
+                (idx, "efficiency", efficiency)
+                for idx, efficiency in enumerate(postprocessing_object.efficiency)
+            ],
+            *[
+                (idx, "clustering", clustering)
+                for idx, clustering in enumerate(postprocessing_object.clustering)
+            ],
+            *[
+                (idx, "betweenness", betweenness)
+                for idx, betweenness in enumerate(postprocessing_object.betweenness)
+            ],
+            *[
+                (idx, "stability", stability)
+                for idx, stability in enumerate(postprocessing_object.network_stability)
+            ],
+        ]
+        metrics.extend(
+            [
+                (
+                    idx,
+                    attack,
+                    threshold,
+                )
+                for idx, scenario in enumerate(postprocessing_object.percolation)
+                for attack, (threshold, _, _) in scenario.items()
+            ]
+        )
+        assert all([isinstance(idx, int) for (idx, _, _) in metrics])
+        assert all([isinstance(metric_name, str) for (_, metric_name, _) in metrics])
+        assert all(
+            [
+                isinstance(metric_value, float) or isinstance(metric_value, int)
+                for (_, _, metric_value) in metrics
             ]
         )
 
