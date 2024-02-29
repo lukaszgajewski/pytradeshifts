@@ -1238,7 +1238,6 @@ class Postprocessing:
                     x="removed_nodes",
                     y="eigenvalue",
                     errorbar=("se", sigma),
-                    # noqa: E226
                     label=f"{idx}, random, {threshold:.2g} +/- {sigma*threshold_sem:.2g}",
                     ax=ax,
                 )
