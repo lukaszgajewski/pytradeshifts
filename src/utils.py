@@ -5,8 +5,10 @@ import pandas as pd
 import country_converter as coco
 import os
 from itertools import groupby
-from networkx import to_pandas_adjacency as nx_to_pandas_adjacency, Graph as nx_Graph
+import networkx as nx
 from matplotlib.axes import Axes
+from geopy.distance import geodesic
+from scipy.spatial.distance import squareform, pdist
 
 
 def plot_winkel_tripel_map(ax):
@@ -154,6 +156,68 @@ def jaccard_index(iterable_A: Iterable, iterable_B: Iterable) -> float:
     return len(A.intersection(B)) / len(A.union(B))
 
 
+def get_degree_centrality(graph: nx.DiGraph, out=False) -> dict:
+    """
+    Provides degree centrality for a directed, weighted graph.
+    Assumes the weight attribute to be `weight`.
+
+    Arguments:
+        graph (nx.DiGraph): Graph on which the degrees are computed.
+        out (bool, optional): Whether to compute out- or in-degree.
+
+    Returns:
+        dict: The mapping of node -> degree centrality.
+    """
+    if out:
+        degrees = list(graph.out_degree(weight="weight"))
+    else:
+        degrees = list(graph.in_degree(weight="weight"))
+    total_degrees = sum(map(lambda t: t[1], degrees))
+    return dict(map(lambda t: (t[0], t[1] / total_degrees), degrees))
+
+
+def get_entropic_degree(graph: nx.DiGraph, out=True) -> dict:
+    """
+    Compute the entropic in-/out-degree for each node in a directed, weighted graph.
+    This is a generalisation of the concept introduced here:
+    Bompard, E., Napoli, R., & Xue, F. (2009).
+    Analysis of structural vulnerabilities in power transmission grids.
+    International Journal of Critical Infrastructure Protection, 2(1-2), 5-12.
+    https://www.sciencedirect.com/science/article/abs/pii/S1874548209000031.
+    This metric uses the idea of entropy to calculate an importance of a node.
+
+    Arguments:
+        graph (nx.DiGraph): The directed, weighted graph whose nodes are to be evaluated.
+        out (bool, optional): whether to compute the out- or in-degree. Default is out-degree.
+
+    Returns:
+        dict: The mapping of node -> entropic degree.
+    """
+    if out:
+        degree = graph.out_degree(weight="weight")
+    else:
+        degree = graph.in_degree(weight="weight")
+    entropic_degree = {}
+    for n in graph:
+        if degree[n] == 0:
+            entropic_degree[n] = 0
+            continue
+        # p_ij is the normalised edge weight between the nodes i,j
+        # by the sum of edge weights at node j
+        # here we only consider outward pointing edges
+        p = np.fromiter(
+            map(
+                lambda x: x[2]["weight"] / degree[n],
+                graph.out_edges(n, data=True) if out else graph.in_edges(n, data=True),
+            ),
+            dtype=float,
+            count=len(graph[n]),
+        )
+        # 0 * log(0) = 0 in information theory
+        entropic_degree[n] = (1 - np.sum(p * np.nan_to_num(np.log(p)))) * degree[n]
+    return entropic_degree
+
+
 def prepare_world() -> gpd.GeoDataFrame:
     """
     Prepares the geospatial Natural Earth (NE) data (to be presumebly used in plotting).
@@ -184,66 +248,17 @@ def prepare_world() -> gpd.GeoDataFrame:
     return world
 
 
-def plot_degree_map(
-    ax: Axes, scenario, degree: dict, label: str, shrink=0.15, **kwargs
+def plot_node_metric_map(
+    ax: Axes, scenario, metric: dict, metric_name: str, shrink=1.0, **kwargs
 ) -> None:
     """
-    Plots world map with each country coloured by their degree in the trade graph.
-
-    Arguments:
-        ax (Axes): axis to which the plot is to be committed.
-        scenario (PyTradeShifts): PyTradeShifts instance
-        degree (dict): dictionary containing the mapping: country->value
-        label (str): label to be put on the colour bar and the title (e.g., 'in-degree')
-        shrink (float, optional): colour bar shrink parameter
-        **kwargs (optional): any additional keyworded arguments recognised
-            by geopandas' plot function.
-
-    Returns:
-        None
-    """
-    assert scenario.trade_communities is not None
-    world = prepare_world()
-
-    # Join the country_community dictionary to the world dataframe
-    world["degree"] = world["names_short"].map(degree)
-
-    world.plot(
-        ax=ax,
-        column="degree",
-        missing_kwds={"color": "lightgrey"},
-        legend=True,
-        legend_kwds={"label": label, "shrink": shrink},
-        **kwargs,
-    )
-
-    plot_winkel_tripel_map(ax)
-
-    # Add a title with self.scenario_name if applicable
-    ax.set_title(
-        f"{label} for {scenario.crop} with base year {scenario.base_year[1:]}"
-        + (
-            f" in scenario: {scenario.scenario_name}"
-            if scenario.scenario_name is not None
-            else " (no scenario)"
-        )
-    )
-
-
-def plot_jaccard_map(
-    ax: Axes, scenario, jaccard: dict, similarity=False, shrink=1.0, **kwargs
-) -> None:
-    """
-    Plots world map with countries coloured by their community's Jaccard similarity
-    to their original community (in the specified scenario).
+    Plots world map with countries coloured by the specified metric.
 
     Arguments:
         ax (Axes): axis on which to plot.
         scenario (PyTradeShifts): a PyTradeShifts instance.
-        jaccard (dict): dictionary containing the mapping: country->value
-        similarity (bool, optional): whether to plot Jaccard index or distance.
-            If True similarity (index) will be used, if False, distance = (1-index).
-            Defualt is False.
+        metric (dict): dictionary containing the mapping: country->value
+        metric_name (str): the name of the metric
         shrink (float, optional): colour bar shrink parameter
         **kwargs (optional): any additional keyworded arguments recognised
             by geopandas plot function.
@@ -255,16 +270,15 @@ def plot_jaccard_map(
     world = prepare_world()
 
     # Join the country_community dictionary to the world dataframe
-    world["jaccard_index"] = world["names_short"].map(jaccard)
-    world["jaccard_distance"] = 1 - world["jaccard_index"]
+    world[metric_name] = world["names_short"].map(metric)
 
     world.plot(
         ax=ax,
-        column="jaccard_distance" if not similarity else "jaccard_index",
+        column=metric_name,
         missing_kwds={"color": "lightgrey"},
         legend=True,
         legend_kwds={
-            "label": "Jaccard distance" if not similarity else "Jaccard index",
+            "label": metric_name,
             "shrink": shrink,
         },
         **kwargs,
@@ -273,10 +287,8 @@ def plot_jaccard_map(
     plot_winkel_tripel_map(ax)
 
     # Add a title with self.scenario_name if applicable
-    value_plotted_label = "Similarity to" if similarity else "Dissimilarity to"
     ax.set_title(
-        f"{value_plotted_label} base scenario for {scenario.crop} with base year "
-        f"{scenario.base_year[1:]}"
+        f"{metric_name} for {scenario.crop} with base year {scenario.base_year[1:]}"
         + (
             f"\nin scenario: {scenario.scenario_name}"
             if scenario.scenario_name is not None
@@ -285,7 +297,7 @@ def plot_jaccard_map(
     )
 
 
-def get_right_stochastic_matrix(trade_graph: nx_Graph) -> np.ndarray:
+def get_right_stochastic_matrix(trade_graph: nx.Graph) -> np.ndarray:
     """
     Convert graph's adjacency matrix to a right stochastic matrix (RSM).
     https://en.wikipedia.org/wiki/Stochastic_matrix
@@ -297,7 +309,7 @@ def get_right_stochastic_matrix(trade_graph: nx_Graph) -> np.ndarray:
         numpy.ndarray: an array representing the RSM.
     """
     # extract the adjaceny matrix from the graph
-    right_stochastic_matrix = nx_to_pandas_adjacency(trade_graph)
+    right_stochastic_matrix = nx.to_pandas_adjacency(trade_graph)
     # normalise the matrix such that each row sums up to 1
     right_stochastic_matrix = right_stochastic_matrix.div(
         right_stochastic_matrix.sum(axis=1), axis=0
@@ -358,21 +370,22 @@ def _compute_entropy_rate(
     return entropy_rate
 
 
-def get_entropy_rate(scenario) -> float:
+def get_entropy_rate(graph: nx.Graph) -> float:
     """
-    Compute entropy rate for a given scenario.
+    Compute entropy rate for a given graph.
     https://en.wikipedia.org/wiki/Entropy_rate
     This is under the assumption that we are interested in a Markov random
     walk on the trade graph.
 
     Arguments:
-        scenario (PyTradeShifts): a PyTradeShifts object instance.
+        graph (nx.Graph): The networkx graph object, presumably a trade graph
+            from a PyTradeShifts instance.
 
     Returns:
         float: the entropy rate of a random walker on the scnearios' trade graph.
     """
     # get the right stochastic matrix and the stationary probabiltiy vector
-    stochastic_matrix = get_right_stochastic_matrix(scenario.trade_graph)
+    stochastic_matrix = get_right_stochastic_matrix(graph)
     probability_vector = get_stationary_probability_vector(stochastic_matrix)
     entropy_rate = _compute_entropy_rate(stochastic_matrix, probability_vector)
     if np.real(entropy_rate) != np.real_if_close(entropy_rate):
@@ -397,3 +410,184 @@ def get_dict_min_max(iterable: dict) -> tuple[Any, Any, Any, Any]:
     max_key = max(iterable, key=iterable.get)
     min_key = min(iterable, key=iterable.get)
     return min_key, iterable[min_key], max_key, iterable[max_key]
+
+
+def get_graph_efficiency(graph: nx.Graph, normalisation: str | None = "weak") -> float:
+    """
+    Computes graph efficiency score for the specified graph, based on:
+    Bertagnolli, G., Gallotti, R., & De Domenico, M. (2021).
+    Quantifying efficient information exchange in real network flows.
+    Communications Physics, 4(1), 125.
+    https://www.nature.com/articles/s42005-021-00612-5.
+
+    Arguments:
+        graph (nx.Graph): The graph for which to compute the efficiency metric.
+        normalisation (str | None, opional): Whether to normalise (and if so how)
+            the efficiency score. If `None` no normalisation occurs, if `strong`
+            the score is divided by the efficiency of an ideal flow graph, if
+            `weak` the division is by the score for the average of the graph
+            and the ideal graph.
+
+    Returns:
+        float: The efficiency score.
+    """
+    all_pairs_paths = dict(
+        nx.all_pairs_dijkstra(
+            graph,
+            weight=lambda _, __, attr: (
+                attr["weight"] ** -1 if attr["weight"] != 0 else np.inf
+            ),
+        )
+    )
+    cost_matrix = pd.DataFrame(
+        0.0,
+        index=graph.nodes(),
+        columns=graph.nodes(),
+    )
+    flow_matrix = pd.DataFrame(
+        0.0,
+        index=graph.nodes(),
+        columns=graph.nodes(),
+    )
+    for source, (distances, paths) in all_pairs_paths.items():
+        for target, cost in distances.items():
+            cost_matrix.loc[source, target] = cost
+        for target, path in paths.items():
+            flow_matrix.loc[source, target] = nx.path_weight(
+                graph, path, weight="weight"
+            )
+    E = np.sum(1 / cost_matrix.values[cost_matrix != 0])
+    match normalisation:
+        case "weak":
+            ideal_matrix = (flow_matrix + nx.to_pandas_adjacency(graph)) / 2
+        case "strong":
+            ideal_matrix = flow_matrix
+        case None:
+            return E
+        case _:
+            print("Unrecognised normalisation option, defaulting to ``weak''.")
+            ideal_matrix = (flow_matrix + nx.to_pandas_adjacency(graph)) / 2
+    E_ideal = np.sum(ideal_matrix.values)
+    return E / E_ideal
+
+
+def get_stability_index(
+    index_file="data/stability_index/worldbank_governence_indicator_2022_normalised.csv",
+) -> dict[str, float]:
+    """
+    Reads the government stability index from the specified file.
+    The format is assumed to be a .csv file with columns: [country, index].
+
+    Arguments:
+        index_file (str, optional): Path to the file. By default it leads to
+            a World Bank data based index we provide in the repository.
+
+    Returns:
+        dict: The mapping of country -> index
+    """
+    stability_index = pd.read_csv(index_file, index_col=0)
+    stability_index.index = coco.convert(stability_index.index, to="name_short")
+    return stability_index.loc[:, stability_index.columns[-1]].to_dict()
+
+
+def get_distance_matrix(index: pd.Index, columns: pd.Index) -> pd.DataFrame | None:
+    """
+    Computes the distance matrix amongst the centroids of all country pairs
+    specified by index and columns of a trade matrix.
+
+    Arguments:
+        index (pd.Index): The index of a trade matrix.
+        columns (pd.Index): The columns of a trade matrix.
+
+    Returns:
+        pd.DataFrame | None: The resulting distance matrix or None if unsuccessful.
+    """
+    # get central point for each region
+    centroids = prepare_centroids(index)
+    # compute the distance matrix using a geodesic
+    # on an ellipsoidal model of the Earth
+    # https://doi.org/10.1007%2Fs00190-012-0578-z
+    try:
+        distance_matrix = pd.DataFrame(
+            squareform(
+                pdist(
+                    centroids.loc[:, ["latitude", "longitude"]],
+                    metric=lambda lat, lon: geodesic(lat, lon).km,
+                )
+            ),
+            columns=columns,
+            index=index,
+        )
+    except ValueError:
+        print("Error building the distance matrix.")
+        print("Cannot find centroids for these regions:")
+        print(index.difference(centroids["name"]))
+        return
+    return distance_matrix
+
+
+def get_percolation_eigenvalue(
+    adjacency_matrix: np.ndarray, attack_vector: np.ndarray
+) -> float:
+    """
+    Computes the largest eigenvalue of a matrix defined as A_ij*(1-p_i),
+    where A is the adjacency matrix of a graph, and p is an attack vector.
+    This is described in detail here:
+    Restrepo, J. G., Ott, E., & Hunt, B. R. (2008).
+    Weighted percolation on directed networks.
+    Physical review letters, 100(5), 058701.
+    https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.100.058701.
+
+    Arguments:
+        adjacency_matrix (np.ndarray): The adjacency matrix A.
+        attack_vector (np.ndarray): The attack vector p.
+
+    Returns:
+        float: The largest eigenvalue of A_ij*(1-p_i).
+    """
+    return np.real(
+        np.linalg.eigvals((adjacency_matrix.T * (1 - attack_vector)).T).max()
+    )
+
+
+def get_percolation_threshold(
+    adjacency_matrix: np.ndarray, node_importance_list: list
+) -> tuple[int, list[int], list[float]]:
+    """
+    Computes percolation threshold (or the network collapse threshold) using
+    the theory developed in:
+    Restrepo, J. G., Ott, E., & Hunt, B. R. (2008).
+    Weighted percolation on directed networks.
+    Physical review letters, 100(5), 058701.
+    https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.100.058701.
+    The idea is that we represent the attack strategy by a vector `p`,
+    then given an adjacency matrix A, the largest eigenvalue of the matrix A(1-p)
+    is 1 at the critical percolation point. When this eigenvalue is than 1
+    the network disintegrates.
+
+    Arguments:
+        adjacency_matrix (np.ndarray): The adjacency matrix A.
+        node_importance_list (list): A list of values providing priority to nodes
+            to be removed in the order of highest to lowest priority.
+
+    Returns:
+        tuple: The threshold value (number of nodes needed to collapse the graph),
+            list of consecutive node removals, corresponding eigenvalues list.
+    """
+    eigenvalues = []
+    removed_nodes_count = []
+    for node_importance in sorted(node_importance_list, reverse=True):
+        attack_vector = np.fromiter(
+            map(lambda x: x >= node_importance, node_importance_list),
+            dtype=float,
+            count=len(adjacency_matrix),
+        )
+        # largest eigenvalue of a matrix with elements: A_ij * (1-p_i)
+        # where A is the adj. matrix, and p is the attack vector
+        eigenvalues.append(get_percolation_eigenvalue(adjacency_matrix, attack_vector))
+        removed_nodes_count.append(int(attack_vector.sum()))
+    # eigenvalue = 1 is the percolation threshold
+    threshold = removed_nodes_count[
+        len(eigenvalues) - np.searchsorted(eigenvalues[::-1], 1, side="left")
+    ]
+    return threshold, removed_nodes_count, eigenvalues
