@@ -69,7 +69,8 @@ class Postprocessing:
         scenarios: list[PyTradeShifts],
         anchor_countries: list[str] = [],
         normalisation="weak",
-        stability_index_file="data/stability_index/worldbank_governence_indicator_2022_normalised.csv",
+        stability_index_file="data/stability_index/"
+                             "worldbank_governence_indicator_2022_normalised.csv",
         gamma=1.0,
         random_attack_sample_size=100,
         testing=False,
@@ -679,7 +680,8 @@ class Postprocessing:
         Foods, 12(2), 271.
         https://www.mdpi.com/2304-8158/12/2/271, and
         Ji, Q., Zhang, H. Y., & Fan, Y. (2014).
-        Identification of global oil trade patterns: An empirical research based on complex network theory.
+        Identification of global oil trade patterns: An empirical research based
+        on complex network theory.
         Energy Conversion and Management, 85, 856-865.
         https://www.sciencedirect.com/science/article/abs/pii/S0196890414000466.
 
@@ -868,7 +870,8 @@ class Postprocessing:
         Foods, 12(2), 271.
         https://www.mdpi.com/2304-8158/12/2/271, and
         Ji, Q., Zhang, H. Y., & Fan, Y. (2014).
-        Identification of global oil trade patterns: An empirical research based on complex network theory.
+        Identification of global oil trade patterns: An empirical research based
+        on complex network theory.
         Energy Conversion and Management, 85, 856-865.
         https://www.sciencedirect.com/science/article/abs/pii/S0196890414000466.
         Note: the values here are somewhat arbitrary as the stability index
@@ -925,7 +928,8 @@ class Postprocessing:
         Foods, 12(2), 271.
         https://www.mdpi.com/2304-8158/12/2/271, and
         Ji, Q., Zhang, H. Y., & Fan, Y. (2014).
-        Identification of global oil trade patterns: An empirical research based on complex network theory.
+        Identification of global oil trade patterns: An empirical research based
+        on complex network theory.
         Energy Conversion and Management, 85, 856-865.
         https://www.sciencedirect.com/science/article/abs/pii/S0196890414000466.
         Note: the values here are somewhat arbitrary as the stability index
@@ -964,7 +968,8 @@ class Postprocessing:
         Foods, 12(2), 271.
         https://www.mdpi.com/2304-8158/12/2/271, and
         Ji, Q., Zhang, H. Y., & Fan, Y. (2014).
-        Identification of global oil trade patterns: An empirical research based on complex network theory.
+        Identification of global oil trade patterns: An empirical research based
+        on complex network theory.
         Energy Conversion and Management, 85, 856-865.
         https://www.sciencedirect.com/science/article/abs/pii/S0196890414000466.
         Note: the values here are somewhat arbitrary as the stability index
@@ -1011,7 +1016,8 @@ class Postprocessing:
         Foods, 12(2), 271.
         https://www.mdpi.com/2304-8158/12/2/271, and
         Ji, Q., Zhang, H. Y., & Fan, Y. (2014).
-        Identification of global oil trade patterns: An empirical research based on complex network theory.
+        Identification of global oil trade patterns: An empirical research based
+        on complex network theory.
         Energy Conversion and Management, 85, 856-865.
         https://www.sciencedirect.com/science/article/abs/pii/S0196890414000466.
         Note: the values here are somewhat arbitrary as the stability index
@@ -1062,7 +1068,8 @@ class Postprocessing:
         Foods, 12(2), 271.
         https://www.mdpi.com/2304-8158/12/2/271, and
         Ji, Q., Zhang, H. Y., & Fan, Y. (2014).
-        Identification of global oil trade patterns: An empirical research based on complex network theory.
+        Identification of global oil trade patterns: An empirical research based
+        on complex network theory.
         Energy Conversion and Management, 85, 856-865.
         https://www.sciencedirect.com/science/article/abs/pii/S0196890414000466.
         Note: the values here are somewhat arbitrary as the stability index
