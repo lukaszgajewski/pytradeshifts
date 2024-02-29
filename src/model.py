@@ -54,7 +54,10 @@ class PyTradeShifts:
             with only one country or not. If False, these communities are
             removed.
         beta (float, optional): The parameter to use for the distance cost.
-            If 0, no distance cost is applied.
+            When b == 0, there is no change to trade.
+            When b > 0, the farther the two regions are the less trade between them.
+            When b < 0, the farther the two regions are the more trade between them.
+            It is recommended to keep this value low, e.g., in range [0, 2].
         make_plot (bool, optional): Whether to make the plot or not.
         shade_removed_countries (bool, optional): Whether to shade the countries
             that are removed from the trade matrix or not.
