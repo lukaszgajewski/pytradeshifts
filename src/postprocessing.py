@@ -1238,7 +1238,8 @@ class Postprocessing:
                     x="removed_nodes",
                     y="eigenvalue",
                     errorbar=("se", sigma),
-                    label=f"{idx}, random, {threshold:.2g} + / - {sigma*threshold_sem:.2g}",
+                    # noqa: E226
+                    label=f"{idx}, random, {threshold:.2g} +/- {sigma*threshold_sem:.2g}",
                     ax=ax,
                 )
         ax.set_xlabel("# of removed nodes.")
