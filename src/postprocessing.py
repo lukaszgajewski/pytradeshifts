@@ -23,6 +23,7 @@ from operator import itemgetter
 from functools import reduce
 import seaborn as sb
 from scipy import stats
+import os
 
 
 plt.style.use(
@@ -69,8 +70,7 @@ class Postprocessing:
         scenarios: list[PyTradeShifts],
         anchor_countries: list[str] = [],
         normalisation="weak",
-        stability_index_file="data/stability_index/"
-        "worldbank_governence_indicator_2022_normalised.csv",
+        stability_index_file=f"data{os.sep}stability_index{os.sep}worldbank_governence_indicator_2022_normalised.csv",
         gamma=1.0,
         random_attack_sample_size=100,
         testing=False,
@@ -735,6 +735,9 @@ class Postprocessing:
         self,
         figsize: tuple[float, float] | None = None,
         shrink=1.0,
+        file_path: str | None = None,
+        file_format="png",
+        dpi=300,
         **kwargs,
     ) -> None:
         """
@@ -742,10 +745,15 @@ class Postprocessing:
         satisfaction index.
 
         Arguments:
-            figsize (tuple[float, float] | None, optional): the composite figure
+            figsize (tuple[float, float] | None, optional): The composite figure
                 size as expected by the matplotlib subplots routine.
-            shrink (float, optional): colour bar shrink parameter
-            **kwargs (optional): any additional keyworded arguments recognised
+            shrink (float, optional): Colour bar shrink parameter.
+            file_path (str | None, optional): Path to where the image file
+                should be saved to. If `None` no file shall be produced.
+            file_format (str, optional): File extension to use when
+                saving plot to file.
+            dpi (int, optional): DPI of the saved image file.
+            **kwargs (optional): Any additional keyworded arguments recognised
                 by geopandas plot function.
 
         Returns:
@@ -763,12 +771,22 @@ class Postprocessing:
                 shrink=shrink,
                 **kwargs,
             )
-        plt.show()
+        if file_path:
+            plt.savefig(
+                f"{file_path}{os.sep}community_satisfaction.{file_format}",
+                dpi=dpi,
+                bbox_inches="tight",
+            )
+        else:
+            plt.show()
 
     def plot_community_satisfaction_difference(
         self,
         figsize: tuple[float, float] | None = None,
         shrink=1.0,
+        file_path: str | None = None,
+        file_format="png",
+        dpi=300,
         **kwargs,
     ) -> None:
         """
@@ -776,10 +794,15 @@ class Postprocessing:
         community satisfaction index from the base scenario.
 
         Arguments:
-            figsize (tuple[float, float] | None, optional): the composite figure
+            figsize (tuple[float, float] | None, optional): The composite figure
                 size as expected by the matplotlib subplots routine.
-            shrink (float, optional): colour bar shrink parameter
-            **kwargs (optional): any additional keyworded arguments recognised
+            shrink (float, optional): Colour bar shrink parameter.
+            file_path (str | None, optional): Path to where the image file
+                should be saved to. If `None` no file shall be produced.
+            file_format (str, optional): File extension to use when
+                saving plot to file.
+            dpi (int, optional): DPI of the saved image file.
+            **kwargs (optional): Any additional keyworded arguments recognised
                 by geopandas plot function.
 
         Returns:
@@ -804,7 +827,14 @@ class Postprocessing:
                 shrink=shrink,
                 **kwargs,
             )
-        plt.show()
+        if file_path:
+            plt.savefig(
+                f"{file_path}{os.sep}community_satisfaction_diff.{file_format}",
+                dpi=dpi,
+                bbox_inches="tight",
+            )
+        else:
+            plt.show()
 
     def _compute_efficiency(self) -> None:
         """
@@ -958,6 +988,9 @@ class Postprocessing:
         self,
         figsize: tuple[float, float] | None = None,
         shrink=1.0,
+        file_path: str | None = None,
+        file_format="png",
+        dpi=300,
         **kwargs,
     ) -> None:
         """
@@ -980,8 +1013,13 @@ class Postprocessing:
         Arguments:
             figsize (tuple[float, float] | None, optional): the composite figure
                 size as expected by the matplotlib subplots routine.
-            shrink (float, optional): colour bar shrink parameter
-            **kwargs (optional): any additional keyworded arguments recognised
+            shrink (float, optional): Colour bar shrink parameter.
+            file_path (str | None, optional): Path to where the image file
+                should be saved to. If `None` no file shall be produced.
+            file_format (str, optional): File extension to use when
+                saving plot to file.
+            dpi (int, optional): DPI of the saved image file.
+            **kwargs (optional): Any additional keyworded arguments recognised
                 by geopandas plot function.
 
         Returns:
@@ -999,12 +1037,22 @@ class Postprocessing:
                 shrink=shrink,
                 **kwargs,
             )
-        plt.show()
+        if file_path:
+            plt.savefig(
+                f"{file_path}{os.sep}node_stability.{file_format}",
+                dpi=dpi,
+                bbox_inches="tight",
+            )
+        else:
+            plt.show()
 
     def plot_node_stability_difference(
         self,
         figsize: tuple[float, float] | None = None,
         shrink=1.0,
+        file_path: str | None = None,
+        file_format="png",
+        dpi=300,
         **kwargs,
     ) -> None:
         """
@@ -1028,10 +1076,15 @@ class Postprocessing:
         I.e., it measures the relative change from base scenario to another scenario.
 
         Arguments:
-            figsize (tuple[float, float] | None, optional): the composite figure
+            figsize (tuple[float, float] | None, optional): The composite figure
                 size as expected by the matplotlib subplots routine.
-            shrink (float, optional): colour bar shrink parameter
-            **kwargs (optional): any additional keyworded arguments recognised
+            shrink (float, optional): Colour bar shrink parameter.
+            file_path (str | None, optional): Path to where the image file
+                should be saved to. If `None` no file shall be produced.
+            file_format (str, optional): File extension to use when
+                saving plot to file.
+            dpi (int, optional): DPI of the saved image file.
+            **kwargs (optional): Any additional keyworded arguments recognised
                 by geopandas plot function.
 
         Returns:
@@ -1056,7 +1109,14 @@ class Postprocessing:
                 shrink=shrink,
                 **kwargs,
             )
-        plt.show()
+        if file_path:
+            plt.savefig(
+                f"{file_path}{os.sep}node_stability_diff.{file_format}",
+                dpi=dpi,
+                bbox_inches="tight",
+            )
+        else:
+            plt.show()
 
     def _compute_network_stability(self) -> None:
         """
@@ -1184,6 +1244,9 @@ class Postprocessing:
         exclude_attacks=[],
         sigma=2.0,
         figsize: tuple[float, float] | None = None,
+        file_path: str | None = None,
+        file_format="png",
+        dpi=300,
     ) -> None:
         """
         Plots the attack resiliencie for each scenario and attack strategy.
@@ -1199,6 +1262,11 @@ class Postprocessing:
                 sigma=1.0 -> ~68% confidence interval, 2.0->95% CI, etc.
             figsize (tuple[float, float] | None, optional): the composite figure
                 size as expected by the matplotlib subplots routine.
+            file_path (str | None, optional): Path to where the image file
+                should be saved to. If `None` no file shall be produced.
+            file_format (str, optional): File extension to use when
+                saving plot to file.
+            dpi (int, optional): DPI of the saved image file.
 
 
         Returns:
@@ -1245,7 +1313,14 @@ class Postprocessing:
         ax.set_xlabel("# of removed nodes.")
         ax.set_ylabel("Max adj. eigenval. post node removal.")
         ax.legend()
-        plt.show()
+        if file_path:
+            plt.savefig(
+                f"{file_path}{os.sep}attack_resilience.{file_format}",
+                dpi=dpi,
+                bbox_inches="tight",
+            )
+        else:
+            plt.show()
 
     def print_network_metrics(self, wide=True, tablefmt="fancy_grid", **kwargs) -> None:
         """
