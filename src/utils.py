@@ -472,7 +472,7 @@ def get_graph_efficiency(graph: nx.Graph, normalisation: str | None = "weak") ->
 
 
 def get_stability_index(
-    index_file="data/stability_index/worldbank_governence_indicator_2022_normalised.csv",
+    index_file=f"data{os.sep}stability_index{os.sep}worldbank_governence_indicator_2022_normalised.csv",
 ) -> dict[str, float]:
     """
     Reads the government stability index from the specified file.
