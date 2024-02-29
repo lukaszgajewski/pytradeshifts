@@ -70,7 +70,7 @@ class Postprocessing:
         anchor_countries: list[str] = [],
         normalisation="weak",
         stability_index_file="data/stability_index/"
-                             "worldbank_governence_indicator_2022_normalised.csv",
+        "worldbank_governence_indicator_2022_normalised.csv",
         gamma=1.0,
         random_attack_sample_size=100,
         testing=False,
