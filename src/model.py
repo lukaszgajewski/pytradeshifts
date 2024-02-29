@@ -7,11 +7,13 @@ import country_converter as coco
 from matplotlib.colors import ListedColormap
 from matplotlib.axes import Axes
 import seaborn as sns
-from scipy.spatial.distance import squareform, pdist
-from geopy.distance import geodesic
 from math import isclose
 from src.preprocessing import main as preprocessing_main
-from src.utils import plot_winkel_tripel_map, prepare_centroids, prepare_world
+from src.utils import (
+    get_distance_matrix,
+    plot_winkel_tripel_map,
+    prepare_world,
+)
 import leidenalg as la
 import igraph as ig
 import infomap as imp
@@ -506,26 +508,10 @@ class PyTradeShifts:
         Returns:
             None
         """
-        # get central point for each region
-        centroids = prepare_centroids(self.trade_matrix.index)
-        # compute the distance matrix using a geodesic
-        # on an ellipsoidal model of the Earth
-        # https://doi.org/10.1007%2Fs00190-012-0578-z
-        try:
-            distance_matrix = pd.DataFrame(
-                squareform(
-                    pdist(
-                        centroids.loc[:, ["latitude", "longitude"]],
-                        metric=lambda lat, lon: geodesic(lat, lon).km,
-                    )
-                ),
-                columns=self.trade_matrix.columns,
-                index=self.trade_matrix.index,
-            )
-        except ValueError:
-            print("Cannot find centroids for these regions:")
-            print(self.trade_matrix.index.difference(centroids["name"]))
-            print("Consider running with preprocessing enabled.")
+        distance_matrix = get_distance_matrix(
+            self.trade_matrix.index, self.trade_matrix.columns
+        )
+        if distance_matrix is None:
             print("Distance cost shall not be applied.")
             return
         # apply the modification of the gravity law of trade

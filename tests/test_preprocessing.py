@@ -154,8 +154,3 @@ def test_format_prod_trad_data_global():
 
     assert (production_from_R == production).all(axis=None)
     assert (trade_from_R == trade).all(axis=None)
-
-
-if __name__ == "__main__":
-    test_format_prod_trad_data_global()
-    test_format_prod_trad_data_oceania()
