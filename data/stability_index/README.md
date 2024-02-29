@@ -4,7 +4,7 @@ We provide one data set:
 
 - [World Bank governence indicator, 2022](worldbank_governence_indicator_2022_normalised.csv)
 
-The World Bank's index is the mean of all "Estimate" values from the WGI full dataset Excel file (see data sources below). These values are normally in range [-2.5, 2.5], we normalise the data such 
+The World Bank's index is the mean of all "Estimate" values from the WGI full dataset Excel file (see data sources below). These values are normally in range [-2.5, 2.5], we normalise the data such that it's in range [0, 1].
 ## Data sources
 - Daniel Kaufmann and Aart Kraay (2023). Worldwide Governance Indicators, 2023 Update (www.govindicators.org), Accessed on 10/19/2023.
 https://www.worldbank.org/en/publication/worldwide-governance-indicators
