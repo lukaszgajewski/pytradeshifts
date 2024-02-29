@@ -245,12 +245,16 @@ class Postprocessing:
         )
         self.distance_df = df
 
-    def print_distance_metrics(self, tablefmt="fancy_grid", **kwargs) -> None:
+    def print_distance_metrics(
+        self, tablefmt="fancy_grid", file: str | None = None, **kwargs
+    ) -> None:
         """
         Prints the graph distance metrics in a neat tabulated form.
 
         Arguments:
             tablefmt (str, optional): table format as expected by the tabulate package.
+            file (str | None, optional): The file to which we print the result.
+                If `None`, prints to standard output.
             **kwargs: any other keyworded arguments recognised by the tabulate package.
 
         Returns:
@@ -259,20 +263,32 @@ class Postprocessing:
         df = self.distance_df.copy()
         df.set_index("Scenario ID", drop=True, inplace=True)
         print("***| Graph distance to the base scenario |***")
-        print(df.to_markdown(tablefmt=tablefmt, **kwargs))
+        print(df.to_markdown(tablefmt=tablefmt, **kwargs), file=file)
 
-    def plot_distance_metrics(self, frobenius: str | None = None, **kwargs) -> None:
+    def plot_distance_metrics(
+        self,
+        frobenius: str | None = None,
+        file_path: str | None = None,
+        file_format="png",
+        dpi=300,
+        **kwargs,
+    ) -> None:
         """
         Plots the distance metrics as a bar plot.
 
         Arguments:
             frobenius (str | None, optional): Flag controlling the behaviour of
-                                                graph difference metrics.
+                graph difference metrics.
                 If frobenius == "relative" *all* metrics are normalised relative
                 to the highest found value in each category; if "ignore" then
                 frobenius will not be included in the the plot; if None, nothing
                 special happens -- in this case the Frobenius metrics is very likely
                 to completety overshadow other values in the plot.
+            file_path (str | None, optional): Path to where the image file
+                should be saved to. If `None` no file shall be produced.
+            file_format (str, optional): File extension to use when
+                saving plot to file.
+            dpi (int, optional): DPI of the saved image file.
             **kwargs: any keyworded arguments recognised by seaborn barplot.
 
         Returns:
@@ -302,7 +318,14 @@ class Postprocessing:
         )
         plt.ylabel("Distance")
         plt.title("Graph distance to the base scenario")
-        plt.show()
+        if file_path:
+            plt.savefig(
+                f"{file_path}{os.sep}network_distance.{file_format}",
+                dpi=dpi,
+                bbox_inches="tight",
+            )
+        else:
+            plt.show()
 
     def _compute_centrality(self) -> None:
         """
@@ -344,12 +367,16 @@ class Postprocessing:
             centrality_metrics.append([idx, *in_min_max, *out_min_max])
         self.global_centrality_metrics = centrality_metrics
 
-    def print_global_centrality_metrics(self, tablefmt="fancy_grid", **kwargs) -> None:
+    def print_global_centrality_metrics(
+        self, tablefmt="fancy_grid", file: str | None = None, **kwargs
+    ) -> None:
         """
         Prints the global centrality metrics in a neat tabulated form.
 
         Arguments:
             tablefmt (str, optional): table format as expected by the tabulate package.
+            file (str | None, optional): The file to which we print the result.
+                If `None`, prints to standard output.
             **kwargs: any other keyworded arguments recognised by the tabulate package.
 
         Returns:
@@ -370,7 +397,7 @@ class Postprocessing:
             ],
         )
         print("***| Degree centrality metrics for each scenario |***")
-        print(df.to_markdown(tablefmt=tablefmt, **kwargs))
+        print(df.to_markdown(tablefmt=tablefmt, **kwargs), file=file)
 
     def _compute_community_centrality_metrics(self) -> None:
         """
@@ -401,13 +428,15 @@ class Postprocessing:
         self.community_centrality_metrics = centrality_metrics
 
     def print_per_community_centrality_metrics(
-        self, tablefmt="fancy_grid", **kwargs
+        self, tablefmt="fancy_grid", file: str | None = None, **kwargs
     ) -> None:
         """
         Prints the local centrality metrics (per community) in a neat tabulated form.
 
         Arguments:
             tablefmt (str, optional): table format as expected by the tabulate package.
+            file (str | None, optional): The file to which we print the result.
+                If `None`, prints to standard output.
             **kwargs: any other keyworded arguments recognised by the tabulate package.
 
         Returns:
@@ -433,10 +462,16 @@ class Postprocessing:
             print(
                 f"***| Degree centrality metrics for the scenario with ID: {scenario_id} |***"
             )
-            print(df.to_markdown(tablefmt=tablefmt, **kwargs))
+            print(df.to_markdown(tablefmt=tablefmt, **kwargs), file=file)
 
     def plot_centrality_maps(
-        self, figsize: tuple[float, float] | None = None, shrink=0.15, **kwargs
+        self,
+        figsize: tuple[float, float] | None = None,
+        shrink=0.15,
+        file_path: str | None = None,
+        file_format="png",
+        dpi=300,
+        **kwargs,
     ) -> None:
         """
         Plots world maps for each scenario, with each country coloured by their
@@ -446,6 +481,11 @@ class Postprocessing:
             figsize (tuple[float, float] | None, optional): the composite figure
                 size as expected by the matplotlib subplots routine.
             shrink (float, optional): colour bar shrink parameter
+            file_path (str | None, optional): Path to where the image file
+                should be saved to. If `None` no file shall be produced.
+            file_format (str, optional): File extension to use when
+                saving plot to file.
+            dpi (int, optional): DPI of the saved image file.
             **kwargs (optional): any additional keyworded arguments recognised
                 by geopandas' plot function.
 
@@ -487,7 +527,14 @@ class Postprocessing:
                 **kwargs,
             )
             idx += 2
-        plt.show()
+        if file_path:
+            plt.savefig(
+                f"{file_path}{os.sep}centrality_map.{file_format}",
+                dpi=dpi,
+                bbox_inches="tight",
+            )
+        else:
+            plt.show()
 
     def _find_new_order(self, scenario: PyTradeShifts) -> list[set[str]]:
         """
@@ -605,6 +652,9 @@ class Postprocessing:
         similarity=False,
         figsize: tuple[float, float] | None = None,
         shrink=1.0,
+        file_path: str | None = None,
+        file_format="png",
+        dpi=300,
         **kwargs,
     ):
         """
@@ -618,6 +668,11 @@ class Postprocessing:
             figsize (tuple[float, float] | None, optional): the composite figure
                 size as expected by the matplotlib subplots routine.
             shrink (float, optional): colour bar shrink parameter
+            file_path (str | None, optional): Path to where the image file
+                should be saved to. If `None` no file shall be produced.
+            file_format (str, optional): File extension to use when
+                saving plot to file.
+            dpi (int, optional): DPI of the saved image file.
             **kwargs (optional): any additional keyworded arguments recognised
                 by geopandas plot function.
 
@@ -647,10 +702,21 @@ class Postprocessing:
                 shrink=shrink,
                 **kwargs,
             )
-        plt.show()
+        if file_path:
+            plt.savefig(
+                f"{file_path}{os.sep}community_diff.{file_format}",
+                dpi=dpi,
+                bbox_inches="tight",
+            )
+        else:
+            plt.show()
 
     def plot_all_trade_communities(
-        self, figsize: tuple[float, float] | None = None
+        self,
+        figsize: tuple[float, float] | None = None,
+        file_path: str | None = None,
+        file_format="png",
+        dpi=300,
     ) -> None:
         """
         Plots the trade communities in each of the scenarios.
@@ -658,6 +724,11 @@ class Postprocessing:
         Arguments:
             figsize (tuple[float, float] | None, optional): the composite figure
                 size as expected by the matplotlib subplots routine.
+            file_path (str | None, optional): Path to where the image file
+                should be saved to. If `None` no file shall be produced.
+            file_format (str, optional): File extension to use when
+                saving plot to file.
+            dpi (int, optional): DPI of the saved image file.
 
         Returns:
             None
@@ -667,7 +738,14 @@ class Postprocessing:
         )
         for ax, scenario in zip(axs, self.scenarios):
             scenario._plot_trade_communities(ax)
-        plt.show()
+        if file_path:
+            plt.savefig(
+                f"{file_path}{os.sep}trade_communities.{file_format}",
+                dpi=dpi,
+                bbox_inches="tight",
+            )
+        else:
+            plt.show()
 
     def _compute_community_satisfaction(self) -> None:
         """
@@ -1322,13 +1400,17 @@ class Postprocessing:
         else:
             plt.show()
 
-    def print_network_metrics(self, wide=True, tablefmt="fancy_grid", **kwargs) -> None:
+    def print_network_metrics(
+        self, wide=True, tablefmt="fancy_grid", file: str | None = None, **kwargs
+    ) -> None:
         """
         Prints general graph metrics in a neat tabulated form.
 
         Arguments:
             wide (bool, optional): Whether print the table in long or wide format.
             tablefmt (str, optional): table format as expected by the tabulate package.
+            file (str | None, optional): The file to which we print the result.
+                If `None`, prints to standard output.
             **kwargs: any other keyworded arguments recognised by the tabulate package.
 
         Returns:
@@ -1371,7 +1453,7 @@ class Postprocessing:
             metrics = metrics.pivot(
                 index="Scenario ID", columns="Metric", values="Value"
             )
-        print(metrics.to_markdown(tablefmt=tablefmt, **kwargs))
+        print(metrics.to_markdown(tablefmt=tablefmt, **kwargs), file=file)
 
     def report(self) -> None:
         """
