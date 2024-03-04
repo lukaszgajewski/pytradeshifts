@@ -473,6 +473,7 @@ class Postprocessing:
             )
             df = df.set_index("Community\nID", drop=True)
             if file:
+                file.write(f"<h3> Degree centrality metrics for the scenario with ID: {scenario_id} </h3> </br>")
                 df.to_html(buf=file, **kwargs)
             else:
                 print(
@@ -1475,6 +1476,71 @@ class Postprocessing:
         else:
             print(metrics.to_markdown(tablefmt=tablefmt, **kwargs))
 
+    def _plot_all_to_file(self, figures_folder) -> None:
+        """
+        TODO
+        """
+        self.plot_all_trade_communities(file_path=figures_folder)
+        plt.close()  # this is to prevent cross-contamination of plots
+        self.plot_community_difference(file_path=figures_folder)
+        plt.close()
+        # there is no point in this plot if there's only base scenario and
+        # on other
+        if len(self.scenarios) > 2:
+            self.plot_distance_metrics(file_path=figures_folder, frobenius="relative")
+            plt.close()
+        self.plot_centrality_maps(file_path=figures_folder)
+        plt.close()
+        self.plot_community_satisfaction(file_path=figures_folder)
+        plt.close()
+        self.plot_community_satisfaction_difference(file_path=figures_folder)
+        plt.close()
+        self.plot_node_stability(file_path=figures_folder)
+        plt.close()
+        self.plot_node_stability_difference(file_path=figures_folder)
+        plt.close()
+        self.plot_attack_resilience(file_path=figures_folder)
+        plt.close()
+
+    def _write_to_report_file(self, report_file_path, time_now, utc_label) -> None:
+        """
+        TODO
+        """
+        with open(report_file_path, "w") as report_file:
+            report_file.write("""<!DOCTYPE html> <html> <body>""")
+            report_file.write("<p><center>")
+            report_file.write(f"<h1> PyTradeShifts Report {time_now.replace("_", " ")} {utc_label} </h1> </br>")
+            report_file.write("<h2> Trade communities </h2>")
+            report_file.write("""<img src="figs/trade_communities.png">""")
+            report_file.write("<h2> Difference in trade communities </h2>")
+            report_file.write("""<img src="figs/community_diff.png">""")
+            report_file.write("<h2> Community satisfaction </h2>")
+            report_file.write("""<img src="figs/community_satisfaction.png">""")
+            report_file.write("<h2> Difference in community satisfaction </h2>")
+            report_file.write("""<img src="figs/community_satisfaction_diff.png">""")
+            report_file.write("<h2> Graph structural difference to base scenario (ID=0) </h2>")
+            self.print_distance_metrics(file=report_file, justify="center")
+            if len(self.scenarios) > 2:
+                report_file.write("""<img src="figs/network_distance.png">""")
+            report_file.write("<h2> Centrality metrics by scenario </h2>")
+            self.print_global_centrality_metrics(file=report_file, justify="center")
+            report_file.write("<h2> Centrality metrics by community </h2>")
+            self.print_per_community_centrality_metrics(
+                file=report_file, justify="center"
+            )
+            report_file.write("<h2> Centrality map </h2>")
+            report_file.write("""<img src="figs/centrality_map.png">""")
+            report_file.write("<h2> Stability map </h2>")
+            report_file.write("""<img src="figs/node_stability.png">""")
+            report_file.write("<h2> Difference in stability </h2>")
+            report_file.write("""<img src="figs/node_stability_diff.png">""")
+            report_file.write("<h2> General network characteristics </h2>")
+            self.print_network_metrics(file=report_file, justify="center")
+            report_file.write("<h2> Attack resilience </h2>")
+            report_file.write("""<img src="figs/attack_resilience.png">""")
+            report_file.write("</center></p>")
+            report_file.write("</body> </html>")
+
     def report(self, path=f"results{os.sep}reports", utc=True) -> None:
         """
         TODO
@@ -1484,16 +1550,8 @@ class Postprocessing:
         utc_label = "UTC" if utc else ""
         report_folder = f"{path}{os.sep}report_{time_now}"
         Path(report_folder).mkdir(parents=True, exist_ok=True)
+        figures_folder = f"{report_folder}{os.sep}figs"
+        Path(figures_folder).mkdir(parents=True, exist_ok=True)
         report_file_path = f"{report_folder}{os.sep}index.html"
-        with open(report_file_path, "w") as report_file:
-            report_file.write("""<!DOCTYPE html> <html> <body> """)
-            report_file.write("<p><center>")
-            report_file.write(f"<h1> PyTradeShifts Report {time_now.replace("_", " ")} {utc_label} </h1> </br>")
-            self.print_distance_metrics(file=report_file, justify="center")
-            self.print_global_centrality_metrics(file=report_file, justify="center")
-            self.print_per_community_centrality_metrics(
-                file=report_file, justify="center"
-            )
-            self.print_network_metrics(file=report_file, justify="center")
-            report_file.write("</center></p>")
-            report_file.write("""</body> </html>  """)
+        self._plot_all_to_file(figures_folder)
+        self._write_to_report_file(report_file_path, time_now, utc_label)
