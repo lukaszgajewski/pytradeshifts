@@ -116,6 +116,7 @@ class Postprocessing:
         ]
         if self.anchor_countries:
             self._arrange_communities()
+        self._add_weight_reciprocals()
         self._find_community_difference()
         self._compute_frobenius_distance()
         self._compute_entropy_rate_distance()
@@ -134,6 +135,28 @@ class Postprocessing:
         self._compute_network_stability()
         self._compute_entropic_out_degree()
         self._compute_percolation_threshold()
+
+    def _add_weight_reciprocals(self) -> None:
+        """
+        Adds a new edge attribute `1/weight` that is the reciprocal of the weight
+        attribute, for each scenarios' graph.
+        This is later used to compute betweenness and efficiency.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        for scenario in self.scenarios:
+            nx.set_edge_attributes(
+                scenario.trade_graph,
+                values={
+                    (u, v): d["weight"] ** -1 if d["weight"] != 0 else np.inf
+                    for (u, v, d) in scenario.trade_graph.edges(data=True)
+                },
+                name="1/weight",
+            )
 
     def _compute_frobenius_distance(self) -> None:
         """
@@ -843,6 +866,8 @@ class Postprocessing:
     def _compute_betweenness_centrality(self) -> None:
         """
         Computes the betweenness centrality for each scenario.
+        Here, we consider the weight of the edge to be the inverse
+        for the trade value as trade is more of a flow than a cost metric on a graph.
 
         Arguments:
             None
@@ -854,7 +879,7 @@ class Postprocessing:
             np.mean(
                 list(
                     nx.betweenness_centrality(
-                        scenario.trade_graph, weight="weight"
+                        scenario.trade_graph, weight="1/weight"
                     ).values()
                 )
             )
