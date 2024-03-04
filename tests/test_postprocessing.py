@@ -232,6 +232,6 @@ if __name__ == "__main__":
             Wheat2018,
             ISIMIP,
         ],
-        random_attack_sample_size=2,
+        random_attack_sample_size=20,
     )
     pp.report(utc=True)

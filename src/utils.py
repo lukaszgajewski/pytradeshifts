@@ -292,7 +292,7 @@ def plot_node_metric_map(
         + (
             f"\nin scenario: {scenario.scenario_name}"
             if scenario.scenario_name is not None
-            else " (no scenario)"
+            else "\n(no scenario)"
         )
     )
 
