@@ -1546,14 +1546,7 @@ class Postprocessing:
         """
         with open(report_file_path, "w") as report_file:
             report_file.write(
-                """
-                                <!DOCTYPE html> <html>
-                                <style>
-                                table {width: 50%;}
-                                img   {width: 50%;}
-                                </style>
-                                <body>
-                                """
+                """<!DOCTYPE html> <html> <style> table {width: 50%;} img {width: 50%;} </style> <body>"""
             )
             report_file.write("<p><center>")
             report_file.write(
