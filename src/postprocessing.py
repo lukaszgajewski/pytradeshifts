@@ -274,6 +274,7 @@ class Postprocessing:
     def plot_distance_metrics(
         self,
         frobenius: str | None = None,
+        figsize: tuple[float, float] | None = None,
         file_path: str | None = None,
         file_format="png",
         dpi=300,
@@ -290,6 +291,8 @@ class Postprocessing:
                 frobenius will not be included in the the plot; if None, nothing
                 special happens -- in this case the Frobenius metrics is very likely
                 to completety overshadow other values in the plot.
+            figsize (tuple[float, float] | None, optional): the composite figure
+                size as expected by the matplotlib subplots routine.
             file_path (str | None, optional): Path to where the image file
                 should be saved to. If `None` no file shall be produced.
             file_format (str, optional): File extension to use when
@@ -315,6 +318,7 @@ class Postprocessing:
                 )
                 df[df.columns[1:]] = df[df.columns[1:]] / df[df.columns[1:]].max()
         df = df.melt(id_vars="Scenario ID", value_vars=df.columns[1:])
+        _, ax = plt.subplots(figsize=figsize)
         sns.barplot(
             df,
             x="Scenario ID",
@@ -473,7 +477,9 @@ class Postprocessing:
             )
             df = df.set_index("Community\nID", drop=True)
             if file:
-                file.write(f"<h3> Degree centrality metrics for the scenario with ID: {scenario_id} </h3> </br>")
+                file.write(
+                    f"<h3> Degree centrality metrics for the scenario with ID: {scenario_id} </h3> <br>"
+                )
                 df.to_html(buf=file, **kwargs)
             else:
                 print(
@@ -484,7 +490,7 @@ class Postprocessing:
     def plot_centrality_maps(
         self,
         figsize: tuple[float, float] | None = None,
-        shrink=0.15,
+        shrink=1.0,
         file_path: str | None = None,
         file_format="png",
         dpi=300,
@@ -514,7 +520,7 @@ class Postprocessing:
             1,
             sharex=True,
             tight_layout=True,
-            figsize=(5, 2 * len(self.scenarios) * 5) if figsize is None else figsize,
+            figsize=(5, len(self.scenarios) * 5) if figsize is None else figsize,
         )
         # if there is only one scenario axs will be just an ax object
         # convert to a list to comply with other cases
@@ -698,7 +704,13 @@ class Postprocessing:
         """
         assert len(self.scenarios) > 1
         _, axs = plt.subplots(
-            len(self.scenarios) - 1, 1, sharex=True, tight_layout=True, figsize=figsize
+            len(self.scenarios) - 1,
+            1,
+            sharex=True,
+            tight_layout=True,
+            figsize=(
+                (5, (len(self.scenarios) - 1) * 2.5) if figsize is None else figsize
+            ),
         )
         # if there are only two scenarios axs will be just an ax object
         # convert to a list to comply with other cases
@@ -751,7 +763,11 @@ class Postprocessing:
             None
         """
         _, axs = plt.subplots(
-            len(self.scenarios), 1, sharex=True, tight_layout=True, figsize=figsize
+            len(self.scenarios),
+            1,
+            sharex=True,
+            tight_layout=True,
+            figsize=((5, len(self.scenarios) * 2.5) if figsize is None else figsize),
         )
         for ax, scenario in zip(axs, self.scenarios):
             scenario._plot_trade_communities(ax)
@@ -855,7 +871,11 @@ class Postprocessing:
             None
         """
         _, axs = plt.subplots(
-            len(self.scenarios), 1, sharex=True, tight_layout=True, figsize=figsize
+            len(self.scenarios),
+            1,
+            sharex=True,
+            tight_layout=True,
+            figsize=(5, len(self.scenarios) * 2.5) if figsize is None else figsize,
         )
         for ax, (idx, scenario) in zip(axs, enumerate(self.scenarios)):
             plot_node_metric_map(
@@ -905,7 +925,13 @@ class Postprocessing:
         """
         assert len(self.scenarios) > 1
         _, axs = plt.subplots(
-            len(self.scenarios) - 1, 1, sharex=True, tight_layout=True, figsize=figsize
+            len(self.scenarios) - 1,
+            1,
+            sharex=True,
+            tight_layout=True,
+            figsize=(
+                (5, (len(self.scenarios) - 1) * 2.5) if figsize is None else figsize
+            ),
         )
         # if there are only two scenarios axs will be just an ax object
         # convert to a list to comply with other cases
@@ -1121,7 +1147,11 @@ class Postprocessing:
             None
         """
         _, axs = plt.subplots(
-            len(self.scenarios), 1, sharex=True, tight_layout=True, figsize=figsize
+            len(self.scenarios),
+            1,
+            sharex=True,
+            tight_layout=True,
+            figsize=(5, len(self.scenarios) * 2.5) if figsize is None else figsize,
         )
         for ax, (idx, scenario) in zip(axs, enumerate(self.scenarios)):
             plot_node_metric_map(
@@ -1187,7 +1217,13 @@ class Postprocessing:
         """
         assert len(self.scenarios) > 1
         _, axs = plt.subplots(
-            len(self.scenarios) - 1, 1, sharex=True, tight_layout=True, figsize=figsize
+            len(self.scenarios) - 1,
+            1,
+            sharex=True,
+            tight_layout=True,
+            figsize=(
+                (5, (len(self.scenarios) - 1) * 2.5) if figsize is None else figsize
+            ),
         )
         # if there are only two scenarios axs will be just an ax object
         # convert to a list to comply with other cases
@@ -1487,7 +1523,9 @@ class Postprocessing:
         # there is no point in this plot if there's only base scenario and
         # on other
         if len(self.scenarios) > 2:
-            self.plot_distance_metrics(file_path=figures_folder, frobenius="relative")
+            self.plot_distance_metrics(
+                file_path=figures_folder, frobenius="relative", figsize=(5, 2.5)
+            )
             plt.close()
         self.plot_centrality_maps(file_path=figures_folder)
         plt.close()
@@ -1507,21 +1545,34 @@ class Postprocessing:
         TODO
         """
         with open(report_file_path, "w") as report_file:
-            report_file.write("""<!DOCTYPE html> <html> <body>""")
+            report_file.write(
+                """
+                                <!DOCTYPE html> <html>
+                                <style>
+                                table {width: 50%;}
+                                img   {width: 50%;}
+                                </style>
+                                <body>
+                                """
+            )
             report_file.write("<p><center>")
-            report_file.write(f"<h1> PyTradeShifts Report {time_now.replace("_", " ")} {utc_label} </h1> </br>")
+            report_file.write(
+                f"""<h1> PyTradeShifts Report {time_now.replace("_", " ")} {utc_label} </h1> <br>"""
+            )
             report_file.write("<h2> Trade communities </h2>")
-            report_file.write("""<img src="figs/trade_communities.png">""")
+            report_file.write("""<img src="figs/trade_communities.png" >""")
             report_file.write("<h2> Difference in trade communities </h2>")
             report_file.write("""<img src="figs/community_diff.png">""")
             report_file.write("<h2> Community satisfaction </h2>")
             report_file.write("""<img src="figs/community_satisfaction.png">""")
             report_file.write("<h2> Difference in community satisfaction </h2>")
-            report_file.write("""<img src="figs/community_satisfaction_diff.png">""")
-            report_file.write("<h2> Graph structural difference to base scenario (ID=0) </h2>")
+            report_file.write("""<img src="figs/community_satisfaction_diff.png" >""")
+            report_file.write(
+                "<h2> Graph structural difference to base scenario (ID=0) </h2>"
+            )
             self.print_distance_metrics(file=report_file, justify="center")
             if len(self.scenarios) > 2:
-                report_file.write("""<img src="figs/network_distance.png">""")
+                report_file.write("""<img src="figs/network_distance.png" >""")
             report_file.write("<h2> Centrality metrics by scenario </h2>")
             self.print_global_centrality_metrics(file=report_file, justify="center")
             report_file.write("<h2> Centrality metrics by community </h2>")
@@ -1529,15 +1580,15 @@ class Postprocessing:
                 file=report_file, justify="center"
             )
             report_file.write("<h2> Centrality map </h2>")
-            report_file.write("""<img src="figs/centrality_map.png">""")
+            report_file.write("""<img src="figs/centrality_map.png" >""")
             report_file.write("<h2> Stability map </h2>")
-            report_file.write("""<img src="figs/node_stability.png">""")
+            report_file.write("""<img src="figs/node_stability.png" >""")
             report_file.write("<h2> Difference in stability </h2>")
-            report_file.write("""<img src="figs/node_stability_diff.png">""")
+            report_file.write("""<img src="figs/node_stability_diff.png" >""")
             report_file.write("<h2> General network characteristics </h2>")
             self.print_network_metrics(file=report_file, justify="center")
             report_file.write("<h2> Attack resilience </h2>")
-            report_file.write("""<img src="figs/attack_resilience.png">""")
+            report_file.write("""<img src="figs/attack_resilience.png" >""")
             report_file.write("</center></p>")
             report_file.write("</body> </html>")
 
