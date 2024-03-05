@@ -72,7 +72,7 @@ class Postprocessing:
         scenarios: list[PyTradeShifts],
         anchor_countries: list[str] = [],
         normalisation="weak",
-        stability_index_file = (
+        stability_index_file=(
             f"data{os.sep}stability_index{os.sep}"
             f"worldbank_governence_indicator_2022_normalised.csv"
         ),
