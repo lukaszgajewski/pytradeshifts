@@ -108,6 +108,7 @@ class Postprocessing:
         Returns:
             None
         """
+        print("Starting postprocessing computations...")
         # in order to compute matrix distances we need matrices to be
         # of the same shape, this is a helper member variable that allows that
         self.elligible_countries = [
@@ -1514,35 +1515,61 @@ class Postprocessing:
 
     def _plot_all_to_file(self, figures_folder) -> None:
         """
-        TODO
+        A helper function generating all the plots used for the report.
+
+        Arguments:
+            figures_folder (str): Path to where the plots should be placed.
+
+        Returns:
+            None
         """
         self.plot_all_trade_communities(file_path=figures_folder)
         plt.close()  # this is to prevent cross-contamination of plots
+        print("Plotted trade communities")
         self.plot_community_difference(file_path=figures_folder)
         plt.close()
+        print("Plotted difference in trade communities")
         # there is no point in this plot if there's only base scenario and
-        # on other
+        # one other
         if len(self.scenarios) > 2:
             self.plot_distance_metrics(
                 file_path=figures_folder, frobenius="relative", figsize=(5, 2.5)
             )
             plt.close()
+            print("Plotted distance metrics")
         self.plot_centrality_maps(file_path=figures_folder)
         plt.close()
+        print("Plotted centrality map")
         self.plot_community_satisfaction(file_path=figures_folder)
         plt.close()
+        print("Plotted community satisfaction index")
         self.plot_community_satisfaction_difference(file_path=figures_folder)
         plt.close()
+        print("Plotted difference in community satisfaction")
         self.plot_node_stability(file_path=figures_folder)
         plt.close()
+        print("Plotted node stability map")
         self.plot_node_stability_difference(file_path=figures_folder)
         plt.close()
+        print("Plotted difference in node stability")
         self.plot_attack_resilience(file_path=figures_folder)
         plt.close()
+        print("Plotted attack resilience")
 
     def _write_to_report_file(self, report_file_path, time_now, utc_label) -> None:
         """
-        TODO
+        A helper function generating all the HTML tags and data tables in the
+        index.html file.
+
+        Arguments:
+            report_file_path (str): Path to the index.html file.
+            time_now (datetime): A datetime object, presumably current date and time.
+            utc_label (str): String to be added to the report signifying the timezone.
+                Presumably this just says "UTC" when the utc flag is used in the
+                report function; however, technically any string can be passed.
+
+        Returns:
+            None
         """
         with open(report_file_path, "w") as report_file:
             report_file.write(
@@ -1587,7 +1614,22 @@ class Postprocessing:
 
     def report(self, path=f"results{os.sep}reports", utc=True) -> None:
         """
-        TODO
+        Generates all results available in the postprocessing suite and formats
+        them into a readable report in the specified path.
+        Name of the report is date and time at the moment of calling the function,
+        time is UTC or local (controlled by a function parameter).
+        Note: this function does no allow for much personalisation of how the
+        results are presented. The idea of this function is to be run ``as is''.
+        If a custom solution is required use something else such as a jupyter notebook.
+        An example of such a notebook is provided at: scripts/scenario_comparison.ipynb.
+
+        Arguments:
+            path (str, optional): The localtion where the report is to be put.
+                This function will generate all necessary parent directories.
+            utc (bool, optional): Whether to use UTC or local time in the report.
+
+        Returns:
+            None
         """
         time_now = datetime.now(UTC) if utc else datetime.now()
         time_now = time_now.strftime("%Y-%m-%d_%H:%M:%S")
@@ -1597,5 +1639,8 @@ class Postprocessing:
         figures_folder = f"{report_folder}{os.sep}figs"
         Path(figures_folder).mkdir(parents=True, exist_ok=True)
         report_file_path = f"{report_folder}{os.sep}index.html"
+        print("Starting plotting procedures...")
         self._plot_all_to_file(figures_folder)
+        print("Starting printing procedures...")
         self._write_to_report_file(report_file_path, time_now, utc_label)
+        print("Fin.")
