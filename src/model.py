@@ -756,9 +756,9 @@ class PyTradeShifts:
         ax.set_title(
             f"Trade communities for {self.crop} with base year {self.base_year[1:]}"
             + (
-                f" in scenario: {self.scenario_name}"
+                f"\nin scenario: {self.scenario_name}"
                 if self.scenario_name is not None
-                else " (no scenario)"
+                else "\n(no scenario)"
             )
             + (
                 " with country subset"

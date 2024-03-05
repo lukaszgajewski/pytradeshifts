@@ -23,6 +23,9 @@ from operator import itemgetter
 from functools import reduce
 import seaborn as sb
 from scipy import stats
+import os
+from pathlib import Path
+from datetime import datetime, UTC
 
 
 plt.style.use(
@@ -69,8 +72,7 @@ class Postprocessing:
         scenarios: list[PyTradeShifts],
         anchor_countries: list[str] = [],
         normalisation="weak",
-        stability_index_file="data/stability_index/"
-        "worldbank_governence_indicator_2022_normalised.csv",
+        stability_index_file=f"data{os.sep}stability_index{os.sep}worldbank_governence_indicator_2022_normalised.csv",
         gamma=1.0,
         random_attack_sample_size=100,
         testing=False,
@@ -106,6 +108,7 @@ class Postprocessing:
         Returns:
             None
         """
+        print("Starting postprocessing computations...")
         # in order to compute matrix distances we need matrices to be
         # of the same shape, this is a helper member variable that allows that
         self.elligible_countries = [
@@ -268,34 +271,57 @@ class Postprocessing:
         )
         self.distance_df = df
 
-    def print_distance_metrics(self, tablefmt="fancy_grid", **kwargs) -> None:
+    def print_distance_metrics(
+        self, tablefmt="fancy_grid", file: str | None = None, **kwargs
+    ) -> None:
         """
         Prints the graph distance metrics in a neat tabulated form.
 
         Arguments:
             tablefmt (str, optional): table format as expected by the tabulate package.
-            **kwargs: any other keyworded arguments recognised by the tabulate package.
+            file (str | None, optional): The file to which we print the result.
+                If `None`, prints to standard output.
+            **kwargs: any other keyworded arguments recognised by the tabulate package
+                or pandas' `to_html` method if file is specified.
 
         Returns:
             None
         """
         df = self.distance_df.copy()
         df.set_index("Scenario ID", drop=True, inplace=True)
-        print("***| Graph distance to the base scenario |***")
-        print(df.to_markdown(tablefmt=tablefmt, **kwargs))
+        if file:
+            df.to_html(buf=file, **kwargs)
+        else:
+            print("***| Graph distance to the base scenario |***")
+            print(df.to_markdown(tablefmt=tablefmt, **kwargs))
 
-    def plot_distance_metrics(self, frobenius: str | None = None, **kwargs) -> None:
+    def plot_distance_metrics(
+        self,
+        frobenius: str | None = None,
+        figsize: tuple[float, float] | None = None,
+        file_path: str | None = None,
+        file_format="png",
+        dpi=300,
+        **kwargs,
+    ) -> None:
         """
         Plots the distance metrics as a bar plot.
 
         Arguments:
             frobenius (str | None, optional): Flag controlling the behaviour of
-                                                graph difference metrics.
+                graph difference metrics.
                 If frobenius == "relative" *all* metrics are normalised relative
                 to the highest found value in each category; if "ignore" then
                 frobenius will not be included in the the plot; if None, nothing
                 special happens -- in this case the Frobenius metrics is very likely
                 to completety overshadow other values in the plot.
+            figsize (tuple[float, float] | None, optional): the composite figure
+                size as expected by the matplotlib subplots routine.
+            file_path (str | None, optional): Path to where the image file
+                should be saved to. If `None` no file shall be produced.
+            file_format (str, optional): File extension to use when
+                saving plot to file.
+            dpi (int, optional): DPI of the saved image file.
             **kwargs: any keyworded arguments recognised by seaborn barplot.
 
         Returns:
@@ -316,6 +342,7 @@ class Postprocessing:
                 )
                 df[df.columns[1:]] = df[df.columns[1:]] / df[df.columns[1:]].max()
         df = df.melt(id_vars="Scenario ID", value_vars=df.columns[1:])
+        _, ax = plt.subplots(figsize=figsize)
         sns.barplot(
             df,
             x="Scenario ID",
@@ -325,7 +352,14 @@ class Postprocessing:
         )
         plt.ylabel("Distance")
         plt.title("Graph distance to the base scenario")
-        plt.show()
+        if file_path:
+            plt.savefig(
+                f"{file_path}{os.sep}network_distance.{file_format}",
+                dpi=dpi,
+                bbox_inches="tight",
+            )
+        else:
+            plt.show()
 
     def _compute_centrality(self) -> None:
         """
@@ -367,13 +401,18 @@ class Postprocessing:
             centrality_metrics.append([idx, *in_min_max, *out_min_max])
         self.global_centrality_metrics = centrality_metrics
 
-    def print_global_centrality_metrics(self, tablefmt="fancy_grid", **kwargs) -> None:
+    def print_global_centrality_metrics(
+        self, tablefmt="fancy_grid", file: str | None = None, **kwargs
+    ) -> None:
         """
         Prints the global centrality metrics in a neat tabulated form.
 
         Arguments:
             tablefmt (str, optional): table format as expected by the tabulate package.
-            **kwargs: any other keyworded arguments recognised by the tabulate package.
+            file (str | None, optional): The file to which we print the result.
+                If `None`, prints to standard output.
+            **kwargs: any other keyworded arguments recognised by the tabulate package
+                or pandas' `to_html` method if file is specified.
 
         Returns:
             None
@@ -392,8 +431,12 @@ class Postprocessing:
                 "Largest\nout-degree\nvalue",
             ],
         )
-        print("***| Degree centrality metrics for each scenario |***")
-        print(df.to_markdown(tablefmt=tablefmt, **kwargs))
+        df = df.set_index("Scenario\nID", drop=True)
+        if file:
+            df.to_html(buf=file, **kwargs)
+        else:
+            print("***| Degree centrality metrics for each scenario |***")
+            print(df.to_markdown(tablefmt=tablefmt, **kwargs))
 
     def _compute_community_centrality_metrics(self) -> None:
         """
@@ -424,14 +467,17 @@ class Postprocessing:
         self.community_centrality_metrics = centrality_metrics
 
     def print_per_community_centrality_metrics(
-        self, tablefmt="fancy_grid", **kwargs
+        self, tablefmt="fancy_grid", file: str | None = None, **kwargs
     ) -> None:
         """
         Prints the local centrality metrics (per community) in a neat tabulated form.
 
         Arguments:
             tablefmt (str, optional): table format as expected by the tabulate package.
-            **kwargs: any other keyworded arguments recognised by the tabulate package.
+            file (str | None, optional): The file to which we print the result.
+                If `None`, prints to standard output.
+            **kwargs: any other keyworded arguments recognised by the tabulate package
+                or pandas' `to_html` method if file is specified.
 
         Returns:
             None
@@ -453,13 +499,26 @@ class Postprocessing:
                     "Largest\nout-degree\nvalue",
                 ],
             )
-            print(
-                f"***| Degree centrality metrics for the scenario with ID: {scenario_id} |***"
-            )
-            print(df.to_markdown(tablefmt=tablefmt, **kwargs))
+            df = df.set_index("Community\nID", drop=True)
+            if file:
+                file.write(
+                    f"<h3> Degree centrality metrics for the scenario with ID: {scenario_id} </h3> <br>"
+                )
+                df.to_html(buf=file, **kwargs)
+            else:
+                print(
+                    f"***| Degree centrality metrics for the scenario with ID: {scenario_id} |***"
+                )
+                print(df.to_markdown(tablefmt=tablefmt, **kwargs))
 
     def plot_centrality_maps(
-        self, figsize: tuple[float, float] | None = None, shrink=0.15, **kwargs
+        self,
+        figsize: tuple[float, float] | None = None,
+        shrink=1.0,
+        file_path: str | None = None,
+        file_format="png",
+        dpi=300,
+        **kwargs,
     ) -> None:
         """
         Plots world maps for each scenario, with each country coloured by their
@@ -469,6 +528,11 @@ class Postprocessing:
             figsize (tuple[float, float] | None, optional): the composite figure
                 size as expected by the matplotlib subplots routine.
             shrink (float, optional): colour bar shrink parameter
+            file_path (str | None, optional): Path to where the image file
+                should be saved to. If `None` no file shall be produced.
+            file_format (str, optional): File extension to use when
+                saving plot to file.
+            dpi (int, optional): DPI of the saved image file.
             **kwargs (optional): any additional keyworded arguments recognised
                 by geopandas' plot function.
 
@@ -480,7 +544,7 @@ class Postprocessing:
             1,
             sharex=True,
             tight_layout=True,
-            figsize=(5, 2 * len(self.scenarios) * 5) if figsize is None else figsize,
+            figsize=(5, len(self.scenarios) * 5) if figsize is None else figsize,
         )
         # if there is only one scenario axs will be just an ax object
         # convert to a list to comply with other cases
@@ -510,7 +574,14 @@ class Postprocessing:
                 **kwargs,
             )
             idx += 2
-        plt.show()
+        if file_path:
+            plt.savefig(
+                f"{file_path}{os.sep}centrality_map.{file_format}",
+                dpi=dpi,
+                bbox_inches="tight",
+            )
+        else:
+            plt.show()
 
     def _find_new_order(self, scenario: PyTradeShifts) -> list[set[str]]:
         """
@@ -628,6 +699,9 @@ class Postprocessing:
         similarity=False,
         figsize: tuple[float, float] | None = None,
         shrink=1.0,
+        file_path: str | None = None,
+        file_format="png",
+        dpi=300,
         **kwargs,
     ):
         """
@@ -641,6 +715,11 @@ class Postprocessing:
             figsize (tuple[float, float] | None, optional): the composite figure
                 size as expected by the matplotlib subplots routine.
             shrink (float, optional): colour bar shrink parameter
+            file_path (str | None, optional): Path to where the image file
+                should be saved to. If `None` no file shall be produced.
+            file_format (str, optional): File extension to use when
+                saving plot to file.
+            dpi (int, optional): DPI of the saved image file.
             **kwargs (optional): any additional keyworded arguments recognised
                 by geopandas plot function.
 
@@ -649,7 +728,13 @@ class Postprocessing:
         """
         assert len(self.scenarios) > 1
         _, axs = plt.subplots(
-            len(self.scenarios) - 1, 1, sharex=True, tight_layout=True, figsize=figsize
+            len(self.scenarios) - 1,
+            1,
+            sharex=True,
+            tight_layout=True,
+            figsize=(
+                (5, (len(self.scenarios) - 1) * 2.5) if figsize is None else figsize
+            ),
         )
         # if there are only two scenarios axs will be just an ax object
         # convert to a list to comply with other cases
@@ -670,10 +755,21 @@ class Postprocessing:
                 shrink=shrink,
                 **kwargs,
             )
-        plt.show()
+        if file_path:
+            plt.savefig(
+                f"{file_path}{os.sep}community_diff.{file_format}",
+                dpi=dpi,
+                bbox_inches="tight",
+            )
+        else:
+            plt.show()
 
     def plot_all_trade_communities(
-        self, figsize: tuple[float, float] | None = None
+        self,
+        figsize: tuple[float, float] | None = None,
+        file_path: str | None = None,
+        file_format="png",
+        dpi=300,
     ) -> None:
         """
         Plots the trade communities in each of the scenarios.
@@ -681,16 +777,32 @@ class Postprocessing:
         Arguments:
             figsize (tuple[float, float] | None, optional): the composite figure
                 size as expected by the matplotlib subplots routine.
+            file_path (str | None, optional): Path to where the image file
+                should be saved to. If `None` no file shall be produced.
+            file_format (str, optional): File extension to use when
+                saving plot to file.
+            dpi (int, optional): DPI of the saved image file.
 
         Returns:
             None
         """
         _, axs = plt.subplots(
-            len(self.scenarios), 1, sharex=True, tight_layout=True, figsize=figsize
+            len(self.scenarios),
+            1,
+            sharex=True,
+            tight_layout=True,
+            figsize=((5, len(self.scenarios) * 2.5) if figsize is None else figsize),
         )
         for ax, scenario in zip(axs, self.scenarios):
             scenario._plot_trade_communities(ax)
-        plt.show()
+        if file_path:
+            plt.savefig(
+                f"{file_path}{os.sep}trade_communities.{file_format}",
+                dpi=dpi,
+                bbox_inches="tight",
+            )
+        else:
+            plt.show()
 
     def _compute_community_satisfaction(self) -> None:
         """
@@ -758,6 +870,9 @@ class Postprocessing:
         self,
         figsize: tuple[float, float] | None = None,
         shrink=1.0,
+        file_path: str | None = None,
+        file_format="png",
+        dpi=300,
         **kwargs,
     ) -> None:
         """
@@ -765,17 +880,26 @@ class Postprocessing:
         satisfaction index.
 
         Arguments:
-            figsize (tuple[float, float] | None, optional): the composite figure
+            figsize (tuple[float, float] | None, optional): The composite figure
                 size as expected by the matplotlib subplots routine.
-            shrink (float, optional): colour bar shrink parameter
-            **kwargs (optional): any additional keyworded arguments recognised
+            shrink (float, optional): Colour bar shrink parameter.
+            file_path (str | None, optional): Path to where the image file
+                should be saved to. If `None` no file shall be produced.
+            file_format (str, optional): File extension to use when
+                saving plot to file.
+            dpi (int, optional): DPI of the saved image file.
+            **kwargs (optional): Any additional keyworded arguments recognised
                 by geopandas plot function.
 
         Returns:
             None
         """
         _, axs = plt.subplots(
-            len(self.scenarios), 1, sharex=True, tight_layout=True, figsize=figsize
+            len(self.scenarios),
+            1,
+            sharex=True,
+            tight_layout=True,
+            figsize=(5, len(self.scenarios) * 2.5) if figsize is None else figsize,
         )
         for ax, (idx, scenario) in zip(axs, enumerate(self.scenarios)):
             plot_node_metric_map(
@@ -786,12 +910,22 @@ class Postprocessing:
                 shrink=shrink,
                 **kwargs,
             )
-        plt.show()
+        if file_path:
+            plt.savefig(
+                f"{file_path}{os.sep}community_satisfaction.{file_format}",
+                dpi=dpi,
+                bbox_inches="tight",
+            )
+        else:
+            plt.show()
 
     def plot_community_satisfaction_difference(
         self,
         figsize: tuple[float, float] | None = None,
         shrink=1.0,
+        file_path: str | None = None,
+        file_format="png",
+        dpi=300,
         **kwargs,
     ) -> None:
         """
@@ -799,10 +933,15 @@ class Postprocessing:
         community satisfaction index from the base scenario.
 
         Arguments:
-            figsize (tuple[float, float] | None, optional): the composite figure
+            figsize (tuple[float, float] | None, optional): The composite figure
                 size as expected by the matplotlib subplots routine.
-            shrink (float, optional): colour bar shrink parameter
-            **kwargs (optional): any additional keyworded arguments recognised
+            shrink (float, optional): Colour bar shrink parameter.
+            file_path (str | None, optional): Path to where the image file
+                should be saved to. If `None` no file shall be produced.
+            file_format (str, optional): File extension to use when
+                saving plot to file.
+            dpi (int, optional): DPI of the saved image file.
+            **kwargs (optional): Any additional keyworded arguments recognised
                 by geopandas plot function.
 
         Returns:
@@ -810,7 +949,13 @@ class Postprocessing:
         """
         assert len(self.scenarios) > 1
         _, axs = plt.subplots(
-            len(self.scenarios) - 1, 1, sharex=True, tight_layout=True, figsize=figsize
+            len(self.scenarios) - 1,
+            1,
+            sharex=True,
+            tight_layout=True,
+            figsize=(
+                (5, (len(self.scenarios) - 1) * 2.5) if figsize is None else figsize
+            ),
         )
         # if there are only two scenarios axs will be just an ax object
         # convert to a list to comply with other cases
@@ -827,7 +972,14 @@ class Postprocessing:
                 shrink=shrink,
                 **kwargs,
             )
-        plt.show()
+        if file_path:
+            plt.savefig(
+                f"{file_path}{os.sep}community_satisfaction_diff.{file_format}",
+                dpi=dpi,
+                bbox_inches="tight",
+            )
+        else:
+            plt.show()
 
     def _compute_efficiency(self) -> None:
         """
@@ -983,6 +1135,9 @@ class Postprocessing:
         self,
         figsize: tuple[float, float] | None = None,
         shrink=1.0,
+        file_path: str | None = None,
+        file_format="png",
+        dpi=300,
         **kwargs,
     ) -> None:
         """
@@ -1005,15 +1160,24 @@ class Postprocessing:
         Arguments:
             figsize (tuple[float, float] | None, optional): the composite figure
                 size as expected by the matplotlib subplots routine.
-            shrink (float, optional): colour bar shrink parameter
-            **kwargs (optional): any additional keyworded arguments recognised
+            shrink (float, optional): Colour bar shrink parameter.
+            file_path (str | None, optional): Path to where the image file
+                should be saved to. If `None` no file shall be produced.
+            file_format (str, optional): File extension to use when
+                saving plot to file.
+            dpi (int, optional): DPI of the saved image file.
+            **kwargs (optional): Any additional keyworded arguments recognised
                 by geopandas plot function.
 
         Returns:
             None
         """
         _, axs = plt.subplots(
-            len(self.scenarios), 1, sharex=True, tight_layout=True, figsize=figsize
+            len(self.scenarios),
+            1,
+            sharex=True,
+            tight_layout=True,
+            figsize=(5, len(self.scenarios) * 2.5) if figsize is None else figsize,
         )
         for ax, (idx, scenario) in zip(axs, enumerate(self.scenarios)):
             plot_node_metric_map(
@@ -1024,12 +1188,22 @@ class Postprocessing:
                 shrink=shrink,
                 **kwargs,
             )
-        plt.show()
+        if file_path:
+            plt.savefig(
+                f"{file_path}{os.sep}node_stability.{file_format}",
+                dpi=dpi,
+                bbox_inches="tight",
+            )
+        else:
+            plt.show()
 
     def plot_node_stability_difference(
         self,
         figsize: tuple[float, float] | None = None,
         shrink=1.0,
+        file_path: str | None = None,
+        file_format="png",
+        dpi=300,
         **kwargs,
     ) -> None:
         """
@@ -1053,10 +1227,15 @@ class Postprocessing:
         I.e., it measures the relative change from base scenario to another scenario.
 
         Arguments:
-            figsize (tuple[float, float] | None, optional): the composite figure
+            figsize (tuple[float, float] | None, optional): The composite figure
                 size as expected by the matplotlib subplots routine.
-            shrink (float, optional): colour bar shrink parameter
-            **kwargs (optional): any additional keyworded arguments recognised
+            shrink (float, optional): Colour bar shrink parameter.
+            file_path (str | None, optional): Path to where the image file
+                should be saved to. If `None` no file shall be produced.
+            file_format (str, optional): File extension to use when
+                saving plot to file.
+            dpi (int, optional): DPI of the saved image file.
+            **kwargs (optional): Any additional keyworded arguments recognised
                 by geopandas plot function.
 
         Returns:
@@ -1064,7 +1243,13 @@ class Postprocessing:
         """
         assert len(self.scenarios) > 1
         _, axs = plt.subplots(
-            len(self.scenarios) - 1, 1, sharex=True, tight_layout=True, figsize=figsize
+            len(self.scenarios) - 1,
+            1,
+            sharex=True,
+            tight_layout=True,
+            figsize=(
+                (5, (len(self.scenarios) - 1) * 2.5) if figsize is None else figsize
+            ),
         )
         # if there are only two scenarios axs will be just an ax object
         # convert to a list to comply with other cases
@@ -1081,7 +1266,14 @@ class Postprocessing:
                 shrink=shrink,
                 **kwargs,
             )
-        plt.show()
+        if file_path:
+            plt.savefig(
+                f"{file_path}{os.sep}node_stability_diff.{file_format}",
+                dpi=dpi,
+                bbox_inches="tight",
+            )
+        else:
+            plt.show()
 
     def _compute_network_stability(self) -> None:
         """
@@ -1209,6 +1401,9 @@ class Postprocessing:
         exclude_attacks=[],
         sigma=2.0,
         figsize: tuple[float, float] | None = None,
+        file_path: str | None = None,
+        file_format="png",
+        dpi=300,
     ) -> None:
         """
         Plots the attack resiliencie for each scenario and attack strategy.
@@ -1224,6 +1419,11 @@ class Postprocessing:
                 sigma=1.0 -> ~68% confidence interval, 2.0->95% CI, etc.
             figsize (tuple[float, float] | None, optional): the composite figure
                 size as expected by the matplotlib subplots routine.
+            file_path (str | None, optional): Path to where the image file
+                should be saved to. If `None` no file shall be produced.
+            file_format (str, optional): File extension to use when
+                saving plot to file.
+            dpi (int, optional): DPI of the saved image file.
 
 
         Returns:
@@ -1270,38 +1470,50 @@ class Postprocessing:
         ax.set_xlabel("# of removed nodes.")
         ax.set_ylabel("Max adj. eigenval. post node removal.")
         ax.legend()
-        plt.show()
+        if file_path:
+            plt.savefig(
+                f"{file_path}{os.sep}attack_resilience.{file_format}",
+                dpi=dpi,
+                bbox_inches="tight",
+            )
+        else:
+            plt.show()
 
-    def print_network_metrics(self, wide=True, tablefmt="fancy_grid", **kwargs) -> None:
+    def print_network_metrics(
+        self, wide=True, tablefmt="fancy_grid", file: str | None = None, **kwargs
+    ) -> None:
         """
         Prints general graph metrics in a neat tabulated form.
 
         Arguments:
             wide (bool, optional): Whether print the table in long or wide format.
             tablefmt (str, optional): table format as expected by the tabulate package.
-            **kwargs: any other keyworded arguments recognised by the tabulate package.
+            file (str | None, optional): The file to which we print the result.
+                If `None`, prints to standard output.
+            **kwargs: any other keyworded arguments recognised by the tabulate package
+                or pandas' `to_html` method if file is specified.
 
         Returns:
             None
         """
         metrics = [
             *[
-                (idx, "efficiency", efficiency)
+                (idx, "Efficiency", efficiency)
                 for idx, efficiency in enumerate(self.efficiency)
             ],
             *[
-                (idx, "clustering", clustering)
+                (idx, "Clustering", clustering)
                 for idx, clustering in enumerate(self.clustering)
             ],
             *[
-                (idx, "betweenness", betweenness)
+                (idx, "Betweenness", betweenness)
                 for idx, betweenness in enumerate(self.betweenness)
             ],
         ]
         if self.network_stability is not None:
             metrics.extend(
                 [
-                    (idx, "stability", stability)
+                    (idx, "Stability", stability)
                     for idx, stability in enumerate(self.network_stability)
                 ],
             )
@@ -1309,7 +1521,7 @@ class Postprocessing:
             [
                 (
                     idx,
-                    f"{attack}-attack\nthreshold",
+                    f"{attack.title()}-attack\nthreshold",
                     threshold if attack != "random" else f"{threshold:.2g} +/- {_:.2g}",
                 )
                 for idx, scenario in enumerate(self.percolation)
@@ -1320,11 +1532,140 @@ class Postprocessing:
         if wide:
             metrics = metrics.pivot(
                 index="Scenario ID", columns="Metric", values="Value"
-            )
-        print(metrics.to_markdown(tablefmt=tablefmt, **kwargs))
+            ).rename_axis(None, axis=1)
+        if file:
+            metrics.to_html(buf=file, **kwargs)
+        else:
+            print(metrics.to_markdown(tablefmt=tablefmt, **kwargs))
 
-    def report(self) -> None:
+    def _plot_all_to_file(self, figures_folder) -> None:
         """
-        TODO
+        A helper function generating all the plots used for the report.
+
+        Arguments:
+            figures_folder (str): Path to where the plots should be placed.
+
+        Returns:
+            None
         """
-        raise NotImplementedError
+        self.plot_all_trade_communities(file_path=figures_folder)
+        plt.close()  # this is to prevent cross-contamination of plots
+        print("Plotted trade communities")
+        self.plot_community_difference(file_path=figures_folder)
+        plt.close()
+        print("Plotted difference in trade communities")
+        # there is no point in this plot if there's only base scenario and
+        # one other
+        if len(self.scenarios) > 2:
+            self.plot_distance_metrics(
+                file_path=figures_folder, frobenius="relative", figsize=(5, 2.5)
+            )
+            plt.close()
+            print("Plotted distance metrics")
+        self.plot_centrality_maps(file_path=figures_folder)
+        plt.close()
+        print("Plotted centrality map")
+        self.plot_community_satisfaction(file_path=figures_folder)
+        plt.close()
+        print("Plotted community satisfaction index")
+        self.plot_community_satisfaction_difference(file_path=figures_folder)
+        plt.close()
+        print("Plotted difference in community satisfaction")
+        self.plot_node_stability(file_path=figures_folder)
+        plt.close()
+        print("Plotted node stability map")
+        self.plot_node_stability_difference(file_path=figures_folder)
+        plt.close()
+        print("Plotted difference in node stability")
+        self.plot_attack_resilience(file_path=figures_folder)
+        plt.close()
+        print("Plotted attack resilience")
+
+    def _write_to_report_file(self, report_file_path, time_now, utc_label) -> None:
+        """
+        A helper function generating all the HTML tags and data tables in the
+        index.html file.
+
+        Arguments:
+            report_file_path (str): Path to the index.html file.
+            time_now (datetime): A datetime object, presumably current date and time.
+            utc_label (str): String to be added to the report signifying the timezone.
+                Presumably this just says "UTC" when the utc flag is used in the
+                report function; however, technically any string can be passed.
+
+        Returns:
+            None
+        """
+        with open(report_file_path, "w") as report_file:
+            report_file.write(
+                """<!DOCTYPE html> <html> <style> table {width: 50%;} img {width: 50%;} </style> <body>"""
+            )
+            report_file.write("<p><center>")
+            report_file.write(
+                f"""<h1> PyTradeShifts Report {time_now.replace("_", " ")} {utc_label} </h1> <br>"""
+            )
+            report_file.write("<h2> Trade communities </h2>")
+            report_file.write("""<img src="figs/trade_communities.png" >""")
+            report_file.write("<h2> Difference in trade communities </h2>")
+            report_file.write("""<img src="figs/community_diff.png">""")
+            report_file.write("<h2> Community satisfaction </h2>")
+            report_file.write("""<img src="figs/community_satisfaction.png">""")
+            report_file.write("<h2> Difference in community satisfaction </h2>")
+            report_file.write("""<img src="figs/community_satisfaction_diff.png" >""")
+            report_file.write(
+                "<h2> Graph structural difference to base scenario (ID=0) </h2>"
+            )
+            self.print_distance_metrics(file=report_file, justify="center")
+            if len(self.scenarios) > 2:
+                report_file.write("""<img src="figs/network_distance.png" >""")
+            report_file.write("<h2> Centrality metrics by scenario </h2>")
+            self.print_global_centrality_metrics(file=report_file, justify="center")
+            report_file.write("<h2> Centrality metrics by community </h2>")
+            self.print_per_community_centrality_metrics(
+                file=report_file, justify="center"
+            )
+            report_file.write("<h2> Centrality map </h2>")
+            report_file.write("""<img src="figs/centrality_map.png" >""")
+            report_file.write("<h2> Stability map </h2>")
+            report_file.write("""<img src="figs/node_stability.png" >""")
+            report_file.write("<h2> Difference in stability </h2>")
+            report_file.write("""<img src="figs/node_stability_diff.png" >""")
+            report_file.write("<h2> General network characteristics </h2>")
+            self.print_network_metrics(file=report_file, justify="center")
+            report_file.write("<h2> Attack resilience </h2>")
+            report_file.write("""<img src="figs/attack_resilience.png" >""")
+            report_file.write("</center></p>")
+            report_file.write("</body> </html>")
+
+    def report(self, path=f"results{os.sep}reports", utc=True) -> None:
+        """
+        Generates all results available in the postprocessing suite and formats
+        them into a readable report in the specified path.
+        Name of the report is date and time at the moment of calling the function,
+        time is UTC or local (controlled by a function parameter).
+        Note: this function does no allow for much personalisation of how the
+        results are presented. The idea of this function is to be run ``as is''.
+        If a custom solution is required use something else such as a jupyter notebook.
+        An example of such a notebook is provided at: scripts/scenario_comparison.ipynb.
+
+        Arguments:
+            path (str, optional): The localtion where the report is to be put.
+                This function will generate all necessary parent directories.
+            utc (bool, optional): Whether to use UTC or local time in the report.
+
+        Returns:
+            None
+        """
+        time_now = datetime.now(UTC) if utc else datetime.now()
+        time_now = time_now.strftime("%Y-%m-%d_%H:%M:%S")
+        utc_label = "UTC" if utc else ""
+        report_folder = f"{path}{os.sep}report_{time_now}"
+        Path(report_folder).mkdir(parents=True, exist_ok=True)
+        figures_folder = f"{report_folder}{os.sep}figs"
+        Path(figures_folder).mkdir(parents=True, exist_ok=True)
+        report_file_path = f"{report_folder}{os.sep}index.html"
+        print("Starting plotting procedures...")
+        self._plot_all_to_file(figures_folder)
+        print("Starting printing procedures...")
+        self._write_to_report_file(report_file_path, time_now, utc_label)
+        print("Fin.")
