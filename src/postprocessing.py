@@ -72,7 +72,10 @@ class Postprocessing:
         scenarios: list[PyTradeShifts],
         anchor_countries: list[str] = [],
         normalisation="weak",
-        stability_index_file=f"data{os.sep}stability_index{os.sep}worldbank_governence_indicator_2022_normalised.csv",
+        stability_index_file = (
+            f"data{os.sep}stability_index{os.sep}"
+            f"worldbank_governence_indicator_2022_normalised.csv"
+        ),
         gamma=1.0,
         random_attack_sample_size=100,
         testing=False,
@@ -502,7 +505,7 @@ class Postprocessing:
             df = df.set_index("Community\nID", drop=True)
             if file:
                 file.write(
-                    f"<h3> Degree centrality metrics for the scenario with ID: {scenario_id} </h3> <br>"
+                    f"<h3> Degree centrality metrics for the scenario with ID: {scenario_id}"
                 )
                 df.to_html(buf=file, **kwargs)
             else:
