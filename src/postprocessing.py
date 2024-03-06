@@ -72,10 +72,7 @@ class Postprocessing:
         scenarios: list[PyTradeShifts],
         anchor_countries: list[str] = [],
         normalisation="weak",
-        stability_index_file=(
-            f"data{os.sep}stability_index{os.sep}"
-            f"worldbank_governence_indicator_2022_normalised.csv"
-        ),
+        stability_index_file=f"data{os.sep}stability_index{os.sep}worldbank_governence_indicator_2022_normalised.csv",
         gamma=1.0,
         random_attack_sample_size=100,
         testing=False,
