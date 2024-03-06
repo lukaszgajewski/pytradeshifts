@@ -561,6 +561,11 @@ class PyTradeShifts:
             + self.scenario_file_name,
             index_col=0,
         ).squeeze()
+        # Cast all the values to float
+        scenario_data = pd.to_numeric(scenario_data, errors="raise")
+
+        # make sure that this only contains numbers
+        assert scenario_data.dtype == float
 
         assert isinstance(scenario_data, pd.Series)
 
