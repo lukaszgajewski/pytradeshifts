@@ -292,7 +292,7 @@ def plot_node_metric_map(
         + (
             f"\nin scenario: {scenario.scenario_name}"
             if scenario.scenario_name is not None
-            else " (no scenario)"
+            else "\n(no scenario)"
         )
     )
 
@@ -422,6 +422,7 @@ def get_graph_efficiency(graph: nx.Graph, normalisation: str | None = "weak") ->
 
     Arguments:
         graph (nx.Graph): The graph for which to compute the efficiency metric.
+        Note: we're assuming that all edges have a `1/weight` attribute.
         normalisation (str | None, opional): Whether to normalise (and if so how)
             the efficiency score. If `None` no normalisation occurs, if `strong`
             the score is divided by the efficiency of an ideal flow graph, if
@@ -431,14 +432,7 @@ def get_graph_efficiency(graph: nx.Graph, normalisation: str | None = "weak") ->
     Returns:
         float: The efficiency score.
     """
-    all_pairs_paths = dict(
-        nx.all_pairs_dijkstra(
-            graph,
-            weight=lambda _, __, attr: (
-                attr["weight"] ** -1 if attr["weight"] != 0 else np.inf
-            ),
-        )
-    )
+    all_pairs_paths = dict(nx.all_pairs_dijkstra(graph, weight="1/weight"))
     cost_matrix = pd.DataFrame(
         0.0,
         index=graph.nodes(),
@@ -472,7 +466,7 @@ def get_graph_efficiency(graph: nx.Graph, normalisation: str | None = "weak") ->
 
 
 def get_stability_index(
-    index_file="data/stability_index/worldbank_governence_indicator_2022_normalised.csv",
+    index_file=f"data{os.sep}stability_index{os.sep}worldbank_governence_indicator_2022_normalised.csv",
 ) -> dict[str, float]:
     """
     Reads the government stability index from the specified file.

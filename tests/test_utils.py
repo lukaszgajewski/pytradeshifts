@@ -72,6 +72,15 @@ def test_graph_efficiency() -> None:
     """
     adj_mat = np.random.random((100, 100))
     G = nx.DiGraph(adj_mat)
+    # get efficiency requires 1/weight attribute
+    nx.set_edge_attributes(
+        G,
+        values={
+            (u, v): d["weight"] ** -1 if d["weight"] != 0 else np.inf
+            for (u, v, d) in G.edges(data=True)
+        },
+        name="1/weight",
+    )
     weak = utils.get_graph_efficiency(G, "weak")
     strong = utils.get_graph_efficiency(G, "strong")
     none = utils.get_graph_efficiency(G, None)
