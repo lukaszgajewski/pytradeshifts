@@ -565,7 +565,7 @@ class PyTradeShifts:
         assert isinstance(scenario_data, pd.Series)
 
         # Make sure that all the values are above -100, as this is a percentage change
-        assert scenario_data.min() >= -100      
+        assert scenario_data.min() >= -100
 
         # Convert the percentage change to a scalar, so we can multiply the trade matrix with it
         scenario_data = 1 + scenario_data / 100
