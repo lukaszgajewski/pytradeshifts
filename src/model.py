@@ -42,6 +42,11 @@ class PyTradeShifts:
             If None, no scenario is applied.
         scenario_file_name (str, optional): The path to the scenario file.
             If None, no scenario is applied.
+        only_keep_scenario_countries (bool, optional): Whether to only keep the
+            countries that are in the scenario file or not. If True, only the
+            countries in the scenario file are kept. If False, all the countries
+            in the trade matrix are kept (but the scenario is only applied to the
+            countries in the scenario file).
         with_preprocessing (bool, optional): Whether to run the preprocessing
             or not.
         countries_to_remove (list, optional): A list of countries to remove
@@ -83,6 +88,7 @@ class PyTradeShifts:
         testing=False,
         scenario_name=None,
         scenario_file_name=None,
+        only_keep_scenario_countries=False,
         with_preprocessing=False,
         countries_to_remove=None,
         countries_to_keep=None,
@@ -100,6 +106,7 @@ class PyTradeShifts:
         self.region = region
         self.scenario_name = scenario_name
         self.scenario_file_name = scenario_file_name
+        self.only_keep_scenario_countries = only_keep_scenario_countries
         self.countries_to_remove = countries_to_remove
         self.countries_to_keep = countries_to_keep
         self.keep_singletons = keep_singletons
@@ -554,6 +561,11 @@ class PyTradeShifts:
             + self.scenario_file_name,
             index_col=0,
         ).squeeze()
+        # Cast all the values to float
+        scenario_data = pd.to_numeric(scenario_data, errors="raise")
+
+        # make sure that this only contains numbers
+        assert scenario_data.dtype == float
 
         assert isinstance(scenario_data, pd.Series)
 
@@ -562,6 +574,9 @@ class PyTradeShifts:
 
         # Convert the percentage change to a scalar, so we can multiply the trade matrix with it
         scenario_data = 1 + scenario_data / 100
+
+        # Make sure that all the values are above 0, as yield cannot become negative
+        assert scenario_data.min() >= 0
 
         # Drop all NaNs
         scenario_data = scenario_data.dropna()
@@ -572,25 +587,44 @@ class PyTradeShifts:
             pd.Series(scenario_data.index), to="name_short"
         )
 
-        # Only keep the countries that are in the trade matrix index, trade matrix columns and
-        # the scenario data
-        countries = np.intersect1d(
-            np.intersect1d(self.trade_matrix.index, self.trade_matrix.columns),
-            scenario_data.index,
-        )
-        self.trade_matrix = self.trade_matrix.loc[countries, countries]
-        scenario_data = scenario_data.loc[countries]
+        if self.only_keep_scenario_countries:
+            # Only keep the countries that are in the trade matrix index, trade matrix columns and
+            # the scenario data
+            countries = np.intersect1d(
+                np.intersect1d(self.trade_matrix.index, self.trade_matrix.columns),
+                scenario_data.index,
+            )
+            self.trade_matrix = self.trade_matrix.loc[countries, countries]
+            scenario_data = scenario_data.loc[countries]
 
-        # Sort the indices
-        self.trade_matrix = self.trade_matrix.sort_index(axis=0).sort_index(axis=1)
-        scenario_data = scenario_data.sort_index()
+            # Sort the indices
+            self.trade_matrix = self.trade_matrix.sort_index(axis=0).sort_index(axis=1)
+            scenario_data = scenario_data.sort_index()
 
-        # Make sure the indices + columns are the same
-        assert self.trade_matrix.index.equals(self.trade_matrix.columns)
-        assert self.trade_matrix.index.equals(scenario_data.index)
+            # Make sure the indices + columns are the same
+            assert self.trade_matrix.index.equals(self.trade_matrix.columns)
+            assert self.trade_matrix.index.equals(scenario_data.index)
 
-        # Multiply all the columns with the scenario data
-        self.trade_matrix = self.trade_matrix.mul(scenario_data.values, axis=0)
+            # Multiply all the columns with the scenario data
+            self.trade_matrix = self.trade_matrix.mul(scenario_data.values, axis=0)
+        
+        else:
+            # Multiply the trade matrix with the scenario data, but only for the countries
+            # that are in the scenario data. Still keep all the countries in the trade matrix.
+            # But first remove that are in the scenario data but not in the trade matrix, as
+            # we are not interested in them.
+
+            # Filter scenario data to include only countries present in the trade matrix
+            scenario_data = scenario_data[scenario_data.index.isin(self.trade_matrix.index)]
+            # Add all the countries that are in the trade matrix but not in the scenario data
+            # to the scenario data with a scalar of 1 (which means their production does not change)
+            scenario_data = scenario_data.reindex(self.trade_matrix.index, fill_value=1)
+
+            # Update trade matrix values based on scenario data (masking for missing values)
+            self.trade_matrix = self.trade_matrix.mul(scenario_data, axis=0)
+
+            # Assert index consistency
+            assert self.trade_matrix.index.equals(self.trade_matrix.columns)
 
         print(f"Applied scenario {self.scenario_name}.")
 
