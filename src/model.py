@@ -607,7 +607,6 @@ class PyTradeShifts:
 
             # Multiply all the columns with the scenario data
             self.trade_matrix = self.trade_matrix.mul(scenario_data.values, axis=0)
-
         else:
             # Multiply the trade matrix with the scenario data, but only for the countries
             # that are in the scenario data. Still keep all the countries in the trade matrix.
