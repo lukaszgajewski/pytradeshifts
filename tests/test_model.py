@@ -525,6 +525,3 @@ def test_apply_scenario() -> None:
     assert round(Wheat2018.trade_matrix.loc["Australia", "Bangladesh"], 1) == round(
         aus_ban, 1
     )
-
-    # Check if a country which is not in the scenario has been removed
-    assert "Indonesia" not in Wheat2018.trade_matrix.index

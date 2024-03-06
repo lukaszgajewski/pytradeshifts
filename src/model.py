@@ -570,6 +570,9 @@ class PyTradeShifts:
         # Convert the percentage change to a scalar, so we can multiply the trade matrix with it
         scenario_data = 1 + scenario_data / 100
 
+        # Make sure that all the values are above 0, as yield cannot become negative
+        assert scenario_data.min() >= 0
+
         # Drop all NaNs
         scenario_data = scenario_data.dropna()
 
@@ -605,10 +608,18 @@ class PyTradeShifts:
             # that are in the scenario data. Still keep all the countries in the trade matrix.
             # But first remove that are in the scenario data but not in the trade matrix, as
             # we are not interested in them.
-            scenario_data = scenario_data.loc[
-                self.trade_matrix.index.intersection(scenario_data.index)
-            ]
+
+            # Filter scenario data to include only countries present in the trade matrix
+            scenario_data = scenario_data[scenario_data.index.isin(self.trade_matrix.index)]
+            # Add all the countries that are in the trade matrix but not in the scenario data
+            # to the scenario data with a scalar of 1 (which means their production does not change)
+            scenario_data = scenario_data.reindex(self.trade_matrix.index, fill_value=1)
+
+            # Update trade matrix values based on scenario data (masking for missing values)
             self.trade_matrix = self.trade_matrix.mul(scenario_data, axis=0)
+
+            # Assert index consistency
+            assert self.trade_matrix.index.equals(self.trade_matrix.columns)
 
         print(f"Applied scenario {self.scenario_name}.")
 
