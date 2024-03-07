@@ -1439,7 +1439,12 @@ class Postprocessing:
         )
         num_scenarios = len(self.scenarios)
         alpha_steps = 0.9 / num_scenarios
-        colors = ['#6c7075', '#e06234', '#F0B323', '#3D87CB',]
+        colors = [
+            "#6c7075",
+            "#e06234",
+            "#F0B323",
+            "#3D87CB",
+        ]
         for idx, x in enumerate(self.percolation):
             if idx in exclude_scenarios:
                 continue
