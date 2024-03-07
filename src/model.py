@@ -607,7 +607,6 @@ class PyTradeShifts:
 
             # Multiply all the columns with the scenario data
             self.trade_matrix = self.trade_matrix.mul(scenario_data.values, axis=0)
-        
         else:
             # Multiply the trade matrix with the scenario data, but only for the countries
             # that are in the scenario data. Still keep all the countries in the trade matrix.
@@ -615,7 +614,9 @@ class PyTradeShifts:
             # we are not interested in them.
 
             # Filter scenario data to include only countries present in the trade matrix
-            scenario_data = scenario_data[scenario_data.index.isin(self.trade_matrix.index)]
+            scenario_data = scenario_data[
+                scenario_data.index.isin(self.trade_matrix.index)
+            ]
             # Add all the countries that are in the trade matrix but not in the scenario data
             # to the scenario data with a scalar of 1 (which means their production does not change)
             scenario_data = scenario_data.reindex(self.trade_matrix.index, fill_value=1)
