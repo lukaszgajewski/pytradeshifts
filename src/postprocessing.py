@@ -1437,9 +1437,13 @@ class Postprocessing:
             linestyle="dashed",
             label="network collapse; \n[ID, attack, threshold]:",
         )
+        num_scenarios = len(self.scenarios)
+        alpha_steps = 0.9 / num_scenarios
+        colors = ['#6c7075', '#e06234', '#F0B323', '#3D87CB',]
         for idx, x in enumerate(self.percolation):
             if idx in exclude_scenarios:
                 continue
+            alpha = 1
             if "export" not in exclude_attacks:
                 threshold, removed_nodes, eigenvalues = x["export"]
                 ax.plot(
@@ -1447,7 +1451,10 @@ class Postprocessing:
                     eigenvalues,
                     "-",
                     label=f"{idx}, export, {threshold}",
+                    color=colors[idx],
+                    alpha=alpha,
                 )
+                alpha -= alpha_steps
             if "entropic" not in exclude_attacks:
                 threshold, removed_nodes, eigenvalues = x["entropic"]
                 ax.plot(
@@ -1455,7 +1462,10 @@ class Postprocessing:
                     eigenvalues,
                     "-",
                     label=f"{idx}, entropic, {threshold}",
+                    color=colors[idx],
+                    alpha=alpha,
                 )
+                alpha -= alpha_steps
             if "random" not in exclude_attacks:
                 threshold, threshold_sem, random_attacks_df = x["random"]
                 sb.lineplot(
@@ -1465,6 +1475,8 @@ class Postprocessing:
                     errorbar=("se", sigma),
                     label=f"{idx}, random, {threshold:.2g} +/- {sigma*threshold_sem:.2g}",
                     ax=ax,
+                    color=colors[idx],
+                    alpha=alpha,
                 )
         ax.set_xlabel("# of removed nodes.")
         ax.set_ylabel("Max adj. eigenval. post node removal.")
