@@ -334,6 +334,11 @@ def remove_entries_from_data(
         # We want to look at China and Taiwan seperately, so this is not needed
         # as 159 refers to China incl. Taiwan
         "China": "'159",
+        # There a bunch of very small countries and islands which only are present in very
+        # few years and usually have no trade data. As this gives our preprocessing a hard time
+        # we remove them here
+        "Midway Island": "'488",
+        "Monaco": "'492",
     }
 
     # Remove the entries
@@ -406,8 +411,16 @@ def main(
     item = rename_item(item)
 
     # Make sure that production index and trade matrix index/columns are the same
-    assert production.index.equals(trade_matrix.index)
-    assert production.index.equals(trade_matrix.columns)
+    # and print out the difference if there is any
+    assert trade_matrix.index.equals(trade_matrix.columns), f"difference: {trade_matrix.index.difference(
+        trade_matrix.columns
+    )}"
+    assert production.index.equals(trade_matrix.index), f"difference: {production.index.difference(
+        trade_matrix.index
+    )}"
+    assert production.index.equals(trade_matrix.columns), f"difference: {production.index.difference(
+        trade_matrix.columns
+    )}"
 
     # Replace "All_Data" with "global" for readability
     if region == "All_Data":
