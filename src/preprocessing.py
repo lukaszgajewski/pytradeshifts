@@ -3,6 +3,8 @@ import os
 import country_converter as coco
 import logging
 from zipfile import ZipFile
+from time import time
+from tqdm import tqdm
 
 # This is just to keep the output clean, as otherwise the coco packages notifies
 # you about every regex match that did not work
@@ -29,8 +31,9 @@ def rename_item(item: str) -> str:
         str: The renamed item name.
     """
     item_renames = {
-        "Maize (corn)": "Maize",
-        "Rice, paddy (rice milled equivalent)": "Rice",
+        # "Maize (corn)": "Maize",
+        # "Rice, paddy (rice milled equivalent)": "Rice",
+        "Swine / pigs": "pig",
     }
     return item_renames.get(item, item)
 
@@ -344,35 +347,28 @@ def remove_entries_from_data(
     return data
 
 
+def get_all_item_names(production_pkl):
+    prod = pd.read_pickle(production_pkl)
+    return prod["Item"].unique()
+
+
 def main(
     region: str,
-    item: str,
     production_unit="t",
     trade_unit="tonnes",
     element="Export Quantity",
-    year="Y2018",
+    year="Y2020",
 ) -> None:
     try:
-        print(f"Reading in data for {item} in {region}...")
+        print(f"Reading in data for all items in {region}...")
         production_pkl = (
             f"data{os.sep}temp_files{os.sep}Production_Crops_Livestock_E_{region}.pkl"
         )
         trade_pkl = (
             f"data{os.sep}temp_files{os.sep}Trade_DetailedTradeMatrix_E_{region}.pkl"
         )
-        production, trade_matrix = format_prod_trad_data(
-            production_pkl,
-            trade_pkl,
-            item,
-            production_unit,
-            trade_unit,
-            element,
-            year,
-        )
     except FileNotFoundError:
-        print(
-            f"Data for {item} in {region} in pickle format not found. Reading zip to create pickle"
-        )
+        print(f"Pickled Data in {region} not found. Reading zip to create pickle.")
         production_zip = (
             f"data{os.sep}data_raw{os.sep}Production_Crops_Livestock_E_{region}.zip"
         )
@@ -381,13 +377,19 @@ def main(
         )
         serialise_faostat_bulk(production_zip)
         serialise_faostat_bulk(trade_zip)
-        print(f"Pickles created. Reading in data for {item} in {region}...")
-        # Replace the zip with the pickle and link to the temp files folder
-        production_pkl = production_zip.replace("zip", "pkl")
-        trade_pkl = trade_zip.replace("zip", "pkl")
-        production_pkl = production_pkl.replace("data_raw", "temp_files")
-        trade_pkl = trade_pkl.replace("data_raw", "temp_files")
+        print("Serialisation complete. Run the script again.")
+        return
 
+    items = get_all_item_names(production_pkl)
+    # Replace "All_Data" with "global" for readability
+    region_label = "Global" if region == "All_Data" else region
+
+    for item in tqdm(items):
+        p_f_name = f"data{os.sep}preprocessed_data{os.sep}integrated_model{os.sep}{item}_{year}_{region_label}_production.csv"
+        t_f_name = f"data{os.sep}preprocessed_data{os.sep}integrated_model{os.sep}{item}_{year}_{region_label}_trade.csv"
+        if os.path.isfile(p_f_name) and os.path.isfile(t_f_name):
+            print(item, "files already exist, skipping.")
+            continue
         production, trade_matrix = format_prod_trad_data(
             production_pkl,
             trade_pkl,
@@ -397,44 +399,60 @@ def main(
             element,
             year,
         )
+        try:
+            # Replace country codes with country names
+            trade_matrix = rename_countries(
+                trade_matrix, region, "Trade_DetailedTradeMatrix_E"
+            )
+            production = rename_countries(
+                production, region, "Production_Crops_Livestock_E"
+            )
+        except AttributeError as AE:
+            # TODO: this happens for Tallowtree, Jojoba seed
+            # reason is: only China, Mexico produces it, and nobody buys it
+            # needs to be resolved manually later on
+            print(item)
+            print(production)
+            print(trade_matrix)
+            print(AE)
+            continue
 
-    # Replace country codes with country names
-    trade_matrix = rename_countries(trade_matrix, region, "Trade_DetailedTradeMatrix_E")
-    production = rename_countries(production, region, "Production_Crops_Livestock_E")
+        # Rename the item for readability
+        if "/" in item:
+            item = rename_item(item)
+            p_f_name = f"data{os.sep}preprocessed_data{os.sep}integrated_model{os.sep}{item}_{year}_{region_label}_production.csv"
+            t_f_name = f"data{os.sep}preprocessed_data{os.sep}integrated_model{os.sep}{item}_{year}_{region_label}_trade.csv"
 
-    # Rename the item for readability
-    item = rename_item(item)
+        # Make sure that production index and trade matrix index/columns are the same
+        if not production.index.equals(trade_matrix.index):
+            print("index != index", item)
+            continue
+        if not production.index.equals(trade_matrix.columns):
+            print("index != columns", item)
+            continue
 
-    # Make sure that production index and trade matrix index/columns are the same
-    assert production.index.equals(trade_matrix.index)
-    assert production.index.equals(trade_matrix.columns)
-
-    # Replace "All_Data" with "global" for readability
-    if region == "All_Data":
-        region = "Global"
-
-    # Save to CSV
-    production.to_csv(
-        f"data{os.sep}preprocessed_data{os.sep}{item}_{year}_{region}_production.csv"
-    )
-    trade_matrix.to_csv(
-        f"data{os.sep}preprocessed_data{os.sep}{item}_{year}_{region}_trade.csv"
-    )
+        # Save to CSV
+        try:
+            production.to_csv(p_f_name)
+            trade_matrix.to_csv(t_f_name)
+        except OSError as OSE:
+            t = time()
+            print(f"Something broke when saving {item} to file, saving to a temp csv")
+            print("CSV ID: ", t)
+            production.to_csv(f"{t}_prod.csv")
+            trade_matrix.to_csv(f"{t}_trade.csv")
+            print(OSE)
 
 
 if __name__ == "__main__":
     # Define values
-    year = "Y2018"
-    items_trade = ["Maize (corn)", "Wheat", "Rice, paddy (rice milled equivalent)"]
+    year = "Y2020"
     # Define regions for which the data is processed
     # "Oceania" is used for testing, as it has the least amount of countries
     # to run with all data use: "All_Data" for region
+    # WARNING: takes 2-3 hourse on a laptop
     region = "All_Data"
-    print("\n")
-    for item in items_trade:
-        main(
-            region,
-            item,
-            year=year,
-        )
-        print("\n\n")
+    main(
+        region,
+        year=year,
+    )
