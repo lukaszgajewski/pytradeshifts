@@ -1,3 +1,8 @@
+# DO NOT USE
+This branch for internal use only (for now).
+
+The idea is to generate trading data that can be used in the [integrated model](https://github.com/allfed/allfed-integrated-model)
+
 # PyTradeShifts
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![Testing](https://github.com/allfed/pytradeshifts/actions/workflows/testing.yml/badge.svg)
