@@ -186,7 +186,6 @@ Here are the matches between items from set A and set B:
 178. Pomelos and grapefruits - Grapefruit (inc. pomelos)
 179. Asses - Meat, ass
 180. Edible offal of pigs, fresh, chilled or frozen - Offals, pigs, edible
-
 181. Safflower-seed oil, crude - Oil, safflower
 182. Raw hides and skins of sheep or lambs - Not matched
 183. Skim milk, condensed - Milk, skimmed condensed
@@ -282,7 +281,6 @@ Here are the matches between items from set A and set B:
 273. Melonseed - Melonseed
 274. Raw cane or beet sugar (centrifugal only) - Sugar Raw Centrifugal
 275. Margarine and shortening - Margarine, short
-
 276. Pig fat, rendered - Fat, pigs
 277. Kapok fruit - Kapok fruit
 278. Onions and shallots, green - Onions, shallots, green
@@ -340,4 +338,3 @@ Here are the matches between items from set A and set B:
 330. Olives - Olives
 331. Cheese from milk of buffalo, fresh or processed - Cheese, buffalo milk
 332. Flax, processed but not spun - Not matched
-
