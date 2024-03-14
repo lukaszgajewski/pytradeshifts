@@ -1,6 +1,8 @@
 import os
+from os.path import isfile
 import pandas as pd
 import numpy as np
+from tqdm import tqdm
 from src.model import PyTradeShifts
 
 
@@ -35,14 +37,15 @@ class DomesticSupply(PyTradeShifts):
             None
         """
         assert self.trade_matrix is None
+        print(f"Attempting to load {self.crop} in {self.base_year}.")
         # Read in the data
         trade_matrix = pd.read_csv(
-            f".{os.sep}data{os.sep}preprocessed_data{os.sep}integrated_model{os.sep}{self.crop}_{self.base_year}_{self.region}_trade.csv",
+            f".{os.sep}data{os.sep}preprocessed_data{os.sep}integrated_model{os.sep}prod_trade{os.sep}{self.crop}_{self.base_year}_{self.region}_trade.csv",
             index_col=0,
         )
 
         production_data = pd.read_csv(
-            f".{os.sep}data{os.sep}preprocessed_data{os.sep}integrated_model{os.sep}{self.crop}_{self.base_year}_{self.region}_production.csv",
+            f".{os.sep}data{os.sep}preprocessed_data{os.sep}integrated_model{os.sep}prod_trade{os.sep}{self.crop}_{self.base_year}_{self.region}_production.csv",
             index_col=0,
         ).squeeze()
 
@@ -98,6 +101,48 @@ class DomesticSupply(PyTradeShifts):
         return ds.squeeze()
 
 
+def get_allowed_items():
+    prefix = f"data{os.sep}preprocessed_data{os.sep}integrated_model"
+    path = prefix + f"{os.sep}prod_trade"
+    suffix = "_Y2020_Global_production.csv"  # TODO: generalise for any year/region
+    supply_items = set(
+        [
+            f[: -len(suffix)]
+            for f in os.listdir(path)
+            if os.path.isfile(os.path.join(path, f)) and "production" in f
+        ]
+    )
+    allowed_items = set(
+        pd.read_csv(
+            prefix + f"{os.sep}from_IM{os.sep}FAOSTAT_food_production_2020.csv"
+        )["Item"].values
+    )
+    print(len(supply_items), len(allowed_items))
+    print(len(supply_items.intersection(allowed_items)))
+    print(len(allowed_items.difference(supply_items)))
+    print(supply_items)
+    print(allowed_items.difference(supply_items))
+    exit(1)
+
+
 if __name__ == "__main__":
-    DS = DomesticSupply("Wheat", 2020)
-    print(DS.get_domestic_supply())
+    for item in tqdm(get_allowed_items()):
+        ds_fname = f"data{os.sep}preprocessed_data{os.sep}integrated_model{os.sep}domestic_supply{os.sep}{item}_2020_Global_supply.csv"
+        if os.path.isfile(ds_fname):
+            print(f"{item} domestic supply file already exists, skipping.")
+            continue
+        try:
+            DS = DomesticSupply(item, 2020)
+        except FileNotFoundError:
+            print(f"{item} production/trade data not found, skipping.")
+            continue
+        except (np.linalg.LinAlgError, np.core._exceptions._UFuncInputCastingError):
+            print(f"{item} has a singular matrix problem, skipping.")
+            continue
+        ds = DS.get_domestic_supply()
+        try:
+            ds.to_csv(ds_fname)
+        except AttributeError:
+            print(f"{item} seems result in a single value:", ds)
+            print("Domestic supply file shall not be made.")
+            continue
