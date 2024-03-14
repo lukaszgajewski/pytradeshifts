@@ -15,6 +15,9 @@ supply_items = set(
 xls = pd.ExcelFile(prefix + f"{os.sep}from_IM{os.sep}Supplemental_Data.xlsx")
 nutrition = pd.read_excel(xls, "Nutrition")[["Item", "Calories", "Protein", "Fat"]]
 nutrition_items = set(nutrition["Item"].dropna().unique())
+print(supply_items)
+print(nutrition_items)
+exit(1)
 missing_items = supply_items.difference(nutrition_items)
 guessed_matches = {
     mis_item: max(nutrition_items, key=lambda it: jaccard_index(it, mis_item))

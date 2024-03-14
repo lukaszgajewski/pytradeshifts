@@ -1,0 +1,343 @@
+Having two sets: A and B, match each item of set A with a corresponding item in set B, or say that there is no match.
+
+set A is {'Kenaf, and other textile bast fibres, raw or retted', 'Papayas', 'Tallow', 'Pigeon peas, dry', 'Beer of barley, malted', 'Cloves (whole stems), raw', 'Hop cones', 'Apples', 'Edible offals of camels and other camelids, fresh, chilled or frozen', 'Castor oil seeds', 'Abaca, manila hemp, raw', 'Natural rubber in primary forms', 'Meat of other domestic rodents, fresh or chilled', 'Avocados', 'Meat of turkeys, fresh or chilled', 'Yams', 'Sugar Crops Primary', 'Blueberries', 'Meat of mules, fresh or chilled', 'Cucumbers and gherkins', 'Broad beans and horse beans, green', 'Citrus Fruit, Total', 'Cranberries', 'Raw hides and skins of buffaloes', 'Natural honey', 'Cashewapple', 'Sour cherries', 'Sugar beet', 'Oil of maize', 'Other pulses n.e.c.', 'Soya beans', 'Whey, condensed', 'Pyrethrum, dried flowers', 'Cashew nuts, in shell', 'Oranges', 'pig', 'Other rodents', 'Coconuts, in shell', 'Sheep and Goat Meat', 'Meat of goat, fresh or chilled', 'Plums and sloes', 'Cabbages', 'Oats', 'Chestnuts, in shell', 'Ghee from buffalo milk', 'Vegetables Primary', 'Turkeys', 'Watermelons', 'Wine', 'Meat of other domestic camelids, fresh or chilled', 'Ginger, raw', 'Fat of pigs', 'Areca nuts', 'Cotton seed', 'Pepper (Piper spp.), raw', 'Other fibre crops, raw, n.e.c.', 'Olive oil', 'Pumpkins, squash and gourds', 'Palm oil', 'Eggs Primary', 'Raw hides and skins of goats or kids', 'Butter of cow milk', 'Meat of sheep, fresh or chilled', 'Peas, dry', 'Meat, Poultry', 'Cassava leaves', 'Balata, gutta-percha, guayule, chicle and similar natural gums in primary forms or in plates, sheets or strip', 'Raw silk (not thrown)', 'Quinoa', 'Oil of sesame seed', 'Fibre Crops, Fibre Equivalent', 'Skim milk of cows', 'Skim milk, evaporated', 'Oil of palm kernel', 'Sheep and Goats', 'Plantains and cooking bananas', 'Chickens', 'Beeswax', 'Fonio', 'Onions and shallots, dry (excluding dehydrated)', 'Goat fat, unrendered', 'Meat of cattle with the bone, fresh or chilled', 'Cinnamon and cinnamon-tree flowers, raw', 'Green corn (maize)', 'Asparagus', 'Raw milk of goats', 'Roots and Tubers, Total', 'Poppy seed', 'Other stimulant, spice and aromatic crops, n.e.c.', 'Unmanufactured tobacco', 'Mustard seed', 'Geese', 'Meat of ducks, fresh or chilled', 'Cow peas, dry', 'Sorghum', 'Ghee from cow milk', 'Bambara beans, dry', 'Other meat n.e.c. (excluding mammals), fresh, chilled or frozen', 'Oil palm fruit', 'Whole milk, evaporated', 'Butter of buffalo milk', 'Spinach', 'Gooseberries', 'Edible roots and tubers with high starch or inulin content, n.e.c., fresh', 'Whole milk powder', 'Cauliflowers and broccoli', 'Other oil seeds, n.e.c.', 'Butter and ghee of sheep milk', 'Other berries and fruits of the genus vaccinium n.e.c.', 'Tomatoes', 'Other pome fruits', 'Anise, badian, coriander, cumin, caraway, fennel and juniper berries, raw', 'Cassava, fresh', 'Vanilla, raw', 'Coffee, green', 'Currants', 'Eggplants (aubergines)', 'Edible offals of horses and other equines,  fresh, chilled or frozen', 'Chillies and peppers, dry (Capsicum spp., Pimenta spp.), raw', 'Cattle fat, unrendered', 'Peas, green', 'Other citrus fruit, n.e.c.', 'Groundnut oil', 'Sesame seed', 'Raw hides and skins of cattle', 'Oilcrops, Cake Equivalent', 'Shorn wool, greasy, including fleece-washed shorn wool', 'Ramie, raw or retted', 'Poultry Birds', 'Kiwi fruit', 'Snails, fresh, chilled, frozen, dried, salted or in brine, except sea snails', 'Goats', 'Other tropical fruits, n.e.c.', 'Horse meat, fresh or chilled', 'Coconut oil', 'Mixed grain', 'Peppermint, spearmint', 'Yoghurt', 'Dates', 'Meat, Total', 'Whole milk, condensed', 'Tangerines, mandarins, clementines', 'Other fruits, n.e.c.', 'Fruit Primary', 'True hemp, raw or retted', 'Pineapples', 'Other sugar crops n.e.c.', 'Buffalo', 'Cotton lint, ginned', 'Strawberries', 'Karite nuts (sheanuts)', 'Sunflower-seed oil, crude', 'Beans, dry', 'Kapokseed in shell', 'Skim Milk & Buttermilk, Dry', 'Edible offal of goat, fresh, chilled or frozen', 'Millet', 'Tung nuts', 'Rabbits and hares', 'Yautia', 'Cantaloupes and other melons', 'Raw milk of cattle', 'Maize (corn)', 'Oilcrops, Oil Equivalent', 'Sheep', 'Tea leaves', 'Fat of camels', 'Meat of pig with the bone, fresh or chilled', 'Okra', 'Cherries', 'Agave fibres, raw, n.e.c.', 'Meat of rabbits and hares, fresh or chilled', 'Raw milk of camel', 'Buffalo fat, unrendered', 'String beans', 'Coir, raw', 'Almonds, in shell', 'Pomelos and grapefruits', 'Asses', 'Edible offal of pigs, fresh, chilled or frozen', 'Safflower-seed oil, crude', 'Raw hides and skins of sheep or lambs', 'Skim milk, condensed', 'Cheese (All Kinds)', 'Skim milk and whey powder', 'Walnuts, in shell', 'Pears', 'Wheat', 'Seed cotton, unginned', 'Quinces', 'Sisal, raw', 'Sugar cane', 'Bananas', 'Locust beans (carobs)', 'Oil of linseed', 'Cottonseed oil', 'Lupins', 'Olives', 'Cheese from milk of buffalo, fresh or processed', 'Flax, processed but not spun', 'Molasses', 'Taro', 'Raw milk of sheep', 'Jute, raw or retted', 'Cocoa beans', 'Beef and Buffalo Meat, primary', 'Cheese from milk of goats, fresh or processed', 'Meat of camels, fresh or chilled', 'Whey, dry', 'Camels', 'Meat of buffalo, fresh or chilled', 'Cattle and Buffaloes', 'Raspberries', 'Hazelnuts, in shell', 'Other camelids', 'Rape or colza seed', 'Grapes', 'Bees', 'Buttermilk, dry', 'Carrots and turnips', 'Soya bean oil', 'Cereals, primary', 'Mules and hinnies', 'Edible offal of cattle, fresh, chilled or frozen', 'Silk-worm cocoons suitable for reeling', 'Meat of asses, fresh or chilled', 'Pulses, Total', 'Meat of pigeons and other birds n.e.c., fresh, chilled or frozen', 'Hen eggs in shell, fresh', 'Cheese from whole cow milk', 'Sheep fat, unrendered', 'Lemons and limes', 'Butter of goat milk', 'Chick peas, dry', 'Cream, fresh', 'Pistachios, in shell', 'Nutmeg, mace, cardamoms, raw', 'Sunflower seed', 'Sweet potatoes', 'Evaporated & Condensed Milk', 'Vetches', 'Rye', 'Ducks', 'Raw milk of buffalo', 'Lettuce and chicory', 'Horses', 'Chicory roots', 'Edible offal of sheep, fresh, chilled or frozen', 'Linseed', 'Lentils, dry', 'Brazil nuts, in shell', 'Kola nuts', 'Other vegetables, fresh n.e.c.', 'Eggs from other birds in shell, fresh, n.e.c.', 'Game meat, fresh, chilled or frozen', 'Potatoes', 'Broad beans and horse beans, dry', 'Rapeseed or canola oil, crude', 'Treenuts, Total', 'Barley', 'Green tea (not fermented), black tea (fermented) and partly fermented tea, in immediate packings of a content not exceeding 3 kg', 'Chillies and peppers, green (Capsicum spp. and Pimenta spp.)', 'Figs', 'Milk, Total', 'Triticale', 'Rice', 'Canary seed', 'Groundnuts, excluding shelled', 'Hempseed', 'Peaches and nectarines', 'Persimmons', 'Mushrooms and truffles', 'Melonseed', 'Raw cane or beet sugar (centrifugal only)', 'Margarine and shortening', 'Pig fat, rendered', 'Kapok fruit', 'Onions and shallots, green', 'Butter and Ghee', 'Meat of geese, fresh or chilled', 'Green garlic', 'Cheese from milk of sheep, fresh or processed', 'Cheese from skimmed cow milk', 'Palm kernels', 'Other nuts (excluding wild edible nuts and groundnuts), in shell, n.e.c.', 'Buckwheat', 'Other beans, green', 'Leeks and other alliaceous vegetables', 'Other stone fruits', 'Meat of chickens, fresh or chilled', 'Cattle', 'Artichokes', 'Safflower seed', 'Edible offal of buffalo, fresh, chilled or frozen', 'Maté leaves', 'Cereals n.e.c.', 'Kapok fibre, raw', 'Mangoes, guavas and mangosteens', 'Apricots'}
+
+set B is {'Milk, whole fresh camel', 'Onions, dry', 'Blueberries', 'Juice, lemon, concentrated', 'Bulgur', 'Cucumbers and gherkins', 'Fatty acids', 'Beer of millet', 'Cashewapple', 'Cheese, buffalo milk', 'Flour, rye', 'Oranges', 'Rice, milled', 'Cheese, skimmed cow milk', 'Plantains and others', 'Margarine, liquid', 'Milk, skimmed sheep', 'Fruits, nuts, peel, sugar preserved', 'Fruit, prepared nes', 'Oil, poppy', 'Nuts nes', 'Wine', 'Food prep nes', 'Starch, cassava', 'Oils, fats of animal nes', 'Germ, maize', 'Peas, dry', 'Bread', 'Quinoa', 'Meat, goat', 'Offals, sheep,edible', 'Meat, turkey', 'Offals, liver geese', 'Oil palm fruit', 'Whey, cheese', 'Juice, grapefruit', 'Roots and tubers dried', 'Juice, vegetables nes', 'Butter, goat milk', 'Meat, beef, dried, salted, smoked', 'Sesame seed', 'Coconuts', 'Offals, horses', 'Oil, sesame', 'Gluten, rice', 'Cheese, goat milk', 'Peanut butter', 'Maize, green', 'Offals, edible, cattle', 'Cherries, sour', 'Gluten, wheat', 'Maté', 'Sugar refined', 'Eggs, liquid', 'Cassava', 'Fat, poultry, rendered', 'Eggs, other bird, in shell', 'Starch, potatoes', 'Carobs', 'Taro (cocoyam)', 'Milk, skimmed goat', 'Cider etc', 'Oil, groundnut', 'Olives', 'Hazelnuts, with shell', 'Starch, wheat', 'Bran, millet', 'Mushrooms, canned', 'Whey, dry', 'Tapioca, potatoes', 'Bran, oats', 'Beer of barley', 'Meat nes', 'Grapes', 'Fat, pig butcher', 'Bran, buckwheat', 'Lard stearine oil', 'Leeks, other alliaceous vegetables', 'Meat, cattle, boneless (beef & veal)', 'Sunflower seed', 'Flour, buckwheat', 'Cereals nes', 'Flour, fruit', 'Offals, liver turkeys', 'Milk, whole fresh buffalo', 'Pepper (piper spp.)', 'Ghee, buffalo milk', 'Meat, pork', 'Potatoes', 'Fructose chemically pure', 'Meat, homogenized preparations', 'Eggs, dried', 'Fat, sheep', 'Triticale', 'Peaches and nectarines', 'Raisins', 'Liver prep.', 'Bran, triticale', 'Kapok fruit', 'Fat, cattle', 'Sweet corn prep or preserved', 'Meat, beef and veal sausages', 'Almonds shelled', 'Safflower seed', 'Vegetables, preserved nes', 'Grease incl. lanolin wool', 'Apricots', 'Flour, cereals', 'Vanilla', 'Soybeans', 'Papayas', 'Tallow', 'Oil, palm kernel', 'Yautia (cocoyam)', 'Bran, wheat', 'Malt', 'Juice, tomato', 'Meat, chicken, canned', 'Degras', 'Meat, camel', 'Ginger', 'Yams', 'Cocoa, paste', 'Milk, dry buttermilk', 'Tapioca, cassava', 'Oil, cottonseed', 'Buttermilk, curdled, acidified milk', 'Chocolate products nes', 'Groundnuts, with shell', 'Plums and sloes', 'Oats', 'Bran, barley', 'Fruit, fresh nes', 'Watermelons', 'Sugar crops nes', 'Barley, pearled', 'Flour, rice', 'Flour, barley and grits', 'Meat, game', 'Oil, soybean', 'Starch, rice', 'Yoghurt, concentrated or not', 'Onions, shallots, green', 'Gluten, maize', 'Fat, camels', 'Castor oil seed', 'Almonds, with shell', 'Fruit, cooked, homogenized preparations', 'Sweet corn frozen', 'Meat, beef, preparations', 'Beverages, fermented rice', 'Cinnamon (cannella)', 'Vermouths & similar', 'Juice, citrus, single strength', 'Flour, sorghum', 'Grapefruit (inc. pomelos)', 'Gooseberries', 'Groundnuts, prepared', 'Pineapples canned', 'Spinach', 'Grapes, must', 'Vegetables, preserved, frozen', 'Juice, lemon, single strength', 'Brazil nuts, with shell', 'Tomatoes', 'Currants', 'Flour, mixed grain', 'Cheese, whole cow milk', 'Yoghurt', 'Pineapples', 'Mangoes, mangosteens, guavas', 'Kapokseed in shell', 'Apricots, dry', 'Cabbages and other brassicas', 'Rice, husked', 'Millet', 'Vegetable tallow', 'Cocoa, butter', 'Vegetables, fresh nes', 'String beans', 'Flour, potatoes', 'Soya curd', 'Oil, castor beans', 'Tomatoes, peeled', 'Meat, duck', 'Wheat', 'Meat, other rodents', 'Bacon and ham', 'Meat, ass', 'Vegetables, dehydrated', 'Meat, extracts', 'Oil, tung nuts', 'Vegetables, frozen', 'Sugar nes', 'Meat, goose and guinea fowl', 'Cereal preparations nes', 'Fat, goats', 'Butter and ghee, sheep milk', 'Lemons and limes', 'Juice, apple, concentrated', 'Chicory roots', 'Vetches', 'Beer of sorghum', 'Lettuce and chicory', 'Fruit, tropical dried nes', 'Pigeon peas', 'Figs dried', 'Bran, rye', 'Kola nuts', 'Barley', 'Bran, fonio', 'Tomatoes, paste', 'Bran, mixed grains', 'Offals, edible, camels', 'Oil, kapok', 'Juice, pineapple', 'Maltose chemically pure', 'Hempseed', 'Chillies and peppers, dry', 'Persimmons', 'Cassava dried', 'Tallowtree seed', 'Oil, coconut (copra)', 'Malt extract', 'Mixes and doughs', 'Beans, green', 'Juice, mango', 'Beer of maize', 'Flour, mustard', 'Cashew nuts, with shell', 'Bran, cereals nes', 'Feed and meal, gluten', 'Cranberries', 'Fat, cattle butcher', 'Juice, citrus, concentrated', 'Whey, condensed', 'Juice, fruit nes', 'Soya paste', 'Bran, pulses', 'Jojoba seed', 'Beverages, fermented wheat', 'Sugar Raw Centrifugal', 'Rice, paddy', 'Snails, not sea', 'Juice, grapefruit, concentrated', 'Lentils', 'Pistachios', 'Brazil nuts, shelled', 'Germ, wheat', 'Bran, maize', 'Lard', 'Fonio', 'Offals, pigs, edible', 'Fruit, stone nes', 'Cheese, processed', 'Poppy seed', 'Meat nes, preparations', 'Milk, skimmed dried', 'Oil, sunflower', 'Cauliflowers and broccoli', 'Barley, pot', 'Meat, pig sausages', 'Melons, other (inc.cantaloupes)', 'Eggplants (aubergines)', 'Vegetables, homogenized preparations', 'Cereals, breakfast', 'Cheese, sheep milk', 'Oil, mustard', 'Flour, roots and tubers nes', 'Milk, whole fresh sheep', 'Garlic', 'Nuts, prepared (exc. groundnuts)', 'Dates', 'Vegetables, temporarily preserved', 'Milk, skimmed evaporated', 'Juice, pineapple, concentrated', 'Rice, milled/husked', 'Strawberries', 'Nutmeg, mace and cardamoms', 'Karite nuts (sheanuts)', 'Beans, dry', 'Fat, liver prepared (foie gras)', 'Anise, badian, fennel, coriander', 'Juice, tangerine', 'Offals, edible, goats', 'Cherries', 'Milk, whole dried', 'Pears', 'Chestnut', 'Groundnuts, shelled', 'Offals, liver duck', 'Sugar cane', 'Starch, maize', 'Meat, cattle', 'Offals nes', 'Spices nes', 'Molasses', 'Flour, fonio', 'Eggs, hen, in shell', 'Pulses nes', 'Carrots and turnips', 'Flour, cassava', 'Maize', 'Castor oil, hydrogenated (opal wax)', 'Casein', 'Juice, grape', 'Rapeseed', 'Fat, pigs', 'Rye', 'Butter, cow milk', 'Linseed', 'Flour, pulses', 'Plums dried (prunes)', 'Fat nes, prepared', 'Fruit, dried nes', 'Milk, whole evaporated', 'Figs', 'Roots and tubers nes', 'Milk, skimmed buffalo', 'Meat, chicken', 'Vegetables, leguminous nes', 'Macaroni', 'Oil, vegetable origin nes', 'Flour, triticale', 'Buckwheat', 'Artichokes', 'Meat, rabbit', 'Rice, broken', 'Mushrooms, dried', 'Egg albumine', 'Butter, buffalo milk', 'Wafers', 'Coffee, substitutes containing coffee', 'Milk, skimmed cow', 'Cottonseed', 'Apples', 'Avocados', 'Oil, hydrogenated', 'Sugar beet', 'Meat, horse', 'Cocoa, beans', 'Coffee, roasted', 'Cream fresh', 'Juice, plum, single strength', 'Vegetables in vinegar', 'Oil, olive residues', 'Grain, mixed', 'Bran, rice', 'Areca nuts', 'Ice cream and edible ice', 'Meat, pig, preparations', 'Oil, safflower', 'Pumpkins, squash and gourds', 'Berries nes', 'Cassava leaves', 'Oil, linseed', 'Oats rolled', 'Asparagus', 'Ghee, butteroil of cow milk', 'Cow peas, dry', 'Mustard seed', 'Sorghum', 'Fat, poultry', 'Walnuts, shelled', 'Flour, wheat', 'Chick peas', 'Fructose and syrup, other', 'Flour, millet', 'Soya sauce', 'Coffee, green', 'Meat, dried nes', 'Meat, sheep', 'Hazelnuts, shelled', 'Tangerines, mandarins, clementines, satsumas', 'Tea', 'Juice, plum, concentrated', 'Peas, green', 'Milk, reconstituted', 'Oil, rice bran', 'Beverages, distilled alcoholic', 'Fruit, tropical fresh nes', 'Kiwi fruit', 'Margarine, short', 'Pastry', 'Oil, palm', 'Copra', 'Chillies and peppers, green', 'Oil, maize', 'Milk, whole fresh goat', 'Whey, fresh', 'Flour, oilseeds', 'Infant food', 'Lactose', 'Tung nuts', 'Meat, pig', 'Oil, jojoba', 'Meat, bird nes', 'Oilseeds nes', 'Okra', 'Juice, apple, single strength', 'Bran, sorghum', 'Tea, mate extracts', 'Fruit, pome nes', 'Cocoa, powder & cake', 'Isoglucose', 'Fatty substance residues', 'Quinces', 'Bananas', 'Lupins', 'Milk, skimmed condensed', 'Juice, orange, single strength', 'Raspberries', 'Oil, olive, virgin', 'Fat, other camelids', 'Fat, buffaloes', 'Milk, whole fresh cow', 'Sugar confectionery', 'Cloves', 'Maple sugar and syrups', 'Oil, rapeseed', 'Sweet potatoes', 'Kapokseed shelled', 'Oil, hempseed', 'Meat, mule', 'Offals, edible, buffaloes', 'Sugar non-centrifugal', 'Coconuts, desiccated', 'Fruit, citrus nes', 'Bambara beans', 'Olives preserved', 'Milk, products of natural constituents nes', 'Coffee, extracts', 'Glucose and dextrose', 'Juice, orange, concentrated', 'Broad beans, horse beans, dry', 'Canary seed', 'Butter of karite nuts', 'Honey, natural', 'Walnuts, with shell', 'Oil, boiled etc', 'Milk, whole condensed', 'Mushrooms and truffles', 'Melonseed', 'Offals, liver chicken', 'Cashew nuts, shelled', 'Food preparations, flour, malt extract', 'Palm kernels', 'Potatoes, frozen', 'Alcohol non food', 'Meat, buffalo', 'Flour, maize'}
+
+Here are the matches between items from set A and set B:
+
+1. Kenaf, and other textile bast fibres, raw or retted - Not matched
+2. Papayas - Papayas
+3. Tallow - Tallow
+4. Pigeon peas, dry - Pigeon peas
+5. Beer of barley, malted - Beer of barley
+6. Cloves (whole stems), raw - Cloves
+7. Hop cones - Not matched
+8. Apples - Apples
+9. Edible offals of camels and other camelids, fresh, chilled or frozen - Offals, camel
+10. Castor oil seeds - Castor oil seed
+11. Abaca, manila hemp, raw - Not matched
+12. Natural rubber in primary forms - Not matched
+13. Meat of other domestic rodents, fresh or chilled - Not matched
+14. Avocados - Avocados
+15. Meat of turkeys, fresh or chilled - Meat, turkey
+16. Yams - Yams
+17. Sugar Crops Primary - Not matched
+18. Blueberries - Blueberries
+19. Meat of mules, fresh or chilled - Meat, mule
+20. Cucumbers and gherkins - Cucumbers and gherkins
+21. Broad beans and horse beans, green - Broad beans, horse beans, dry
+22. Citrus Fruit, Total - Fruit, citrus nes
+23. Cranberries - Cranberries
+24. Raw hides and skins of buffaloes - Not matched
+25. Natural honey - Honey, natural
+26. Cashewapple - Cashewapple
+27. Sour cherries - Cherries, sour
+28. Sugar beet - Sugar beet
+29. Oil of maize - Oil, maize
+30. Other pulses n.e.c. - Pulses nes
+31. Soya beans - Soybeans
+32. Whey, condensed - Whey, condensed
+33. Pyrethrum, dried flowers - Not matched
+34. Cashew nuts, in shell - Cashew nuts, with shell
+35. Oranges - Oranges
+36. Pig - Meat, pig
+37. Other rodents - Not matched
+38. Coconuts, in shell - Coconuts
+39. Sheep and Goat Meat - Meat, sheep
+40. Meat of goat, fresh or chilled - Meat, goat
+41. Plums and sloes - Plums dried (prunes)
+42. Cabbages - Cabbages and other brassicas
+43. Oats - Oats
+44. Chestnuts, in shell - Chestnut
+45. Ghee from buffalo milk - Ghee, buffalo milk
+46. Vegetables Primary - Vegetables, fresh nes
+47. Turkeys - Meat, turkey
+48. Watermelons - Watermelons
+49. Wine - Wine
+50. Meat of other domestic camelids, fresh or chilled - Meat, camel
+51. Ginger, raw - Ginger
+52. Fat of pigs - Fat, pigs
+53. Areca nuts - Areca nuts
+54. Cotton seed - Cottonseed
+55. Pepper (Piper spp.), raw - Pepper (piper spp.)
+56. Other fibre crops, raw, n.e.c. - Not matched
+57. Olive oil - Oil, olive, virgin
+58. Pumpkins, squash and gourds - Pumpkins, squash and gourds
+59. Palm oil - Oil, palm
+60. Eggs Primary - Eggs, hen, in shell
+61. Raw hides and skins of goats or kids - Not matched
+62. Butter of cow milk - Butter, cow milk
+63. Meat of sheep, fresh or chilled - Meat, sheep
+64. Peas, dry - Peas, dry
+65. Meat, Poultry - Meat, chicken
+66. Cassava leaves - Cassava leaves
+67. Balata, gutta-percha, guayule, chicle and similar natural gums in primary forms or in plates, sheets or strip - Not matched
+68. Raw silk (not thrown) - Not matched
+69. Quinoa - Quinoa
+70. Oil of sesame seed - Oil, sesame
+71. Fibre Crops, Fibre Equivalent - Not matched
+72. Skim milk of cows - Milk, skimmed cow
+73. Skim milk, evaporated - Milk, skimmed evaporated
+74. Oil of palm kernel - Oil, palm kernel
+75. Sheep and Goats - Not matched
+76. Plantains and cooking bananas - Plantains and others
+77. Chickens - Meat, chicken
+78. Beeswax - Not matched
+79. Fonio - Flour, fonio
+80. Onions and shallots, dry (excluding dehydrated) - Onions, dry
+81. Goat fat, unrendered - Fat, goats
+82. Meat of cattle with the bone, fresh or chilled - Meat, cattle
+83. Cinnamon and cinnamon-tree flowers, raw - Cinnamon (cannella)
+84. Green corn (maize) - Maize, green
+85. Asparagus - Asparagus
+86. Raw milk of goats - Milk, whole fresh goat
+87. Roots and Tubers, Total - Roots and tubers nes
+88. Poppy seed - Poppy seed
+89. Other stimulant, spice and aromatic crops, n.e.c. - Spices nes
+90. Unmanufactured tobacco - Not matched
+91. Mustard seed - Mustard seed
+92. Geese - Meat, goose and guinea fowl
+93. Meat of ducks, fresh or chilled - Meat, duck
+94. Cow peas, dry - Cow peas, dry
+95. Sorghum - Sorghum
+96. Ghee from cow milk - Butter, cow milk
+97. Bambara beans, dry - Bambara beans
+98. Other meat n.e.c. (excluding mammals), fresh, chilled or frozen - Meat nes
+99. Oil palm fruit - Oil palm fruit
+100. Whole milk, evaporated - Milk, whole evaporated
+101. Butter of buffalo milk - Butter, buffalo milk
+102. Spinach - Spinach
+103. Gooseberries - Gooseberries
+104. Edible roots and tubers with high starch or inulin content, n.e.c., fresh - Roots and tubers nes
+105. Whole milk powder - Milk, whole dried
+106. Cauliflowers and broccoli - Cauliflowers and broccoli
+107. Other oil seeds, n.e.c. - Oilseeds nes
+108. Butter and ghee of sheep milk - Butter, sheep milk
+109. Other berries and fruits of the genus vaccinium n.e.c. - Berries nes
+110. Tomatoes - Tomatoes
+111. Other pome fruits - Fruit, pome nes
+112. Anise, badian, coriander, cumin, caraway, fennel and juniper berries, raw - Anise, badian, fennel, coriander
+113. Cassava, fresh - Cassava
+114. Vanilla, raw - Vanilla
+115. Coffee, green - Coffee, green
+116. Currants - Currants
+117. Eggplants (aubergines) - Eggplants (aubergines)
+118. Edible offals of horses and other equines,  fresh, chilled or frozen - Offals, horses
+119. Chillies and peppers, dry (Capsicum spp., Pimenta spp.), raw - Chillies and peppers, dry
+120. Cattle fat, unrendered - Fat, cattle
+121. Peas, green - Peas, green
+122. Other citrus fruit, n.e.c. - Fruit, citrus nes
+123. Groundnut oil - Oil, groundnut
+124. Sesame seed - Sesame seed
+125. Raw hides and skins of cattle - Not matched
+126. Oilcrops, Cake Equivalent - Not matched
+127. Shorn wool, greasy, including fleece-washed shorn wool - Not matched
+128. Ramie, raw or retted - Not matched
+129. Poultry Birds - Not matched
+130. Kiwi fruit - Kiwi fruit
+131. Snails, fresh, chilled, frozen, dried, salted or in brine, except sea snails - Snails, not sea
+132. Goats - Not matched
+133. Other tropical fruits, n.e.c. - Fruit, tropical fresh nes
+134. Horse meat, fresh or chilled - Meat, horse
+135. Coconut oil - Oil, coconut (copra)
+136. Mixed grain - Grain, mixed
+137. Peppermint, spearmint - Not matched
+138. Yoghurt - Yoghurt
+139. Dates - Dates
+140. Meat, Total - Meat nes
+141. Whole milk, condensed - Milk, whole condensed
+142. Tangerines, mandarins, clementines - Tangerines, mandarins, clementines, satsumas
+143. Other fruits, n.e.c. - Fruit, fresh nes
+144. Fruit Primary - Not matched
+145. True hemp, raw or retted - Not matched
+146. Pineapples - Pineapples
+147. Other sugar crops n.e.c. - Sugar crops nes
+148. Buffalo - Meat, buffalo
+149. Cotton lint, ginned - Not matched
+150. Strawberries - Strawberries
+151. Karite nuts (sheanuts) - Karite nuts (sheanuts)
+152. Sunflower-seed oil, crude - Oil, sunflower
+153. Beans, dry - Beans, dry
+154. Kapokseed in shell - Kapokseed shelled
+155. Skim Milk & Buttermilk, Dry - Milk, skimmed dried
+156. Edible offal of goat, fresh, chilled or frozen - Offals, edible, goats
+157. Millet - Millet
+158. Tung nuts - Tung nuts
+159. Rabbits and hares - Meat, rabbit
+160. Yautia - Yautia (cocoyam)
+161. Cantaloupes and other melons - Melons, other (inc.cantaloupes)
+162. Raw milk of cattle - Milk, whole fresh cow
+163. Maize (corn) - Maize
+164. Oilcrops, Oil Equivalent - Not matched
+165. Sheep - Not matched
+166. Tea leaves - Tea
+167. Fat of camels - Fat, camels
+168. Meat of pig with the bone, fresh or chilled - Meat, pig
+169. Okra - Okra
+170. Cherries - Cherries
+171. Agave fibres, raw, n.e.c. - Not matched
+172. Meat of rabbits and hares, fresh or chilled - Meat, rabbit
+173. Raw milk of camel - Milk, whole fresh camel
+174. Buffalo fat, unrendered - Fat, buffaloes
+175. String beans - String beans
+176. Coir, raw - Not matched
+177. Almonds, in shell - Almonds shelled
+178. Pomelos and grapefruits - Grapefruit (inc. pomelos)
+179. Asses - Meat, ass
+180. Edible offal of pigs, fresh, chilled or frozen - Offals, pigs, edible
+
+181. Safflower-seed oil, crude - Oil, safflower
+182. Raw hides and skins of sheep or lambs - Not matched
+183. Skim milk, condensed - Milk, skimmed condensed
+184. Cheese (All Kinds) - Not matched
+185. Skim milk and whey powder - Not matched
+186. Walnuts, in shell - Walnuts, with shell
+187. Pears - Pears
+188. Wheat - Wheat
+189. Seed cotton, unginned - Not matched
+190. Quinces - Quinces
+191. Sisal, raw - Not matched
+192. Sugar cane - Sugar cane
+193. Bananas - Bananas
+194. Locust beans (carobs) - Carobs
+195. Oil of linseed - Oil, linseed
+196. Cottonseed oil - Oil, cottonseed
+197. Lupins - Lupins
+198. Olives - Olives
+199. Cheese from milk of buffalo, fresh or processed - Cheese, buffalo milk
+200. Flax, processed but not spun - Not matched
+201. Molasses - Molasses
+202. Taro - Taro (cocoyam)
+203. Raw milk of sheep - Milk, whole fresh sheep
+204. Jute, raw or retted - Not matched
+205. Cocoa beans - Cocoa, beans
+206. Beef and Buffalo Meat, primary - Meat, cattle
+207. Cheese from milk of goats, fresh or processed - Cheese, goat milk
+208. Meat of camels, fresh or chilled - Meat, camel
+209. Whey, dry - Whey, dry
+210. Camels - Not matched
+211. Meat of buffalo, fresh or chilled - Meat, buffalo
+212. Cattle and Buffaloes - Not matched
+213. Raspberries - Raspberries
+214. Hazelnuts, in shell - Hazelnuts, with shell
+215. Other camelids - Not matched
+216. Rape or colza seed - Rapeseed
+217. Grapes - Grapes
+218. Bees - Not matched
+219. Buttermilk, dry - Milk, skimmed dried
+220. Carrots and turnips - Carrots and turnips
+221. Soya bean oil - Oil, soybean
+222. Cereals, primary - Not matched
+223. Mules and hinnies - Not matched
+224. Edible offal of cattle, fresh, chilled or frozen - Offals, edible, cattle
+225. Silk-worm cocoons suitable for reeling - Not matched
+226. Meat of asses, fresh or chilled - Meat, ass
+227. Pulses, Total - Pulses nes
+228. Meat of pigeons and other birds n.e.c., fresh, chilled or frozen - Meat, bird nes
+229. Hen eggs in shell, fresh - Eggs, hen, in shell
+230. Cheese from whole cow milk - Cheese, whole cow milk
+231. Sheep fat, unrendered - Fat, sheep
+232. Lemons and limes - Lemons and limes
+233. Butter of goat milk - Butter, goat milk
+234. Chick peas, dry - Chick peas
+235. Cream, fresh - Cream fresh
+236. Pistachios, in shell - Pistachios
+237. Nutmeg, mace, cardamoms, raw - Nutmeg, mace and cardamoms
+238. Sunflower seed - Sunflower seed
+239. Sweet potatoes - Sweet potatoes
+240. Evaporated & Condensed Milk - Not matched
+241. Vetches - Vetches
+242. Rye - Rye
+243. Ducks - Meat, duck
+244. Raw milk of buffalo - Milk, whole fresh buffalo
+245. Lettuce and chicory - Lettuce and chicory
+246. Horses - Not matched
+247. Chicory roots - Chicory roots
+248. Edible offal of sheep, fresh, chilled or frozen - Offals, sheep, edible
+249. Linseed - Oil, linseed
+250. Lentils, dry - Lentils
+251. Brazil nuts, in shell - Brazil nuts, with shell
+252. Kola nuts - Kola nuts
+253. Other vegetables, fresh n.e.c. - Vegetables, fresh nes
+254. Eggs from other birds in shell, fresh, n.e.c. - Eggs, other bird, in shell
+255. Game meat, fresh, chilled or frozen - Meat, game
+256. Potatoes - Potatoes
+257. Broad beans and horse beans, dry - Broad beans, horse beans, dry
+258. Rapeseed or canola oil, crude - Oil, rapeseed
+259. Treenuts, Total - Not matched
+260. Barley - Barley
+261. Green tea (not fermented), black tea (fermented) and partly fermented tea, in immediate packings of a content not exceeding 3 kg - Not matched
+262. Chillies and peppers, green (Capsicum spp. and Pimenta spp.) - Chillies and peppers, green
+263. Figs - Figs
+264. Milk, Total - Not matched
+265. Triticale - Triticale
+266. Rice - Rice
+267. Canary seed - Canary seed
+268. Groundnuts, excluding shelled - Groundnuts, prepared
+269. Hempseed - Hempseed
+270. Peaches and nectarines - Peaches and nectarines
+271. Persimmons - Persimmons
+272. Mushrooms and truffles - Mushrooms, canned
+273. Melonseed - Melonseed
+274. Raw cane or beet sugar (centrifugal only) - Sugar Raw Centrifugal
+275. Margarine and shortening - Margarine, short
+
+276. Pig fat, rendered - Fat, pigs
+277. Kapok fruit - Kapok fruit
+278. Onions and shallots, green - Onions, shallots, green
+279. Butter and Ghee - Butter and ghee
+280. Meat of geese, fresh or chilled - Meat, goose and guinea fowl
+281. Green garlic - Garlic
+282. Cheese from milk of sheep, fresh or processed - Cheese, sheep milk
+283. Cheese from skimmed cow milk - Cheese, skimmed cow milk
+284. Palm kernels - Palm kernels
+285. Other nuts (excluding wild edible nuts and groundnuts), in shell, n.e.c. - Not matched
+286. Buckwheat - Buckwheat
+287. Other beans, green - Beans, green
+288. Leeks and other alliaceous vegetables - Leeks, other alliaceous vegetables
+289. Other stone fruits - Fruit, stone nes
+290. Meat of chickens, fresh or chilled - Meat, chicken
+291. Cattle - Not matched
+292. Artichokes - Artichokes
+293. Safflower seed - Safflower seed
+294. Edible offal of buffalo, fresh, chilled or frozen - Offals, edible, buffaloes
+295. Maté leaves - Maté
+296. Cereals n.e.c. - Not matched
+297. Kapok fibre, raw - Not matched
+298. Mangoes, guavas and mangosteens - Mangoes, mangosteens, guavas
+299. Apricots - Apricots
+300. Karite nuts (sheanuts) - Buttermilk, dry
+301. Okra - Okra
+302. Cherries - Cherries
+303. Agave fibres, raw, n.e.c. - Not matched
+304. Meat of rabbits and hares, fresh or chilled - Meat, rabbit
+305. Raw milk of camel - Milk, whole fresh camel
+306. Buffalo fat, unrendered - Fat, buffaloes
+307. String beans - String beans
+308. Coir, raw - Coir, raw
+309. Almonds, in shell - Almonds shelled
+310. Pomelos and grapefruits - Grapefruit (inc. pomelos)
+311. Asses - Asses
+312. Edible offal of pigs, fresh, chilled or frozen - Offals, pigs, edible
+313. Safflower-seed oil, crude - Safflower seed
+314. Raw hides and skins of sheep or lambs - Raw hides and skins of sheep or lambs
+315. Skim milk, condensed - Milk, skimmed condensed
+316. Cheese (All Kinds) - Cheese, processed
+317. Skim milk and whey powder - Whey, condensed
+318. Walnuts, in shell - Walnuts, with shell
+319. Pears - Pears
+320. Wheat - Wheat
+321. Seed cotton, unginned - Not matched
+322. Quinces - Quinces
+323. Sisal, raw - Sisal, raw
+324. Sugar cane - Sugar cane
+325. Bananas - Bananas
+326. Locust beans (carobs) - Carobs
+327. Oil of linseed - Oil, linseed
+328. Cottonseed oil - Cottonseed
+329. Lupins - Lupins
+330. Olives - Olives
+331. Cheese from milk of buffalo, fresh or processed - Cheese, buffalo milk
+332. Flax, processed but not spun - Not matched
+
