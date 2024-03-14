@@ -33,7 +33,7 @@ def rename_item(item: str) -> str:
     item_renames = {
         # "Maize (corn)": "Maize",
         # "Rice, paddy (rice milled equivalent)": "Rice",
-        "Swine / pigs": "pig",
+        "Swine / pigs": "Pig",
     }
     return item_renames.get(item, item)
 
