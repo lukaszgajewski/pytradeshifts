@@ -1,4 +1,5 @@
 import os
+import json
 
 with open(
     f"data{os.sep}preprocessed_data{os.sep}integrated_model{os.sep}chatgpt_item_matching.txt",
@@ -31,3 +32,10 @@ supply_items = set(
 )
 
 assert len(supply_items.intersection(matching_dict.keys())) == len(supply_items)
+
+with open(
+    f"data{os.sep}preprocessed_data{os.sep}integrated_model{os.sep}fao_items_match_dict.json",
+    "w",
+    encoding="utf-8",
+) as f:
+    json.dump(matching_dict, f, ensure_ascii=False, indent=4)
