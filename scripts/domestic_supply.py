@@ -1,5 +1,4 @@
 import os
-from os.path import isfile
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
@@ -24,6 +23,8 @@ class DomesticSupply(PyTradeShifts):
         self.correct_reexports()
         # Set diagonal to zero
         np.fill_diagonal(self.trade_matrix.values, 0)
+        if self.scenario_name is not None and self.scenario_file_name is not None:
+            self.apply_scenario()
 
     def load_data(self) -> None:
         """
@@ -112,17 +113,10 @@ def get_allowed_items():
             if os.path.isfile(os.path.join(path, f)) and "production" in f
         ]
     )
-    allowed_items = set(
-        pd.read_csv(
-            prefix + f"{os.sep}from_IM{os.sep}FAOSTAT_food_production_2020.csv"
-        )["Item"].values
-    )
-    print(len(supply_items), len(allowed_items))
-    print(len(supply_items.intersection(allowed_items)))
-    print(len(allowed_items.difference(supply_items)))
-    print(supply_items)
-    print(allowed_items.difference(supply_items))
-    exit(1)
+    # TODO this list is done manually and might be incomplete
+    with open("data/preprocessed_data/integrated_model/not_crop.txt", "r") as f:
+        not_crop = set([l[:-1] for l in f.readlines()])
+    return supply_items.difference(not_crop)
 
 
 if __name__ == "__main__":
