@@ -222,14 +222,19 @@ class PyTradeShifts:
         # duplicates are most likely a result of incorrect preprocessing
         # or lack thereof
         if not trade_matrix.index.equals(trade_matrix.index.unique()):
-            print("Warning: trade matrix has duplicate indices")
+            print("Warning: trade matrix has duplicate indices, which will be removed.")
+            print("The duplicates are the following: ")
+            print(trade_matrix.index[trade_matrix.index.duplicated(keep=False)])
+
             trade_entries_to_keep = ~trade_matrix.index.duplicated(keep="first")
             trade_matrix = trade_matrix.loc[
                 trade_entries_to_keep,
                 trade_entries_to_keep,
             ]
         if not production_data.index.equals(production_data.index.unique()):
-            print("Warning: production has duplicate indices")
+            print("Warning: trade matrix has duplicate indices, which will be removed.")
+            print("The duplicates are the following: ")
+            print(production_data.index[production_data.index.duplicated(keep=False)])
             production_data = production_data.loc[
                 ~production_data.index.duplicated(keep="first")
             ]
@@ -306,6 +311,10 @@ class PyTradeShifts:
         """
         assert self.prebalanced is False
         self.prebalanced = True
+
+        # Make sure that the production data actually contains data
+        assert self.production_data is not None
+        assert self.production_data.sum() > 0
 
         # this is virtually 1:1 as in Croft et al.
         test = (

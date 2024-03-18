@@ -150,6 +150,10 @@ def _prep_production_vector(
         depend on particular datasets. E.g., unit can be "tonnes" in one file and "t"
         in another.
     """
+    # Fix the different naming for rice and maize
+    if item == "Rice, paddy (rice milled equivalent)":
+        item = "Rice"
+
     prod = pd.read_pickle(production_pkl)
     print("Filter production vector")
     prod = prod[
@@ -263,13 +267,18 @@ def rename_countries(
         encoding="latin1",
         low_memory=False,
     )
-    # Also rename China; Taiwan Province of to Taiwan, so we don't run into
-    # problems later on with the country names
+    # Rename a bunch of countries which cause trouble, because they map onto
+    # different states now
+    # rename China; Taiwan Province of to Taiwan
     codes.loc[codes["Area"] == "China; Taiwan Province of", "Area"] = "Taiwan"
+    codes.loc[codes["Area"] == 'Serbia and Montenegro', "Area"] = "Serbia"
+    codes.loc[codes["Area"] == 'Belgium-Luxembourg', "Area"] = "Belgium"
 
     # Create a dictionary with the country codes as keys and country names as values
     cc = coco.CountryConverter()
-    codes_area_short = cc.pandas_convert(pd.Series(codes["Area"]), to="name_short")
+    codes_area_short = cc.pandas_convert(
+        pd.Series(codes["Area"]), to="name_short", not_found=None
+    )
 
     codes_dict = dict(zip(codes[code_type], codes_area_short))
 
@@ -325,6 +334,7 @@ def remove_entries_from_data(
         "Eastern Europe": "'151",
         "Northern Europe": "'154",
         "Western Europe": "'155",
+        "Caribbean": "'029",
         # Groups of countries by property
         "Least Developed Countries": "'199",
         "Land Locked Developing Countries": "'432",
