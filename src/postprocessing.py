@@ -133,6 +133,7 @@ class Postprocessing:
         self._compute_efficiency()
         self._compute_clustering_coefficient()
         self._compute_betweenness_centrality()
+        self._compute_within_community_degree()
         self._compute_node_stability()
         self._compute_node_stability_difference()
         self._compute_network_stability()
@@ -1037,6 +1038,30 @@ class Postprocessing:
             )
             for scenario in self.scenarios
         ]
+
+    def _compute_within_community_degree(self) -> None:
+        """
+        TODO: It's the z-score of node degree within community.
+        Ingores direction and weights.
+        https://www.nature.com/articles/nature03288
+        Guimerà, R., & Nunes Amaral, L. A. (2005).
+        Functional cartography of complex metabolic networks.
+        Nature, 433(7028), 895-900. doi:10.1038/nature03288
+        """
+        self.zscores = []
+        for scenario in self.scenarios:
+            zscores = {}
+            for community in scenario.trade_communities:
+                cm_subgraph = nx.subgraph(scenario.trade_graph, nbunch=community)
+                cm_subgraph = cm_subgraph.to_undirected()
+                subgraph_node_degrees = cm_subgraph.degree()
+                zscores |= dict(
+                    zip(
+                        [node for (node, _) in subgraph_node_degrees],
+                        stats.zscore([degree for (_, degree) in subgraph_node_degrees]),
+                    )
+                )
+            self.zscores.append(zscores)
 
     def _compute_node_stability(self) -> None:
         """
