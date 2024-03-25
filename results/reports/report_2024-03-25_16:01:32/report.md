@@ -1,4 +1,4 @@
-# PyTradeShifts Report 2024-03-04 15:52:28 UTC
+# PyTradeShifts Report 2024-03-25 16:01:32 UTC
 
   
 
@@ -38,9 +38,9 @@
 <tbody>
 <tr class="odd">
 <th>1</th>
-<td>3.085576e+06</td>
-<td>5.893734e-16</td>
-<td>-0.000004</td>
+<td>3.097995e+06</td>
+<td>1.132055e-15</td>
+<td>-1.998401e-15</td>
 </tr>
 </tbody>
 </table>
@@ -89,11 +89,11 @@
 <td>Argentina</td>
 <td>0.0</td>
 <td>Egypt</td>
-<td>0.080807</td>
+<td>0.080104</td>
 <td>Afghanistan</td>
 <td>0.0</td>
 <td>Russia</td>
-<td>0.235348</td>
+<td>0.233300</td>
 </tr>
 </tbody>
 </table>
@@ -101,8 +101,6 @@
 ## Centrality metrics by community
 
 ### Degree centrality metrics for the scenario with ID: 0
-
-  
 
 <table class="dataframe" data-border="1">
 <thead>
@@ -201,8 +199,6 @@
 
 ### Degree centrality metrics for the scenario with ID: 1
 
-  
-
 <table class="dataframe" data-border="1">
 <thead>
 <tr class="header" style="text-align: center;">
@@ -234,55 +230,55 @@
 <td>Argentina</td>
 <td>0.000000</td>
 <td>Brazil</td>
-<td>0.041255</td>
+<td>0.040896</td>
 <td>Bolivia</td>
 <td>0.0</td>
 <td>Argentina</td>
-<td>0.065466</td>
+<td>0.064897</td>
 </tr>
 <tr class="even">
 <th>1</th>
 <td>Slovenia</td>
 <td>0.000000</td>
 <td>Algeria</td>
-<td>0.055753</td>
+<td>0.055268</td>
 <td>Algeria</td>
 <td>0.0</td>
 <td>France</td>
-<td>0.114812</td>
+<td>0.113817</td>
 </tr>
 <tr class="odd">
 <th>2</th>
-<td>Laos</td>
-<td>0.000002</td>
-<td>Egypt</td>
-<td>0.080807</td>
-<td>Albania</td>
-<td>0.0</td>
-<td>Russia</td>
-<td>0.235348</td>
-</tr>
-<tr class="even">
-<th>3</th>
 <td>Kazakhstan</td>
-<td>0.000236</td>
+<td>0.000234</td>
 <td>Uzbekistan</td>
-<td>0.016655</td>
+<td>0.016511</td>
 <td>Afghanistan</td>
 <td>0.0</td>
 <td>Kazakhstan</td>
-<td>0.044550</td>
+<td>0.044162</td>
+</tr>
+<tr class="even">
+<th>3</th>
+<td>Laos</td>
+<td>0.000002</td>
+<td>Egypt</td>
+<td>0.080104</td>
+<td>Albania</td>
+<td>0.0</td>
+<td>Russia</td>
+<td>0.233300</td>
 </tr>
 <tr class="odd">
 <th>4</th>
 <td>Australia</td>
 <td>0.000000</td>
 <td>Japan</td>
-<td>0.039187</td>
-<td>Chile</td>
+<td>0.038846</td>
+<td>Colombia</td>
 <td>0.0</td>
 <td>Canada</td>
-<td>0.109454</td>
+<td>0.109012</td>
 </tr>
 </tbody>
 </table>
@@ -327,23 +323,23 @@
 <tbody>
 <tr class="odd">
 <th>0</th>
-<td>0.008394</td>
+<td>0.00985</td>
 <td>0.001634</td>
 <td>0.222011</td>
 <td>33</td>
 <td>34</td>
-<td>1e+02 +/- 1.4</td>
+<td>96 +/- 1.7</td>
 <td>0.000137</td>
 </tr>
 <tr class="even">
 <th>1</th>
-<td>0.008557</td>
+<td>0.009868</td>
 <td>0.001744</td>
-<td>0.218211</td>
+<td>0.218578</td>
 <td>33</td>
 <td>34</td>
-<td>95 +/- 1.5</td>
-<td>0.000142</td>
+<td>96 +/- 2.1</td>
+<td>0.000141</td>
 </tr>
 </tbody>
 </table>
@@ -351,3 +347,7 @@
 ## Attack resilience
 
 ![](figs/attack_resilience.png)
+
+## Country roles
+
+![](figs/country_roles.png)
