@@ -1043,12 +1043,20 @@ class Postprocessing:
 
     def _compute_within_community_degree(self) -> None:
         """
-        TODO: It's the z-score of node degree within community.
-        Ingores direction and weights.
-        https://www.nature.com/articles/nature03288
+        Computes the z-score of node's degree within its community for each node
+        in every scenario.
+        Note: this metric ignores edge direction and weight.
+        The metric is taken from:
         Guimerà, R., & Nunes Amaral, L. A. (2005).
         Functional cartography of complex metabolic networks.
         Nature, 433(7028), 895-900. doi:10.1038/nature03288
+        https://www.nature.com/articles/nature03288
+
+        Arguments:
+            None
+
+        Returns:
+            None
         """
         self.zscores = []
         for scenario in self.scenarios:
@@ -1067,18 +1075,34 @@ class Postprocessing:
 
     def _compute_participation(self) -> None:
         """
-        TODO: https://www.nature.com/articles/nature03288
+        Computes the participation coefficient for each node in every scenario.
+        This metric is close to 1.0 if node's links are uniformly distributed
+        among all the communities, and 0.0 if all its links are within its own
+        community.
+        Note: this metric ignores edge direction and weight.
+        The metric is taken from:
+        Guimerà, R., & Nunes Amaral, L. A. (2005).
+        Functional cartography of complex metabolic networks.
+        Nature, 433(7028), 895-900. doi:10.1038/nature03288
+        https://www.nature.com/articles/nature03288
+
+        Arguments:
+            None
+
+        Returns:
+            None
         """
         self.participation = []
         for scenario in self.scenarios:
-            total_degree = scenario.trade_graph.degree()
+            undirected_trade_graph = scenario.trade_graph.to_undirected()
+            total_degree = undirected_trade_graph.degree()
             coefficients = {
                 country: 1.0
                 - sum(
                     [
                         sum(
                             [
-                                community_member in scenario.trade_graph[country]
+                                community_member in undirected_trade_graph[country]
                                 for community_member in community
                             ]
                         )
@@ -1087,7 +1111,7 @@ class Postprocessing:
                     ]
                 )
                 / total_degree[country] ** 2
-                for country in scenario.trade_graph
+                for country in undirected_trade_graph
             }
             self.participation.append(coefficients)
 
@@ -1103,6 +1127,41 @@ class Postprocessing:
         dpi=300,
         **kwargs,
     ) -> None:
+        """
+        Generates a scatter plot where each point is a country, where Y values
+        are the within community z-scores, and X values are participation coefficients.
+        Both metrics are defined in:
+        Guimerà, R., & Nunes Amaral, L. A. (2005).
+        Functional cartography of complex metabolic networks.
+        Nature, 433(7028), 895-900. doi:10.1038/nature03288
+        https://www.nature.com/articles/nature03288
+
+        Arguments:
+            z_threshold (float, optional): value of z-score for a country to
+                be considered a hub, default is 1.0.
+            p_threshold (list[float], optional): list of participation
+                coefficient threshold for a country to be provincial, connector,
+                or kinless (and sub-categories, by default there are 7 different
+                thresholds).
+            alpha (float, optional): transparency level of the background colouring,
+                showing the sectors defined by the above thresholds.
+            sector_labels (list[str] | None, optional): labels for the aforementioned
+                sectors, if provided a legend shall be displayed explaining
+                the colours, otherwise no legend shall be shown.
+            figsize (tuple[float, float] | None, optional): the composite figure
+                size as expected by the matplotlib subplots routine.
+            shrink (float, optional): Colour bar shrink parameter.
+            file_path (str | None, optional): Path to where the image file
+                should be saved to. If `None` no file shall be produced.
+            file_format (str, optional): File extension to use when
+                saving plot to file.
+            dpi (int, optional): DPI of the saved image file.
+            **kwargs (optional): Any additional keyworded arguments recognised
+                by geopandas plot function.
+
+        Returns:
+            None
+        """
         _, axs = plt.subplots(
             len(self.scenarios),
             1,
