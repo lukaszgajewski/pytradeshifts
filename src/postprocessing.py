@@ -796,6 +796,12 @@ class Postprocessing:
             tight_layout=True,
             figsize=((5, len(self.scenarios) * 2.5) if figsize is None else figsize),
         )
+        # if there is only one scenario axs will be just an ax object
+        # convert to a list to comply with other cases
+        try:
+            len(axs)
+        except TypeError:
+            axs = [axs]
         for ax, scenario in zip(axs, self.scenarios):
             scenario._plot_trade_communities(ax)
         if file_path:
@@ -904,6 +910,12 @@ class Postprocessing:
             tight_layout=True,
             figsize=(5, len(self.scenarios) * 2.5) if figsize is None else figsize,
         )
+        # if there is only one scenario axs will be just an ax object
+        # convert to a list to comply with other cases
+        try:
+            len(axs)
+        except TypeError:
+            axs = [axs]
         for ax, (idx, scenario) in zip(axs, enumerate(self.scenarios)):
             plot_node_metric_map(
                 ax,
@@ -1349,6 +1361,12 @@ class Postprocessing:
             tight_layout=True,
             figsize=(5, len(self.scenarios) * 2.5) if figsize is None else figsize,
         )
+        # if there is only one scenario axs will be just an ax object
+        # convert to a list to comply with other cases
+        try:
+            len(axs)
+        except TypeError:
+            axs = [axs]
         for ax, (idx, scenario) in zip(axs, enumerate(self.scenarios)):
             plot_node_metric_map(
                 ax,
@@ -1607,7 +1625,7 @@ class Postprocessing:
             linestyle="dashed",
             label="network collapse; \n[ID, attack, threshold]:",
         )
-        num_scenarios = len(self.scenarios)
+        num_scenarios = max(2, len(self.scenarios))
         alpha_steps = 0.9 / num_scenarios
         colors = [
             "#6c7075",
@@ -1737,11 +1755,12 @@ class Postprocessing:
         self.plot_all_trade_communities(file_path=figures_folder)
         plt.close()  # this is to prevent cross-contamination of plots
         print("Plotted trade communities")
-        self.plot_community_difference(file_path=figures_folder)
-        plt.close()
-        print("Plotted difference in trade communities")
         # there is no point in this plot if there's only base scenario and
         # one other
+        if len(self.scenarios) > 2:
+            self.plot_community_difference(file_path=figures_folder)
+            plt.close()
+            print("Plotted difference in trade communities")
         if len(self.scenarios) > 2:
             self.plot_distance_metrics(
                 file_path=figures_folder, frobenius="relative", figsize=(5, 2.5)
@@ -1754,15 +1773,17 @@ class Postprocessing:
         self.plot_community_satisfaction(file_path=figures_folder)
         plt.close()
         print("Plotted community satisfaction index")
-        self.plot_community_satisfaction_difference(file_path=figures_folder)
-        plt.close()
-        print("Plotted difference in community satisfaction")
+        if len(self.scenarios) > 2:
+            self.plot_community_satisfaction_difference(file_path=figures_folder)
+            plt.close()
+            print("Plotted difference in community satisfaction")
         self.plot_node_stability(file_path=figures_folder)
         plt.close()
         print("Plotted node stability map")
-        self.plot_node_stability_difference(file_path=figures_folder)
-        plt.close()
-        print("Plotted difference in node stability")
+        if len(self.scenarios) > 2:
+            self.plot_node_stability_difference(file_path=figures_folder)
+            plt.close()
+            print("Plotted difference in node stability")
         self.plot_attack_resilience(file_path=figures_folder)
         plt.close()
         print("Plotted attack resilience")
@@ -1807,16 +1828,21 @@ class Postprocessing:
             )
             report_file.write("<h2> Trade communities </h2>")
             report_file.write("""<img src="figs/trade_communities.png" >""")
-            report_file.write("<h2> Difference in trade communities </h2>")
-            report_file.write("""<img src="figs/community_diff.png">""")
+            if len(self.scenarios) > 1:
+                report_file.write("<h2> Difference in trade communities </h2>")
+                report_file.write("""<img src="figs/community_diff.png">""")
             report_file.write("<h2> Community satisfaction </h2>")
             report_file.write("""<img src="figs/community_satisfaction.png">""")
-            report_file.write("<h2> Difference in community satisfaction </h2>")
-            report_file.write("""<img src="figs/community_satisfaction_diff.png" >""")
-            report_file.write(
-                "<h2> Graph structural difference to base scenario (ID=0) </h2>"
-            )
-            self.print_distance_metrics(file=report_file, justify="center")
+            if len(self.scenarios) > 1:
+                report_file.write("<h2> Difference in community satisfaction </h2>")
+                report_file.write(
+                    """<img src="figs/community_satisfaction_diff.png" >"""
+                )
+            if len(self.scenarios) > 1:
+                report_file.write(
+                    "<h2> Graph structural difference to base scenario (ID=0) </h2>"
+                )
+                self.print_distance_metrics(file=report_file, justify="center")
             if len(self.scenarios) > 2:
                 report_file.write("""<img src="figs/network_distance.png" >""")
             report_file.write("<h2> Centrality metrics by scenario </h2>")
@@ -1829,8 +1855,9 @@ class Postprocessing:
             report_file.write("""<img src="figs/centrality_map.png" >""")
             report_file.write("<h2> Stability map </h2>")
             report_file.write("""<img src="figs/node_stability.png" >""")
-            report_file.write("<h2> Difference in stability </h2>")
-            report_file.write("""<img src="figs/node_stability_diff.png" >""")
+            if len(self.scenarios) > 1:
+                report_file.write("<h2> Difference in stability </h2>")
+                report_file.write("""<img src="figs/node_stability_diff.png" >""")
             report_file.write("<h2> General network characteristics </h2>")
             self.print_network_metrics(file=report_file, justify="center")
             report_file.write("<h2> Attack resilience </h2>")
