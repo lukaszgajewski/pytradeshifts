@@ -1116,6 +1116,7 @@ class Postprocessing:
             len(axs)
         except TypeError:
             axs = [axs]
+        legend_plotted = False
         for ax, (idx, scenario) in zip(axs, enumerate(self.scenarios)):
             ax.scatter(
                 self.participation[idx].values(), self.zscores[idx].values(), **kwargs
@@ -1131,8 +1132,13 @@ class Postprocessing:
             fill_sector_by_colour(ax, z_threshold, p_thresholds, alpha, sector_labels)
             ax.set_xlabel("Participation coefficient")
             ax.set_ylabel("Within community degree")
-            if sector_labels:
-                ax.legend()
+            if sector_labels and not legend_plotted:
+                ax.legend(
+                    loc="upper center",
+                    bbox_to_anchor=(0.5, -0.1),
+                    ncol=2,
+                )
+                legend_plotted = True
 
         if file_path:
             plt.savefig(
@@ -1701,6 +1707,21 @@ class Postprocessing:
         self.plot_attack_resilience(file_path=figures_folder)
         plt.close()
         print("Plotted attack resilience")
+        self.plot_roles(
+            c="black",
+            sector_labels=[
+                "Ultra peripheral non-hub",
+                "Provincial hub",
+                "Peripheral non-hub",
+                "Connector hub",
+                "Connector non-hub",
+                "Kinless hub",
+                "Kinless non-hub",
+            ],
+            file_path=figures_folder,
+        )
+        plt.close()
+        print("Plotted country roles")
 
     def _write_to_report_file(self, report_file_path, time_now, utc_label) -> None:
         """
@@ -1755,6 +1776,8 @@ class Postprocessing:
             self.print_network_metrics(file=report_file, justify="center")
             report_file.write("<h2> Attack resilience </h2>")
             report_file.write("""<img src="figs/attack_resilience.png" >""")
+            report_file.write("<h2> Country roles </h2>")
+            report_file.write("""<img src="figs/country_roles.png" >""")
             report_file.write("</center></p>")
             report_file.write("</body> </html>")
 
