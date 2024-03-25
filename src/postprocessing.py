@@ -16,6 +16,7 @@ from src.utils import (
     get_stability_index,
     get_distance_matrix,
     get_percolation_threshold,
+    fill_sector_by_colour,
 )
 import numpy as np
 import pandas as pd
@@ -134,6 +135,7 @@ class Postprocessing:
         self._compute_clustering_coefficient()
         self._compute_betweenness_centrality()
         self._compute_within_community_degree()
+        self._compute_participation()
         self._compute_node_stability()
         self._compute_node_stability_difference()
         self._compute_network_stability()
@@ -1052,9 +1054,9 @@ class Postprocessing:
         for scenario in self.scenarios:
             zscores = {}
             for community in scenario.trade_communities:
-                cm_subgraph = nx.subgraph(scenario.trade_graph, nbunch=community)
-                cm_subgraph = cm_subgraph.to_undirected()
-                subgraph_node_degrees = cm_subgraph.degree()
+                community_subgraph = nx.subgraph(scenario.trade_graph, nbunch=community)
+                community_subgraph = community_subgraph.to_undirected()
+                subgraph_node_degrees = community_subgraph.degree()
                 zscores |= dict(
                     zip(
                         [node for (node, _) in subgraph_node_degrees],
@@ -1062,6 +1064,84 @@ class Postprocessing:
                     )
                 )
             self.zscores.append(zscores)
+
+    def _compute_participation(self) -> None:
+        """
+        TODO: https://www.nature.com/articles/nature03288
+        """
+        self.participation = []
+        for scenario in self.scenarios:
+            total_degree = scenario.trade_graph.degree()
+            coefficients = {
+                country: 1.0
+                - sum(
+                    [
+                        sum(
+                            [
+                                community_member in scenario.trade_graph[country]
+                                for community_member in community
+                            ]
+                        )
+                        ** 2
+                        for community in scenario.trade_communities
+                    ]
+                )
+                / total_degree[country] ** 2
+                for country in scenario.trade_graph
+            }
+            self.participation.append(coefficients)
+
+    def plot_roles(
+        self,
+        z_threshold=1.0,
+        p_thresholds=[0.05, 0.3, 0.62, 0.75, 0.8],
+        alpha=0.3,
+        sector_labels: list[str] | None = None,
+        figsize: tuple[float, float] | None = None,
+        file_path: str | None = None,
+        file_format="png",
+        dpi=300,
+        **kwargs,
+    ) -> None:
+        _, axs = plt.subplots(
+            len(self.scenarios),
+            1,
+            sharex=True,
+            tight_layout=True,
+            figsize=(5, len(self.scenarios) * 2.5) if figsize is None else figsize,
+        )
+        # if there is only one scenario axs will be just an ax object
+        # convert to a list to comply with other cases
+        try:
+            len(axs)
+        except TypeError:
+            axs = [axs]
+        for ax, (idx, scenario) in zip(axs, enumerate(self.scenarios)):
+            ax.scatter(
+                self.participation[idx].values(), self.zscores[idx].values(), **kwargs
+            )
+            ax.set_title(
+                f"Country roles for {scenario.crop} with base year {scenario.base_year[1:]}"
+                + (
+                    f"\nin scenario: {scenario.scenario_name}"
+                    if scenario.scenario_name is not None
+                    else "\n(no scenario)"
+                )
+            )
+            fill_sector_by_colour(ax, z_threshold, p_thresholds, alpha, sector_labels)
+            ax.set_xlabel("Participation coefficient")
+            ax.set_ylabel("Within community degree")
+            if sector_labels:
+                ax.legend()
+
+        if file_path:
+            plt.savefig(
+                f"{file_path}{os.sep}country_roles.{file_format}",
+                dpi=dpi,
+                bbox_inches="tight",
+            )
+        else:
+            plt.show()
 
     def _compute_node_stability(self) -> None:
         """

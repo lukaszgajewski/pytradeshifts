@@ -7,6 +7,7 @@ import os
 from itertools import groupby
 import networkx as nx
 from matplotlib.axes import Axes
+from matplotlib.pyplot import rcParams
 from geopy.distance import geodesic
 from scipy.spatial.distance import squareform, pdist
 
@@ -585,3 +586,93 @@ def get_percolation_threshold(
         len(eigenvalues) - np.searchsorted(eigenvalues[::-1], 1, side="left")
     ]
     return threshold, removed_nodes_count, eigenvalues
+
+
+def fill_sector_by_colour(ax, z_threshold, p_thresholds, alpha, labels=None):
+    x_low, x_high = (0, 1)  # valid range for p
+    y_low, y_high = ax.get_ylim()  # z can be any value technically
+    color_cycle = rcParams["axes.prop_cycle"].by_key()["color"]
+    assert len(p_thresholds) >= 2
+    if labels:
+        assert len(labels) == len(p_thresholds) + 2
+    # left edge panels
+    ii = 0
+    ax.fill(
+        "x",
+        "y",
+        color_cycle[ii],
+        data={
+            "x": [x_low, p_thresholds[ii], p_thresholds[ii], x_low],
+            "y": [y_low, y_low, z_threshold, z_threshold],
+        },
+        alpha=alpha,
+        label=labels[ii] if labels else None,
+    )
+    ii += 1
+    ax.fill(
+        "x",
+        "y",
+        color_cycle[ii],
+        data={
+            "x": [x_low, p_thresholds[ii], p_thresholds[ii], x_low],
+            "y": [z_threshold, z_threshold, y_high, y_high],
+        },
+        alpha=alpha,
+        label=labels[ii] if labels else None,
+    )
+    # middle panels
+    while ii < len(p_thresholds) - 1:
+        ii += 1
+        ax.fill(
+            "x",
+            "y",
+            color_cycle[ii],
+            data={
+                "x": [
+                    p_thresholds[ii - 2],
+                    p_thresholds[ii],
+                    p_thresholds[ii],
+                    p_thresholds[ii - 2],
+                ],
+                "y": (
+                    [y_low, y_low, z_threshold, z_threshold]
+                    if ii % 2 == 0
+                    else [z_threshold, z_threshold, y_high, y_high]
+                ),
+            },
+            alpha=alpha,
+            label=labels[ii] if labels else None,
+        )
+    # right edge panels
+    ax.fill(
+        "x",
+        "y",
+        color_cycle[ii + 1],
+        data={
+            "x": [
+                p_thresholds[ii - 1],
+                x_high,
+                x_high,
+                p_thresholds[ii - 1],
+            ],
+            "y": [z_threshold, z_threshold, y_high, y_high],
+        },
+        alpha=alpha,
+        label=labels[ii + 1] if labels else None,
+    )
+    ax.fill(
+        "x",
+        "y",
+        color_cycle[ii + 2],
+        data={
+            "x": [
+                p_thresholds[ii],
+                x_high,
+                x_high,
+                p_thresholds[ii],
+            ],
+            "y": [y_low, y_low, z_threshold, z_threshold],
+        },
+        alpha=alpha,
+        label=labels[ii + 2] if labels else None,
+    )
