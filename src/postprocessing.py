@@ -1077,6 +1077,8 @@ class Postprocessing:
                 community_subgraph = nx.subgraph(scenario.trade_graph, nbunch=community)
                 community_subgraph = community_subgraph.to_undirected()
                 subgraph_node_degrees = community_subgraph.degree()
+                # we update the dict with countries and their degree z-scores
+                # this assumes that each country can belong to a single community
                 zscores |= dict(
                     zip(
                         [node for (node, _) in subgraph_node_degrees],
@@ -1109,21 +1111,25 @@ class Postprocessing:
             undirected_trade_graph = scenario.trade_graph.to_undirected()
             total_degree = undirected_trade_graph.degree()
             coefficients = {
+                # the score for a given node is 1 - 1/k^2 x sum_s (k_s)^2
+                # where k is total node degree and the sum is over communities
+                # where k_s is the number of edges from the node to community `s`
                 country: 1.0
                 - sum(
                     [
                         sum(
-                            [
+                            [  # this computes the number of edges from `country`
+                                # to `community`
                                 community_member in undirected_trade_graph[country]
                                 for community_member in community
                             ]
                         )
                         ** 2
                         for community in scenario.trade_communities
-                    ]
+                    ]  # we sum up the squares of the number of edges to each community
                 )
-                / total_degree[country] ** 2
-                for country in undirected_trade_graph
+                / total_degree[country] ** 2  # we divide by total degree squared
+                for country in undirected_trade_graph  # for each country
             }
             self.participation.append(coefficients)
 
