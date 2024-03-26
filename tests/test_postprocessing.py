@@ -184,6 +184,39 @@ class TestPostprocessing:
             ]
         )
 
+    def test_compute_within_community_degree(self, postprocessing_object) -> None:
+        assert postprocessing_object.zscores is not None
+        assert len(postprocessing_object.zscores) == len(
+            postprocessing_object.scenarios
+        )
+        assert all(
+            [
+                isinstance(v, float)
+                for sc in postprocessing_object.zscores
+                for v in sc.values()
+            ]
+        )
+
+    def test_compute_participation(self, postprocessing_object) -> None:
+        assert postprocessing_object.participation is not None
+        assert len(postprocessing_object.participation) == len(
+            postprocessing_object.scenarios
+        )
+        assert all(
+            [
+                isinstance(v, float)
+                for sc in postprocessing_object.participation
+                for v in sc.values()
+            ]
+        )
+        assert all(
+            [
+                v >= 0.0 and v <= 1.0
+                for sc in postprocessing_object.participation
+                for v in sc.values()
+            ]
+        )
+
 
 def test_find_new_order() -> None:
     """
