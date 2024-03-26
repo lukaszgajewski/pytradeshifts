@@ -1754,13 +1754,14 @@ class Postprocessing:
         """
         self.plot_all_trade_communities(file_path=figures_folder)
         plt.close()  # this is to prevent cross-contamination of plots
+        # there is no point in this plot if there's only base scenario
         print("Plotted trade communities")
-        # there is no point in this plot if there's only base scenario and
-        # one other
-        if len(self.scenarios) > 2:
+        if len(self.scenarios) > 1:
             self.plot_community_difference(file_path=figures_folder)
             plt.close()
             print("Plotted difference in trade communities")
+        # there is no point in this plot if there's only base scenario and
+        # one other
         if len(self.scenarios) > 2:
             self.plot_distance_metrics(
                 file_path=figures_folder, frobenius="relative", figsize=(5, 2.5)
@@ -1773,14 +1774,14 @@ class Postprocessing:
         self.plot_community_satisfaction(file_path=figures_folder)
         plt.close()
         print("Plotted community satisfaction index")
-        if len(self.scenarios) > 2:
+        if len(self.scenarios) > 1:
             self.plot_community_satisfaction_difference(file_path=figures_folder)
             plt.close()
             print("Plotted difference in community satisfaction")
         self.plot_node_stability(file_path=figures_folder)
         plt.close()
         print("Plotted node stability map")
-        if len(self.scenarios) > 2:
+        if len(self.scenarios) > 1:
             self.plot_node_stability_difference(file_path=figures_folder)
             plt.close()
             print("Plotted difference in node stability")
