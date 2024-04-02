@@ -3,6 +3,9 @@ This branch for internal use only (at least for now).
 
 The idea is to generate trading data that can be used in the [integrated model](https://github.com/allfed/allfed-integrated-model)
 
+Note: This branch is not up to date with main and will probably never be since it doesn't need any fancy post-processing feautres.
+All we need here is the core ```pytradeshifts``` model functionality.
+
 ## Modifications
 
 - ```src/preprocessing.py``` main function has been modified to produce production and trade data for every food item in FAO data
