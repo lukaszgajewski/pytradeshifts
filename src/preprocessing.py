@@ -385,8 +385,8 @@ def main(
     region_label = "Global" if region == "All_Data" else region
 
     for item in tqdm(items):
-        p_f_name = f"data{os.sep}preprocessed_data{os.sep}integrated_model{os.sep}{item}_{year}_{region_label}_production.csv"
-        t_f_name = f"data{os.sep}preprocessed_data{os.sep}integrated_model{os.sep}{item}_{year}_{region_label}_trade.csv"
+        p_f_name = f"intmodel{os.sep}data{os.sep}prod_trade{os.sep}{item}_{year}_{region_label}_production.csv"
+        t_f_name = f"intmodel{os.sep}data{os.sep}prod_trade{os.sep}{item}_{year}_{region_label}_trade.csv"
         if os.path.isfile(p_f_name) and os.path.isfile(t_f_name):
             print(item, "files already exist, skipping.")
             continue
