@@ -420,8 +420,8 @@ def main(
         # Rename the item for readability
         if "/" in item:
             item = rename_item(item)
-            p_f_name = f"data{os.sep}preprocessed_data{os.sep}integrated_model{os.sep}{item}_{year}_{region_label}_production.csv"
-            t_f_name = f"data{os.sep}preprocessed_data{os.sep}integrated_model{os.sep}{item}_{year}_{region_label}_trade.csv"
+            p_f_name = f"intmodel{os.sep}data{os.sep}prod_trade{os.sep}{item}_{year}_{region_label}_production.csv"
+            t_f_name = f"intmodel{os.sep}data{os.sep}prod_trade{os.sep}{item}_{year}_{region_label}_trade.csv"
 
         # Make sure that production index and trade matrix index/columns are the same
         if not production.index.equals(trade_matrix.index):
@@ -450,7 +450,7 @@ if __name__ == "__main__":
     # Define regions for which the data is processed
     # "Oceania" is used for testing, as it has the least amount of countries
     # to run with all data use: "All_Data" for region
-    # WARNING: takes 2-3 hourse on a laptop
+    # WARNING: takes 2-3 hours
     region = "All_Data"
     main(
         region,

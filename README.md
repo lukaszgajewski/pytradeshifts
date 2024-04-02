@@ -1,7 +1,12 @@
 # DO NOT USE
-This branch for internal use only (for now).
+This branch for internal use only (at least for now).
 
 The idea is to generate trading data that can be used in the [integrated model](https://github.com/allfed/allfed-integrated-model)
+
+## Modifications
+
+- ```src/preprocessing.py``` main function has been modified to produce production and trade data for every food item in FAO data
+- ```intmodel``` directory has been added with additional scripts and data
 
 # PyTradeShifts
 
