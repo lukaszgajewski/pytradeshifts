@@ -1,6 +1,7 @@
 import pandas as pd
 
 
+# TODO, no longer valid
 IM_combined = pd.read_csv(
     "data/preprocessed_data/integrated_model/from_IM/computer_readable_combined.csv"
 )

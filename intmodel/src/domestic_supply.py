@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 from src.model import PyTradeShifts
+from read_nutrition_data import read_nutrition_data
 
 
 class DomesticSupply(PyTradeShifts):
@@ -41,12 +42,12 @@ class DomesticSupply(PyTradeShifts):
         print(f"Attempting to load {self.crop} in {self.base_year}.")
         # Read in the data
         trade_matrix = pd.read_csv(
-            f".{os.sep}data{os.sep}preprocessed_data{os.sep}integrated_model{os.sep}prod_trade{os.sep}{self.crop}_{self.base_year}_{self.region}_trade.csv",
+            f"intmodel{os.sep}data{os.sep}prod_trade{os.sep}{self.crop}_{self.base_year}_{self.region}_trade.csv",
             index_col=0,
         )
 
         production_data = pd.read_csv(
-            f".{os.sep}data{os.sep}preprocessed_data{os.sep}integrated_model{os.sep}prod_trade{os.sep}{self.crop}_{self.base_year}_{self.region}_production.csv",
+            f"intmodel{os.sep}data{os.sep}prod_trade{os.sep}{self.crop}_{self.base_year}_{self.region}_production.csv",
             index_col=0,
         ).squeeze()
 
@@ -103,25 +104,13 @@ class DomesticSupply(PyTradeShifts):
 
 
 def get_allowed_items():
-    prefix = f"data{os.sep}preprocessed_data{os.sep}integrated_model"
-    path = prefix + f"{os.sep}prod_trade"
-    suffix = "_Y2020_Global_production.csv"  # TODO: generalise for any year/region
-    supply_items = set(
-        [
-            f[: -len(suffix)]
-            for f in os.listdir(path)
-            if os.path.isfile(os.path.join(path, f)) and "production" in f
-        ]
-    )
-    # TODO this list is done manually and might be incomplete
-    with open("data/preprocessed_data/integrated_model/not_crop.txt", "r") as f:
-        not_crop = set([l[:-1] for l in f.readlines()])
-    return supply_items.difference(not_crop)
+    nd = read_nutrition_data()
+    return nd.index
 
 
 if __name__ == "__main__":
     for item in tqdm(get_allowed_items()):
-        ds_fname = f"data{os.sep}preprocessed_data{os.sep}integrated_model{os.sep}domestic_supply{os.sep}{item}_2020_Global_supply.csv"
+        ds_fname = f"intmodel/data/domestic_supply{os.sep}{item}_2020_Global_supply.csv"
         if os.path.isfile(ds_fname):
             print(f"{item} domestic supply file already exists, skipping.")
             continue
