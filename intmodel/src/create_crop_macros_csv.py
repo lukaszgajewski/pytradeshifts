@@ -7,11 +7,7 @@ using the production of each crop combined with the nutrition of the crops.
 
 import pandas as pd
 import numpy as np
-from src.utilities.import_utilities import ImportUtilities
-import git
-from pathlib import Path
-
-repo_root = git.Repo(".", search_parent_directories=True).working_dir
+from import_utilities import ImportUtilities  # TODO, to be changed later probably
 
 
 class CropMacros:
@@ -20,7 +16,10 @@ class CropMacros:
         Initializes the class with necessary constants and imports nutrient and product data.
         """
         # Set paths to nutrition data and food production data
-        self.NUTRITION_XLS = Path(repo_root) / "data" / "Supplemental_Data.xlsx"
+        self.NUTRITION_XLS = (
+            "intmodel/data/ALLFED Food consumption, supplies and balances.xlsx"
+        )
+        # TODO refactor name to domestic supply
         self.PRODUCTION_CSV = (
             Path(repo_root)
             / "data"
@@ -78,46 +77,6 @@ class CropMacros:
 
         # Return the two dataframes
         return products, nutrition
-
-    def get_kcals_matching(self, match_strings, products):
-        """
-        Returns the sum of kcals, fat, and protein for the products that the passed in
-        name as a substring of the product name string.
-
-        Args:
-            match_strings (list): A list of strings to match against the product names
-            products (pandas.DataFrame): A pandas DataFrame containing product information
-
-        Returns:
-            float: The sum of kcals for the matching products
-
-        """
-        # Create an empty DataFrame to store all matching products
-        all_matching_products = pd.DataFrame([])
-
-        # Loop through each match string
-        for string in match_strings:
-            # Convert the string to lowercase for case-insensitive matching
-            string_lower = string.lower()
-
-            # Filter the products DataFrame to only include products with the match string in the name
-            matching_products = products.loc[
-                products["Item"].str.contains(string_lower, case=False)
-            ]
-
-            # Add the matching products to the all_matching_products DataFrame
-            all_matching_products = pd.concat(
-                [all_matching_products, matching_products]
-            )
-
-        # Remove any duplicate products from the all_matching_products DataFrame
-        all_matching_products.drop_duplicates(subset=["Item"], inplace=True)
-
-        # Get the total kcals, fat, and protein for the matching products
-        kcals, fat, protein = self.get_nutrients(all_matching_products)
-
-        # Return the total kcals for the matching products
-        return kcals
 
     def get_nutrients(self, products):
         """
