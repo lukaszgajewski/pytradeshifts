@@ -7,11 +7,12 @@ import os
 from itertools import groupby
 import networkx as nx
 from matplotlib.axes import Axes
+from matplotlib.pyplot import rcParams
 from geopy.distance import geodesic
 from scipy.spatial.distance import squareform, pdist
 
 
-def plot_winkel_tripel_map(ax):
+def plot_winkel_tripel_map(ax: Axes):
     """
     Helper function to plot a Winkel Tripel map with a border.
     """
@@ -585,3 +586,124 @@ def get_percolation_threshold(
         len(eigenvalues) - np.searchsorted(eigenvalues[::-1], 1, side="left")
     ]
     return threshold, removed_nodes_count, eigenvalues
+
+
+def fill_sector_by_colour(
+    ax: Axes, z_threshold: float, p_thresholds: list[float], alpha: float, labels=None
+):
+    """
+    This is a helper function to colour the background in the z-score, participation
+    space plot.
+    There has been several sectors identified in this attribute space in the following
+    article:
+    Guimerà, R., & Nunes Amaral, L. A. (2005).
+    Functional cartography of complex metabolic networks.
+    Nature, 433(7028), 895-900. doi:10.1038/nature03288
+    https://www.nature.com/articles/nature03288
+    Here, we allow for arbitrary thresholds being used since they do depend on
+    the dataset and do not necessarily match the values in the aforementoned work.
+
+    Arguments:
+        ax (Axes): the axis on which to plot the sectors.
+        z_threshold (float): value of z-score for a country to
+                be considered a hub.
+        p_threshold (list[float]): list of participation
+            coefficient threshold for a country to be provincial, connector,
+            or kinless (and sub-categories, in the paper cited there are 7 different
+            thresholds).
+        alpha (float): transparency level of the background colouring,
+            showing the sectors defined by the above thresholds.
+        labels (list[str] | None, optional): labels for the aforementioned
+            sectors, if provided a legend shall be displayed explaining
+            the colours, otherwise no legend shall be shown.
+
+    Returns:
+        None
+    """
+    x_low, x_high = (0, 1)  # valid range for p
+    y_low, y_high = ax.get_ylim()  # z can be any value technically
+    color_cycle = rcParams["axes.prop_cycle"].by_key()["color"]
+    assert len(p_thresholds) >= 2
+    if labels:
+        assert len(labels) == len(p_thresholds) + 2
+    # left edge panels
+    ii = 0
+    ax.fill(
+        "x",
+        "y",
+        color_cycle[ii],
+        data={
+            "x": [x_low, p_thresholds[ii], p_thresholds[ii], x_low],
+            "y": [y_low, y_low, z_threshold, z_threshold],
+        },
+        alpha=alpha,
+        label=labels[ii] if labels else None,
+    )
+    ii += 1
+    ax.fill(
+        "x",
+        "y",
+        color_cycle[ii],
+        data={
+            "x": [x_low, p_thresholds[ii], p_thresholds[ii], x_low],
+            "y": [z_threshold, z_threshold, y_high, y_high],
+        },
+        alpha=alpha,
+        label=labels[ii] if labels else None,
+    )
+    # middle panels
+    while ii < len(p_thresholds) - 1:
+        ii += 1
+        ax.fill(
+            "x",
+            "y",
+            color_cycle[ii],
+            data={
+                "x": [
+                    p_thresholds[ii - 2],
+                    p_thresholds[ii],
+                    p_thresholds[ii],
+                    p_thresholds[ii - 2],
+                ],
+                "y": (
+                    [y_low, y_low, z_threshold, z_threshold]
+                    if ii % 2 == 0
+                    else [z_threshold, z_threshold, y_high, y_high]
+                ),
+            },
+            alpha=alpha,
+            label=labels[ii] if labels else None,
+        )
+    # right edge panels
+    ax.fill(
+        "x",
+        "y",
+        color_cycle[ii + 1],
+        data={
+            "x": [
+                p_thresholds[ii - 1],
+                x_high,
+                x_high,
+                p_thresholds[ii - 1],
+            ],
+            "y": [z_threshold, z_threshold, y_high, y_high],
+        },
+        alpha=alpha,
+        label=labels[ii + 1] if labels else None,
+    )
+    ax.fill(
+        "x",
+        "y",
+        color_cycle[ii + 2],
+        data={
+            "x": [
+                p_thresholds[ii],
+                x_high,
+                x_high,
+                p_thresholds[ii],
+            ],
+            "y": [y_low, y_low, z_threshold, z_threshold],
+        },
+        alpha=alpha,
+        label=labels[ii + 2] if labels else None,
+    )
