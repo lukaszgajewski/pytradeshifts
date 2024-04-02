@@ -130,6 +130,5 @@ dmypy.json
 
 *.pkl
 
-/data/preprocessed_data/integrated_model/prod_trade
-/data/preprocessed_data/integrated_model/from_IM
-/data/preprocessed_data/integrated_model/domestic_supply
+# Integrated Model data
+intmodel/data
