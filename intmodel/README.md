@@ -17,7 +17,7 @@ Generating domesctic supply is pretty quick (seconds).
 
 # Running
 
-1. PyTradeShifts.preprocessing; this produces production and trade data (prod_trade directory)
-2. domestic_supply.py; this produces domestic supply values for all items (with or without a reduction factor, this can also in the future incorporate trade difficulty factor due to gravity model of trade built into PyTradeShifts)
-3. combine_ds_files.py; this produces domesti_supply_combined.csv
-4. create_crop_macros_csv.py; this produces domestic supply of *calories* for each country, just like the OG script in integrated model repo did for production values
+1. PyTradeShifts.preprocessing; produces production and trade data (prod_trade directory)
+2. domestic_supply.py; produces domestic supply values for all items (with or without a reduction factor, this can also in the future incorporate trade difficulty factor due to gravity model of trade built into PyTradeShifts)
+3. combine_ds_files.py; produces domesti_supply_combined.csv
+4. create_crop_macros_csv.py; produces domestic supply of *calories* for each country, just like the OG script in integrated model repo did for production values

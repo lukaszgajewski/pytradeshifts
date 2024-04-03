@@ -19,14 +19,8 @@ class CropMacros:
         self.NUTRITION_XLS = (
             "intmodel/data/ALLFED Food consumption, supplies and balances.xlsx"
         )
-        # TODO refactor name to domestic supply
-        self.PRODUCTION_CSV = (
-            Path(repo_root)
-            / "data"
-            / "no_food_trade"
-            / "raw_data"
-            / "FAOSTAT_food_production_2020.csv"
-        )
+        # domestic supply
+        self.DS_CSV = "intmodel/data/domestic_supply_combined.csv"
 
         # Set conversion factors
         self.TONS_TO_KG = 1e3
@@ -53,28 +47,33 @@ class CropMacros:
         """
 
         # Import nutrition data from Excel file
-        xls = pd.ExcelFile(self.NUTRITION_XLS)
-        nutrition = pd.read_excel(xls, "Nutrition")[
-            ["Item", "Calories", "Protein", "Fat"]
-        ]
+        # xls = pd.ExcelFile(self.NUTRITION_XLS)
+        nutrition = pd.read_excel(
+            self.NUTRITION_XLS,
+            sheet_name="Nutrition data from FAOSTAT",
+            usecols="A:E",
+            skiprows=1,
+        )
+        # nutrition = pd.read_excel(xls, "Nutrition")[
+        #     ["Item", "Calories", "Protein", "Fat"]
+        # ]
 
         # Define column names for production data
         iso3_code = "Area Code (ISO3)"
         production_col_names = [
             iso3_code,
             "Area",
-            "Element",
-            "Item Code (FAO)",
+            # "Element",
+            # "Item Code (FAO)",
             "Item",
-            "Unit",
+            # "Unit",
             "Value",
         ]
 
         # Import production data from CSV file
         products = ImportUtilities.import_csv(
-            self.PRODUCTION_CSV, production_col_names, iso3_code
+            self.DS_CSV, production_col_names, iso3_code
         )
-
         # Return the two dataframes
         return products, nutrition
 
@@ -203,7 +202,7 @@ if __name__ == "__main__":
     macros_csv = ImportUtilities.clean_up_eswatini(macros_csv)
 
     np.savetxt(
-        Path(repo_root) / "data" / "no_food_trade" / "processed_data/macros_csv.csv",
+        "intmodel/data/macros_csv.csv",
         macros_csv,
         delimiter=",",
         fmt="%s",
