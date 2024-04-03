@@ -7,8 +7,7 @@ Running preprocessing will produce them (warning: takes several hours and a lot 
 Generating domesctic supply is pretty quick (seconds).
 
 # TODO
-- combine all domestic supply files into one
-- modify creat_crop_macros code fron intmodel to work with domestic supply and new nutrition table
+- simplify creat_crop_macros code from intmodel
 - write code for generating domestic supply in a scenario (basic functionality is there, only handling file names is left to do)
 - write docs and instructions on how to use
 - scan repo for TODOs
