@@ -1320,6 +1320,329 @@ Attempting to invert the matrix again.
 Corrected re-exports.
 Attempting to load Yautia (cocoyam) in Y2020.
 Yautia (cocoyam) production/trade data not found, skipping.
+Attempting to load Almonds, in shell in Y2020.
+Loaded data for Almonds, in shell in Y2020.
+Removed 6 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 2 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Almonds, shelled in Y2020.
+Almonds, shelled production/trade data not found, skipping.
+Attempting to load Anise, badian, coriander, cumin, caraway, fennel and juniper berries, raw in Y2020.
+Loaded data for Anise, badian, coriander, cumin, caraway, fennel and juniper berries, raw in Y2020.
+Removed 0 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Apple juice in Y2020.
+Apple juice production/trade data not found, skipping.
+Attempting to load Apple juice, concentrated in Y2020.
+Apple juice, concentrated production/trade data not found, skipping.
+Attempting to load Apricots, dried in Y2020.
+Apricots, dried production/trade data not found, skipping.
+Attempting to load Bambara beans, dry in Y2020.
+Loaded data for Bambara beans, dry in Y2020.
+Removed 4 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 26 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Barley flour and grits in Y2020.
+Barley flour and grits production/trade data not found, skipping.
+Attempting to load Beer of barley, malted in Y2020.
+Warning: trade matrix has duplicate indices
+Warning: production has duplicate indices
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Beer of barley, malted in Y2020.
+Removed 0 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Beer of maize, malted in Y2020.
+Beer of maize, malted production/trade data not found, skipping.
+Attempting to load Beer of millet, malted in Y2020.
+Beer of millet, malted production/trade data not found, skipping.
+Attempting to load Beer of sorghum, malted in Y2020.
+Beer of sorghum, malted production/trade data not found, skipping.
+Attempting to load Bran of barley in Y2020.
+Bran of barley production/trade data not found, skipping.
+Attempting to load Bran of buckwheat in Y2020.
+Bran of buckwheat production/trade data not found, skipping.
+Attempting to load Bran of cereals n.e.c. in Y2020.
+Bran of cereals n.e.c. production/trade data not found, skipping.
+Attempting to load Bran of fonio in Y2020.
+Bran of fonio production/trade data not found, skipping.
+Attempting to load Bran of maize in Y2020.
+Bran of maize production/trade data not found, skipping.
+Attempting to load Bran of millet in Y2020.
+Bran of millet production/trade data not found, skipping.
+Attempting to load Bran of mixed grain in Y2020.
+Bran of mixed grain production/trade data not found, skipping.
+Attempting to load Bran of pulses in Y2020.
+Bran of pulses production/trade data not found, skipping.
+Attempting to load Bran of rice in Y2020.
+Bran of rice production/trade data not found, skipping.
+Attempting to load Bran of rye in Y2020.
+Bran of rye production/trade data not found, skipping.
+Attempting to load Bran of sorghum in Y2020.
+Bran of sorghum production/trade data not found, skipping.
+Attempting to load Bran of triticale in Y2020.
+Bran of triticale production/trade data not found, skipping.
+Attempting to load Bran of wheat in Y2020.
+Bran of wheat production/trade data not found, skipping.
+Attempting to load Brazil nuts, in shell in Y2020.
+Loaded data for Brazil nuts, in shell in Y2020.
+Removed 5 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 18 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Breakfast cereals in Y2020.
+Breakfast cereals production/trade data not found, skipping.
+Attempting to load Broad beans and horse beans, dry in Y2020.
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Broad beans and horse beans, dry in Y2020.
+Removed 1 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 4 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Broad beans and horse beans, green in Y2020.
+Loaded data for Broad beans and horse beans, green in Y2020.
+Removed 0 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 16 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Cabbages in Y2020.
+Warning: trade matrix has duplicate indices
+Warning: production has duplicate indices
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Cabbages in Y2020.
+Removed 1 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Cane sugar, non-centrifugal in Y2020.
+Cane sugar, non-centrifugal production/trade data not found, skipping.
+Attempting to load Canned mushrooms in Y2020.
+Canned mushrooms production/trade data not found, skipping.
+Attempting to load Cantaloupes and other melons in Y2020.
+Warning: trade matrix has duplicate indices
+Warning: production has duplicate indices
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Cantaloupes and other melons in Y2020.
+Removed 1 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 3 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Cashew nuts, in shell in Y2020.
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Cashew nuts, in shell in Y2020.
+Removed 5 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 7 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Cassava, dry in Y2020.
+Cassava, dry production/trade data not found, skipping.
+Attempting to load Cassava, fresh in Y2020.
+Warning: trade matrix has duplicate indices
+Warning: production has duplicate indices
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Cassava, fresh in Y2020.
+Removed 4 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Castor oil seeds in Y2020.
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Castor oil seeds in Y2020.
+Removed 20 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 12 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Castor oil, hydrogenated in Y2020.
+Castor oil, hydrogenated production/trade data not found, skipping.
+Attempting to load Cereal preparations in Y2020.
+Cereal preparations production/trade data not found, skipping.
+Attempting to load Cereals n.e.c. in Y2020.
+Loaded data for Cereals n.e.c. in Y2020.
+Removed 0 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 2 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Chestnuts, in shell in Y2020.
+Loaded data for Chestnuts, in shell in Y2020.
+Removed 5 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 8 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Chick peas, dry in Y2020.
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Chick peas, dry in Y2020.
+Removed 0 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Chillies and peppers, dry (Capsicum spp., Pimenta spp.), raw in Y2020.
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Chillies and peppers, dry (Capsicum spp., Pimenta spp.), raw in Y2020.
+Removed 2 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Chillies and peppers, green (Capsicum spp. and Pimenta spp.) in Y2020.
+Warning: trade matrix has duplicate indices
+Warning: production has duplicate indices
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Chillies and peppers, green (Capsicum spp. and Pimenta spp.) in Y2020.
+Removed 1 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 1 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Cider and other fermented beverages in Y2020.
+Cider and other fermented beverages production/trade data not found, skipping.
+Attempting to load Cinnamon and cinnamon-tree flowers, raw in Y2020.
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Cinnamon and cinnamon-tree flowers, raw in Y2020.
+Removed 2 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Citrus juice, concentrated n.e.c. in Y2020.
+Citrus juice, concentrated n.e.c. production/trade data not found, skipping.
+Attempting to load Cloves (whole stems), raw in Y2020.
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Cloves (whole stems), raw in Y2020.
+Removed 4 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Cocoa beans in Y2020.
+Warning: trade matrix has duplicate indices
+Warning: production has duplicate indices
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Cocoa beans in Y2020.
+Removed 4 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Cocoa butter, fat and oil in Y2020.
+Cocoa butter, fat and oil production/trade data not found, skipping.
+Attempting to load Cocoa paste not defatted in Y2020.
+Cocoa paste not defatted production/trade data not found, skipping.
+Attempting to load Cocoa powder and cake in Y2020.
+Cocoa powder and cake production/trade data not found, skipping.
+Attempting to load Coconut oil in Y2020.
+Warning: trade matrix has duplicate indices
+Warning: production has duplicate indices
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Coconut oil in Y2020.
+Removed 1 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 1 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Coconuts, in shell in Y2020.
+Warning: trade matrix has duplicate indices
+Warning: production has duplicate indices
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Coconuts, in shell in Y2020.
+Removed 1 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 1 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Coffee extracts in Y2020.
+Coffee extracts production/trade data not found, skipping.
+Attempting to load Coffee substitutes in Y2020.
+Coffee substitutes production/trade data not found, skipping.
+Attempting to load Coffee, decaffeinated or roasted in Y2020.
+Coffee, decaffeinated or roasted production/trade data not found, skipping.
+Attempting to load Communion wafers, empty cachets of a kind suitable for pharmaceutical use, sealing wafers, rice paper and similar products. in Y2020.
+Communion wafers, empty cachets of a kind suitable for pharmaceutical use, sealing wafers, rice paper and similar products. production/trade data not found, skipping.
+Attempting to load Cotton seed in Y2020.
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Cotton seed in Y2020.
+Removed 5 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 5 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Cottonseed oil in Y2020.
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Cottonseed oil in Y2020.
+Removed 2 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 2 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Dried mushrooms in Y2020.
+Dried mushrooms production/trade data not found, skipping.
+Attempting to load Extracts, essences and concentrates of tea or mate, and preparations with a basis thereof or with a basis of tea or maté in Y2020.
+Extracts, essences and concentrates of tea or mate, and preparations with a basis thereof or with a basis of tea or maté production/trade data not found, skipping.
 Attempting to load Figs, dried in Y2020.
 Figs, dried production/trade data not found, skipping.
 Attempting to load Flour of buckwheat in Y2020.
@@ -1366,49 +1689,16 @@ Attempting to load Fruit prepared n.e.c. in Y2020.
 Fruit prepared n.e.c. production/trade data not found, skipping.
 Attempting to load Fruit, nuts, peel, sugar preserved in Y2020.
 Fruit, nuts, peel, sugar preserved production/trade data not found, skipping.
-Attempting to load Game meat, fresh, chilled or frozen in Y2020.
-Loaded data for Game meat, fresh, chilled or frozen in Y2020.
-Removed 2 countries with no trade or production.
-Prebalanced trade matrix.
-Determinant=0 encountered in PyTradeShifts.correct_reexports().
-Re-applying PyTradeShifts.remove_net_zero_countries().
-Removed 4 countries with no trade or production.
-Attempting to invert the matrix again.
-Corrected re-exports.
 Attempting to load Germ of maize in Y2020.
 Germ of maize production/trade data not found, skipping.
 Attempting to load Germ of wheat in Y2020.
 Germ of wheat production/trade data not found, skipping.
-Attempting to load Ghee from buffalo milk in Y2020.
-Loaded data for Ghee from buffalo milk in Y2020.
-Removed 0 countries with no trade or production.
-Prebalanced trade matrix.
-Corrected re-exports.
-Attempting to load Ghee from cow milk in Y2020.
-Loaded data for Ghee from cow milk in Y2020.
-Removed 1 countries with no trade or production.
-Prebalanced trade matrix.
-Determinant=0 encountered in PyTradeShifts.correct_reexports().
-Re-applying PyTradeShifts.remove_net_zero_countries().
-Removed 2 countries with no trade or production.
-Attempting to invert the matrix again.
-Corrected re-exports.
 Attempting to load Ginger, raw in Y2020.
 Warning: 'not found' present in trade matrix index
 Warning: 'not found' present in trade matrix columns
 Warning: 'not found' present in production index
 Loaded data for Ginger, raw in Y2020.
 Removed 0 countries with no trade or production.
-Prebalanced trade matrix.
-Corrected re-exports.
-Attempting to load Goat fat, unrendered in Y2020.
-Warning: trade matrix has duplicate indices
-Warning: production has duplicate indices
-Warning: 'not found' present in trade matrix index
-Warning: 'not found' present in trade matrix columns
-Warning: 'not found' present in production index
-Loaded data for Goat fat, unrendered in Y2020.
-Removed 1 countries with no trade or production.
 Prebalanced trade matrix.
 Corrected re-exports.
 Attempting to load Grape juice in Y2020.
@@ -1468,42 +1758,14 @@ Re-applying PyTradeShifts.remove_net_zero_countries().
 Removed 4 countries with no trade or production.
 Attempting to invert the matrix again.
 Corrected re-exports.
-Attempting to load Hen eggs in shell, fresh in Y2020.
-Warning: trade matrix has duplicate indices
-Warning: production has duplicate indices
-Warning: 'not found' present in trade matrix index
-Warning: 'not found' present in trade matrix columns
-Warning: 'not found' present in production index
-Loaded data for Hen eggs in shell, fresh in Y2020.
-Removed 0 countries with no trade or production.
-Prebalanced trade matrix.
-Corrected re-exports.
 Attempting to load Homogenized cooked fruit, prepared in Y2020.
 Homogenized cooked fruit, prepared production/trade data not found, skipping.
-Attempting to load Homogenized meat preparations in Y2020.
-Homogenized meat preparations production/trade data not found, skipping.
 Attempting to load Homogenized vegetable preparations in Y2020.
 Homogenized vegetable preparations production/trade data not found, skipping.
-Attempting to load Horse meat, fresh or chilled in Y2020.
-Warning: 'not found' present in trade matrix index
-Warning: 'not found' present in trade matrix columns
-Warning: 'not found' present in production index
-Loaded data for Horse meat, fresh or chilled in Y2020.
-Removed 5 countries with no trade or production.
-Prebalanced trade matrix.
-Determinant=0 encountered in PyTradeShifts.correct_reexports().
-Re-applying PyTradeShifts.remove_net_zero_countries().
-Removed 11 countries with no trade or production.
-Attempting to invert the matrix again.
-Corrected re-exports.
 Attempting to load Husked rice in Y2020.
 Husked rice production/trade data not found, skipping.
 Attempting to load hydrogenated oils and fats in Y2020.
 hydrogenated oils and fats production/trade data not found, skipping.
-Attempting to load Ice cream and other edible ice in Y2020.
-Ice cream and other edible ice production/trade data not found, skipping.
-Attempting to load Industrial monocarboxylic fatty acids; acid oils from refining in Y2020.
-Industrial monocarboxylic fatty acids; acid oils from refining production/trade data not found, skipping.
 Attempting to load Jojoba oil in Y2020.
 Jojoba oil production/trade data not found, skipping.
 Attempting to load Juice of citrus fruit n.e.c. in Y2020.
@@ -1522,8 +1784,6 @@ Attempting to load Juice of plum, concentrated in Y2020.
 Juice of plum, concentrated production/trade data not found, skipping.
 Attempting to load Juice of tangerine in Y2020.
 Juice of tangerine production/trade data not found, skipping.
-Attempting to load Lard stearine and lard oil in Y2020.
-Lard stearine and lard oil production/trade data not found, skipping.
 Attempting to load Leeks and other alliaceous vegetables in Y2020.
 Warning: 'not found' present in trade matrix index
 Warning: 'not found' present in trade matrix columns
@@ -1545,8 +1805,6 @@ Prebalanced trade matrix.
 Corrected re-exports.
 Attempting to load Liquid margarine in Y2020.
 Liquid margarine production/trade data not found, skipping.
-Attempting to load Liver preparations in Y2020.
-Liver preparations production/trade data not found, skipping.
 Attempting to load Locust beans (carobs) in Y2020.
 Loaded data for Locust beans (carobs) in Y2020.
 Removed 4 countries with no trade or production.
@@ -1603,6 +1861,541 @@ Prebalanced trade matrix.
 Determinant=0 encountered in PyTradeShifts.correct_reexports().
 Re-applying PyTradeShifts.remove_net_zero_countries().
 Removed 3 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Mixed grain in Y2020.
+Loaded data for Mixed grain in Y2020.
+Removed 4 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 5 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Mixes and doughs for the preparation of bakers' wares in Y2020.
+Mixes and doughs for the preparation of bakers' wares production/trade data not found, skipping.
+Attempting to load Must of grape in Y2020.
+Must of grape production/trade data not found, skipping.
+Attempting to load Mustard seed oil, crude in Y2020.
+Mustard seed oil, crude production/trade data not found, skipping.
+Attempting to load Nutmeg, mace, cardamoms, raw in Y2020.
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Nutmeg, mace, cardamoms, raw in Y2020.
+Removed 1 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Oats, rolled in Y2020.
+Oats, rolled production/trade data not found, skipping.
+Attempting to load Oil of castor beans in Y2020.
+Oil of castor beans production/trade data not found, skipping.
+Attempting to load Oil of hempseed in Y2020.
+Oil of hempseed production/trade data not found, skipping.
+Attempting to load Oil of kapok in Y2020.
+Oil of kapok production/trade data not found, skipping.
+Attempting to load Oil of linseed in Y2020.
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Oil of linseed in Y2020.
+Removed 0 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 2 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Oil of maize in Y2020.
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Oil of maize in Y2020.
+Removed 1 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 1 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Oil of olive residues in Y2020.
+Oil of olive residues production/trade data not found, skipping.
+Attempting to load Oil of palm kernel in Y2020.
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Oil of palm kernel in Y2020.
+Removed 4 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 13 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Oil of poppy seed in Y2020.
+Oil of poppy seed production/trade data not found, skipping.
+Attempting to load Oil of rice bran in Y2020.
+Oil of rice bran production/trade data not found, skipping.
+Attempting to load Oil of sesame seed in Y2020.
+Loaded data for Oil of sesame seed in Y2020.
+Removed 1 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Oil of tung nuts in Y2020.
+Oil of tung nuts production/trade data not found, skipping.
+Attempting to load Olive oil in Y2020.
+Loaded data for Olive oil in Y2020.
+Removed 0 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Onions and shallots, dry (excluding dehydrated) in Y2020.
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Onions and shallots, dry (excluding dehydrated) in Y2020.
+Removed 0 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Onions and shallots, green in Y2020.
+Warning: trade matrix has duplicate indices
+Warning: production has duplicate indices
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Onions and shallots, green in Y2020.
+Removed 2 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 10 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Orange juice in Y2020.
+Orange juice production/trade data not found, skipping.
+Attempting to load Orange juice, concentrated in Y2020.
+Orange juice, concentrated production/trade data not found, skipping.
+Attempting to load Other beans, green in Y2020.
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Other beans, green in Y2020.
+Removed 1 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 4 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Other berries and fruits of the genus vaccinium n.e.c. in Y2020.
+Loaded data for Other berries and fruits of the genus vaccinium n.e.c. in Y2020.
+Removed 4 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 18 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Other citrus fruit, n.e.c. in Y2020.
+Warning: trade matrix has duplicate indices
+Warning: production has duplicate indices
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Other citrus fruit, n.e.c. in Y2020.
+Removed 3 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 9 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Other fructose and syrup in Y2020.
+Other fructose and syrup production/trade data not found, skipping.
+Attempting to load Other fruit n.e.c., dried in Y2020.
+Other fruit n.e.c., dried production/trade data not found, skipping.
+Attempting to load Other fruits, n.e.c. in Y2020.
+Warning: trade matrix has duplicate indices
+Warning: production has duplicate indices
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Other fruits, n.e.c. in Y2020.
+Removed 2 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 1 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Other nuts (excluding wild edible nuts and groundnuts), in shell, n.e.c. in Y2020.
+Warning: trade matrix has duplicate indices
+Warning: production has duplicate indices
+Loaded data for Other nuts (excluding wild edible nuts and groundnuts), in shell, n.e.c. in Y2020.
+Removed 0 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 3 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Other oil of vegetable origin, crude n.e.c. in Y2020.
+Other oil of vegetable origin, crude n.e.c. production/trade data not found, skipping.
+Attempting to load Other oil seeds, n.e.c. in Y2020.
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Other oil seeds, n.e.c. in Y2020.
+Removed 2 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 1 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Other pome fruits in Y2020.
+Loaded data for Other pome fruits in Y2020.
+Removed 7 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Other pulses n.e.c. in Y2020.
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Other pulses n.e.c. in Y2020.
+Removed 2 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 1 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Other stimulant, spice and aromatic crops, n.e.c. in Y2020.
+Warning: trade matrix has duplicate indices
+Warning: production has duplicate indices
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Other stimulant, spice and aromatic crops, n.e.c. in Y2020.
+Removed 0 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Other stone fruits in Y2020.
+Loaded data for Other stone fruits in Y2020.
+Removed 14 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 12 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Other sugar crops n.e.c. in Y2020.
+Loaded data for Other sugar crops n.e.c. in Y2020.
+Removed 1 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 66 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Other tropical fruit, dried in Y2020.
+Other tropical fruit, dried production/trade data not found, skipping.
+Attempting to load Other tropical fruits, n.e.c. in Y2020.
+Warning: trade matrix has duplicate indices
+Warning: production has duplicate indices
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Other tropical fruits, n.e.c. in Y2020.
+Removed 1 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 6 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Other vegetable juices in Y2020.
+Other vegetable juices production/trade data not found, skipping.
+Attempting to load Other vegetables provisionally preserved in Y2020.
+Other vegetables provisionally preserved production/trade data not found, skipping.
+Attempting to load Other vegetables, fresh n.e.c. in Y2020.
+Warning: trade matrix has duplicate indices
+Warning: production has duplicate indices
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Other vegetables, fresh n.e.c. in Y2020.
+Removed 0 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Palm oil in Y2020.
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Palm oil in Y2020.
+Removed 0 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Paste of tomatoes in Y2020.
+Paste of tomatoes production/trade data not found, skipping.
+Attempting to load Pepper (Piper spp.), raw in Y2020.
+Warning: trade matrix has duplicate indices
+Warning: production has duplicate indices
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Pepper (Piper spp.), raw in Y2020.
+Removed 1 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Pigeon peas, dry in Y2020.
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Pigeon peas, dry in Y2020.
+Removed 1 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 8 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Pineapple juice in Y2020.
+Pineapple juice production/trade data not found, skipping.
+Attempting to load Pineapples, otherwise prepared or preserved in Y2020.
+Pineapples, otherwise prepared or preserved production/trade data not found, skipping.
+Attempting to load Pistachios, in shell in Y2020.
+Loaded data for Pistachios, in shell in Y2020.
+Removed 2 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Plantains and cooking bananas in Y2020.
+Warning: trade matrix has duplicate indices
+Warning: production has duplicate indices
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Plantains and cooking bananas in Y2020.
+Removed 0 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 8 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Plums, dried in Y2020.
+Plums, dried production/trade data not found, skipping.
+Attempting to load Pomelos and grapefruits in Y2020.
+Warning: trade matrix has duplicate indices
+Warning: production has duplicate indices
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Pomelos and grapefruits in Y2020.
+Removed 2 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Pot barley in Y2020.
+Pot barley production/trade data not found, skipping.
+Attempting to load Prepared groundnuts in Y2020.
+Prepared groundnuts production/trade data not found, skipping.
+Attempting to load Prepared nuts in Y2020.
+Prepared nuts production/trade data not found, skipping.
+Attempting to load Rape or colza seed in Y2020.
+Loaded data for Rape or colza seed in Y2020.
+Removed 2 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 9 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Rapeseed or canola oil, crude in Y2020.
+Loaded data for Rapeseed or canola oil, crude in Y2020.
+Removed 0 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 2 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Raw cane or beet sugar (centrifugal only) in Y2020.
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Raw cane or beet sugar (centrifugal only) in Y2020.
+Removed 1 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Refined cane or beet sugar, in solid form, containing added flavouring or colouring matter; maple sugar and maple syrup in Y2020.
+Refined cane or beet sugar, in solid form, containing added flavouring or colouring matter; maple sugar and maple syrup production/trade data not found, skipping.
+Attempting to load Refined sugar in Y2020.
+Refined sugar production/trade data not found, skipping.
+Attempting to load Rice in Y2020.
+Warning: trade matrix has duplicate indices
+Warning: production has duplicate indices
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Rice in Y2020.
+Removed 1 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Rice, gluten in Y2020.
+Rice, gluten production/trade data not found, skipping.
+Attempting to load Rice, milled (husked) in Y2020.
+Rice, milled (husked) production/trade data not found, skipping.
+Attempting to load Rice-fermented beverages in Y2020.
+Rice-fermented beverages production/trade data not found, skipping.
+Attempting to load Safflower-seed oil, crude in Y2020.
+Loaded data for Safflower-seed oil, crude in Y2020.
+Removed 2 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 1 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Sour cherries in Y2020.
+Loaded data for Sour cherries in Y2020.
+Removed 0 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 11 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Soya bean oil in Y2020.
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Soya bean oil in Y2020.
+Removed 0 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Soya beans in Y2020.
+Loaded data for Soya beans in Y2020.
+Removed 0 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 1 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Starch of cassava in Y2020.
+Starch of cassava production/trade data not found, skipping.
+Attempting to load Starch of maize in Y2020.
+Starch of maize production/trade data not found, skipping.
+Attempting to load Starch of potatoes in Y2020.
+Starch of potatoes production/trade data not found, skipping.
+Attempting to load Starch of rice in Y2020.
+Starch of rice production/trade data not found, skipping.
+Attempting to load Starch of wheat in Y2020.
+Starch of wheat production/trade data not found, skipping.
+Attempting to load Sugar and syrups n.e.c. in Y2020.
+Sugar and syrups n.e.c. production/trade data not found, skipping.
+Attempting to load Sunflower-seed oil, crude in Y2020.
+Loaded data for Sunflower-seed oil, crude in Y2020.
+Removed 0 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Sweet corn, frozen in Y2020.
+Sweet corn, frozen production/trade data not found, skipping.
+Attempting to load Sweet corn, prepared or preserved in Y2020.
+Sweet corn, prepared or preserved production/trade data not found, skipping.
+Attempting to load Tangerines, mandarins, clementines in Y2020.
+Warning: trade matrix has duplicate indices
+Warning: production has duplicate indices
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Tangerines, mandarins, clementines in Y2020.
+Removed 1 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 6 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Tapioca of cassava in Y2020.
+Tapioca of cassava production/trade data not found, skipping.
+Attempting to load Tapioca of potatoes in Y2020.
+Tapioca of potatoes production/trade data not found, skipping.
+Attempting to load Taro in Y2020.
+Warning: trade matrix has duplicate indices
+Warning: production has duplicate indices
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Taro in Y2020.
+Removed 4 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 18 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Tea leaves in Y2020.
+Loaded data for Tea leaves in Y2020.
+Removed 0 countries with no trade or production.
+Prebalanced trade matrix.
+Corrected re-exports.
+Attempting to load Tomato juice in Y2020.
+Tomato juice production/trade data not found, skipping.
+Attempting to load Tomatoes, peeled (o/t vinegar) in Y2020.
+Tomatoes, peeled (o/t vinegar) production/trade data not found, skipping.
+Attempting to load Uncooked pasta, not stuffed or otherwise prepared in Y2020.
+Uncooked pasta, not stuffed or otherwise prepared production/trade data not found, skipping.
+Attempting to load Undenatured ethyl alcohol of an alcoholic strength by volume of 80% vol or higher in Y2020.
+Undenatured ethyl alcohol of an alcoholic strength by volume of 80% vol or higher production/trade data not found, skipping.
+Attempting to load Vanilla, raw in Y2020.
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Vanilla, raw in Y2020.
+Removed 4 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 7 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Vegetable products, fresh or dry n.e.c. in Y2020.
+Vegetable products, fresh or dry n.e.c. production/trade data not found, skipping.
+Attempting to load Vegetables frozen in Y2020.
+Vegetables frozen production/trade data not found, skipping.
+Attempting to load Vegetables preserved (frozen) in Y2020.
+Vegetables preserved (frozen) production/trade data not found, skipping.
+Attempting to load Vegetables preserved nes (o/t vinegar) in Y2020.
+Vegetables preserved nes (o/t vinegar) production/trade data not found, skipping.
+Attempting to load Vegetables, pulses and potatoes, preserved by vinegar or acetic acid in Y2020.
+Vegetables, pulses and potatoes, preserved by vinegar or acetic acid production/trade data not found, skipping.
+Attempting to load Vermouth and other wine of fresh grapes flavoured with plats or aromatic substances in Y2020.
+Vermouth and other wine of fresh grapes flavoured with plats or aromatic substances production/trade data not found, skipping.
+Attempting to load Walnuts, in shell in Y2020.
+Loaded data for Walnuts, in shell in Y2020.
+Removed 4 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 6 countries with no trade or production.
+Attempting to invert the matrix again.
+Corrected re-exports.
+Attempting to load Wheat and meslin flour in Y2020.
+Wheat and meslin flour production/trade data not found, skipping.
+Attempting to load Wheat gluten in Y2020.
+Wheat gluten production/trade data not found, skipping.
+Attempting to load Wheat-fermented beverages in Y2020.
+Wheat-fermented beverages production/trade data not found, skipping.
+Attempting to load Yautia in Y2020.
+Warning: 'not found' present in trade matrix index
+Warning: 'not found' present in trade matrix columns
+Warning: 'not found' present in production index
+Loaded data for Yautia in Y2020.
+Removed 3 countries with no trade or production.
+Prebalanced trade matrix.
+Determinant=0 encountered in PyTradeShifts.correct_reexports().
+Re-applying PyTradeShifts.remove_net_zero_countries().
+Removed 27 countries with no trade or production.
 Attempting to invert the matrix again.
 Corrected re-exports.
 Attempting to load Cake of linseed in Y2020.
