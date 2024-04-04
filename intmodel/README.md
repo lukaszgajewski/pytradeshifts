@@ -7,8 +7,8 @@ Running preprocessing will produce them (warning: takes several hours and a lot 
 Generating domesctic supply is pretty quick (seconds).
 
 # TODO
-- simplify creat_crop_macros code from intmodel
 - write code for generating domestic supply in a scenario (basic functionality is there, only handling file names is left to do)
+- write a script automating the procedure
 - write docs and instructions on how to use
 - scan repo for TODOs
 - check ds gen output for errors
