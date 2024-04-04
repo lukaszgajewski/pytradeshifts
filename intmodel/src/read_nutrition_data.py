@@ -12,8 +12,7 @@ def read_nutrition_data():
     # drop NaNs
     nutri_data = nutri_data.dropna()
     # keep outdoor growing only;
-    # WARNING/TODO: this definetely incorrect right now
-    # Unfortunately, this needs done manually in the spreadsheet
+    # WARNING/TODO: this has been done manually and needs verification
     nutri_data = nutri_data[nutri_data["Outdoor growing?"] == 1.0].reset_index(
         drop=True
     )

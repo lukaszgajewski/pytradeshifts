@@ -131,4 +131,6 @@ dmypy.json
 *.pkl
 
 # Integrated Model data
-intmodel/data
+intmodel/data/domestic_supply/*
+intmodel/data/prod_trade/*
+intmodel/data/ALLFED Food consumption, supplies and balances.xlsx
