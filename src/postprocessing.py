@@ -16,6 +16,7 @@ from src.utils import (
     get_stability_index,
     get_distance_matrix,
     get_percolation_threshold,
+    fill_sector_by_colour,
 )
 import numpy as np
 import pandas as pd
@@ -133,6 +134,8 @@ class Postprocessing:
         self._compute_efficiency()
         self._compute_clustering_coefficient()
         self._compute_betweenness_centrality()
+        self._compute_within_community_degree()
+        self._compute_participation()
         self._compute_node_stability()
         self._compute_node_stability_difference()
         self._compute_network_stability()
@@ -793,6 +796,12 @@ class Postprocessing:
             tight_layout=True,
             figsize=((5, len(self.scenarios) * 2.5) if figsize is None else figsize),
         )
+        # if there is only one scenario axs will be just an ax object
+        # convert to a list to comply with other cases
+        try:
+            len(axs)
+        except TypeError:
+            axs = [axs]
         for ax, scenario in zip(axs, self.scenarios):
             scenario._plot_trade_communities(ax)
         if file_path:
@@ -901,6 +910,12 @@ class Postprocessing:
             tight_layout=True,
             figsize=(5, len(self.scenarios) * 2.5) if figsize is None else figsize,
         )
+        # if there is only one scenario axs will be just an ax object
+        # convert to a list to comply with other cases
+        try:
+            len(axs)
+        except TypeError:
+            axs = [axs]
         for ax, (idx, scenario) in zip(axs, enumerate(self.scenarios)):
             plot_node_metric_map(
                 ax,
@@ -1037,6 +1052,179 @@ class Postprocessing:
             )
             for scenario in self.scenarios
         ]
+
+    def _compute_within_community_degree(self) -> None:
+        """
+        Computes the z-score of node's degree within its community for each node
+        in every scenario.
+        Note: this metric ignores edge direction and weight.
+        The metric is taken from:
+        Guimerà, R., & Nunes Amaral, L. A. (2005).
+        Functional cartography of complex metabolic networks.
+        Nature, 433(7028), 895-900. doi:10.1038/nature03288
+        https://www.nature.com/articles/nature03288
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        self.zscores = []
+        for scenario in self.scenarios:
+            zscores = {}
+            for community in scenario.trade_communities:
+                community_subgraph = nx.subgraph(scenario.trade_graph, nbunch=community)
+                community_subgraph = community_subgraph.to_undirected()
+                subgraph_node_degrees = community_subgraph.degree()
+                # we update the dict with countries and their degree z-scores
+                # this assumes that each country can belong to a single community
+                zscores |= dict(
+                    zip(
+                        [node for (node, _) in subgraph_node_degrees],
+                        stats.zscore([degree for (_, degree) in subgraph_node_degrees]),
+                    )
+                )
+            self.zscores.append(zscores)
+
+    def _compute_participation(self) -> None:
+        """
+        Computes the participation coefficient for each node in every scenario.
+        This metric is close to 1.0 if node's links are uniformly distributed
+        among all the communities, and 0.0 if all its links are within its own
+        community.
+        Note: this metric ignores edge direction and weight.
+        The metric is taken from:
+        Guimerà, R., & Nunes Amaral, L. A. (2005).
+        Functional cartography of complex metabolic networks.
+        Nature, 433(7028), 895-900. doi:10.1038/nature03288
+        https://www.nature.com/articles/nature03288
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        self.participation = []
+        for scenario in self.scenarios:
+            undirected_trade_graph = scenario.trade_graph.to_undirected()
+            total_degree = undirected_trade_graph.degree()
+            coefficients = {
+                # the score for a given node is 1 - 1/k^2 x sum_s (k_s)^2
+                # where k is total node degree and the sum is over communities
+                # where k_s is the number of edges from the node to community `s`
+                country: 1.0
+                - sum(
+                    [
+                        sum(
+                            [  # this computes the number of edges from `country`
+                                # to `community`
+                                community_member in undirected_trade_graph[country]
+                                for community_member in community
+                            ]
+                        )
+                        ** 2
+                        for community in scenario.trade_communities
+                    ]  # we sum up the squares of the number of edges to each community
+                )
+                / total_degree[country] ** 2  # we divide by total degree squared
+                for country in undirected_trade_graph  # for each country
+            }
+            self.participation.append(coefficients)
+
+    def plot_roles(
+        self,
+        z_threshold=1.0,
+        p_thresholds=[0.05, 0.3, 0.62, 0.75, 0.8],
+        alpha=0.3,
+        sector_labels: list[str] | None = None,
+        figsize: tuple[float, float] | None = None,
+        file_path: str | None = None,
+        file_format="png",
+        dpi=300,
+        **kwargs,
+    ) -> None:
+        """
+        Generates a scatter plot where each point is a country, where Y values
+        are the within community z-scores, and X values are participation coefficients.
+        Both metrics are defined in:
+        Guimerà, R., & Nunes Amaral, L. A. (2005).
+        Functional cartography of complex metabolic networks.
+        Nature, 433(7028), 895-900. doi:10.1038/nature03288
+        https://www.nature.com/articles/nature03288
+
+        Arguments:
+            z_threshold (float, optional): value of z-score for a country to
+                be considered a hub, default is 1.0.
+            p_threshold (list[float], optional): list of participation
+                coefficient threshold for a country to be provincial, connector,
+                or kinless (and sub-categories, by default there are 7 different
+                thresholds).
+            alpha (float, optional): transparency level of the background colouring,
+                showing the sectors defined by the above thresholds.
+            sector_labels (list[str] | None, optional): labels for the aforementioned
+                sectors, if provided a legend shall be displayed explaining
+                the colours, otherwise no legend shall be shown.
+            figsize (tuple[float, float] | None, optional): the composite figure
+                size as expected by the matplotlib subplots routine.
+            shrink (float, optional): Colour bar shrink parameter.
+            file_path (str | None, optional): Path to where the image file
+                should be saved to. If `None` no file shall be produced.
+            file_format (str, optional): File extension to use when
+                saving plot to file.
+            dpi (int, optional): DPI of the saved image file.
+            **kwargs (optional): Any additional keyworded arguments recognised
+                by geopandas plot function.
+
+        Returns:
+            None
+        """
+        _, axs = plt.subplots(
+            len(self.scenarios),
+            1,
+            sharex=True,
+            tight_layout=True,
+            figsize=(5, len(self.scenarios) * 2.5) if figsize is None else figsize,
+        )
+        # if there is only one scenario axs will be just an ax object
+        # convert to a list to comply with other cases
+        try:
+            len(axs)
+        except TypeError:
+            axs = [axs]
+        legend_plotted = False
+        for ax, (idx, scenario) in zip(axs, enumerate(self.scenarios)):
+            ax.scatter(
+                self.participation[idx].values(), self.zscores[idx].values(), **kwargs
+            )
+            ax.set_title(
+                f"Country roles for {scenario.crop} with base year {scenario.base_year[1:]}"
+                + (
+                    f"\nin scenario: {scenario.scenario_name}"
+                    if scenario.scenario_name is not None
+                    else "\n(no scenario)"
+                )
+            )
+            fill_sector_by_colour(ax, z_threshold, p_thresholds, alpha, sector_labels)
+            ax.set_xlabel("Participation coefficient")
+            ax.set_ylabel("Within community degree")
+            if sector_labels and not legend_plotted:
+                ax.legend(
+                    loc="upper center",
+                    bbox_to_anchor=(0.5, -0.1),
+                    ncol=2,
+                )
+                legend_plotted = True
+
+        if file_path:
+            plt.savefig(
+                f"{file_path}{os.sep}country_roles.{file_format}",
+                dpi=dpi,
+                bbox_inches="tight",
+            )
+        else:
+            plt.show()
 
     def _compute_node_stability(self) -> None:
         """
@@ -1179,6 +1367,12 @@ class Postprocessing:
             tight_layout=True,
             figsize=(5, len(self.scenarios) * 2.5) if figsize is None else figsize,
         )
+        # if there is only one scenario axs will be just an ax object
+        # convert to a list to comply with other cases
+        try:
+            len(axs)
+        except TypeError:
+            axs = [axs]
         for ax, (idx, scenario) in zip(axs, enumerate(self.scenarios)):
             plot_node_metric_map(
                 ax,
@@ -1437,7 +1631,7 @@ class Postprocessing:
             linestyle="dashed",
             label="network collapse; \n[ID, attack, threshold]:",
         )
-        num_scenarios = len(self.scenarios)
+        num_scenarios = max(2, len(self.scenarios))
         alpha_steps = 0.9 / num_scenarios
         colors = [
             "#6c7075",
@@ -1566,10 +1760,12 @@ class Postprocessing:
         """
         self.plot_all_trade_communities(file_path=figures_folder)
         plt.close()  # this is to prevent cross-contamination of plots
+        # there is no point in this plot if there's only base scenario
         print("Plotted trade communities")
-        self.plot_community_difference(file_path=figures_folder)
-        plt.close()
-        print("Plotted difference in trade communities")
+        if len(self.scenarios) > 1:
+            self.plot_community_difference(file_path=figures_folder)
+            plt.close()
+            print("Plotted difference in trade communities")
         # there is no point in this plot if there's only base scenario and
         # one other
         if len(self.scenarios) > 2:
@@ -1584,18 +1780,35 @@ class Postprocessing:
         self.plot_community_satisfaction(file_path=figures_folder)
         plt.close()
         print("Plotted community satisfaction index")
-        self.plot_community_satisfaction_difference(file_path=figures_folder)
-        plt.close()
-        print("Plotted difference in community satisfaction")
+        if len(self.scenarios) > 1:
+            self.plot_community_satisfaction_difference(file_path=figures_folder)
+            plt.close()
+            print("Plotted difference in community satisfaction")
         self.plot_node_stability(file_path=figures_folder)
         plt.close()
         print("Plotted node stability map")
-        self.plot_node_stability_difference(file_path=figures_folder)
-        plt.close()
-        print("Plotted difference in node stability")
+        if len(self.scenarios) > 1:
+            self.plot_node_stability_difference(file_path=figures_folder)
+            plt.close()
+            print("Plotted difference in node stability")
         self.plot_attack_resilience(file_path=figures_folder)
         plt.close()
         print("Plotted attack resilience")
+        self.plot_roles(
+            c="black",
+            sector_labels=[
+                "Ultra peripheral non-hub",
+                "Provincial hub",
+                "Peripheral non-hub",
+                "Connector hub",
+                "Connector non-hub",
+                "Kinless hub",
+                "Kinless non-hub",
+            ],
+            file_path=figures_folder,
+        )
+        plt.close()
+        print("Plotted country roles")
 
     def _write_to_report_file(self, report_file_path, time_now, utc_label) -> None:
         """
@@ -1622,16 +1835,21 @@ class Postprocessing:
             )
             report_file.write("<h2> Trade communities </h2>")
             report_file.write("""<img src="figs/trade_communities.png" >""")
-            report_file.write("<h2> Difference in trade communities </h2>")
-            report_file.write("""<img src="figs/community_diff.png">""")
+            if len(self.scenarios) > 1:
+                report_file.write("<h2> Difference in trade communities </h2>")
+                report_file.write("""<img src="figs/community_diff.png">""")
             report_file.write("<h2> Community satisfaction </h2>")
             report_file.write("""<img src="figs/community_satisfaction.png">""")
-            report_file.write("<h2> Difference in community satisfaction </h2>")
-            report_file.write("""<img src="figs/community_satisfaction_diff.png" >""")
-            report_file.write(
-                "<h2> Graph structural difference to base scenario (ID=0) </h2>"
-            )
-            self.print_distance_metrics(file=report_file, justify="center")
+            if len(self.scenarios) > 1:
+                report_file.write("<h2> Difference in community satisfaction </h2>")
+                report_file.write(
+                    """<img src="figs/community_satisfaction_diff.png" >"""
+                )
+            if len(self.scenarios) > 1:
+                report_file.write(
+                    "<h2> Graph structural difference to base scenario (ID=0) </h2>"
+                )
+                self.print_distance_metrics(file=report_file, justify="center")
             if len(self.scenarios) > 2:
                 report_file.write("""<img src="figs/network_distance.png" >""")
             report_file.write("<h2> Centrality metrics by scenario </h2>")
@@ -1644,12 +1862,15 @@ class Postprocessing:
             report_file.write("""<img src="figs/centrality_map.png" >""")
             report_file.write("<h2> Stability map </h2>")
             report_file.write("""<img src="figs/node_stability.png" >""")
-            report_file.write("<h2> Difference in stability </h2>")
-            report_file.write("""<img src="figs/node_stability_diff.png" >""")
+            if len(self.scenarios) > 1:
+                report_file.write("<h2> Difference in stability </h2>")
+                report_file.write("""<img src="figs/node_stability_diff.png" >""")
             report_file.write("<h2> General network characteristics </h2>")
             self.print_network_metrics(file=report_file, justify="center")
             report_file.write("<h2> Attack resilience </h2>")
             report_file.write("""<img src="figs/attack_resilience.png" >""")
+            report_file.write("<h2> Country roles </h2>")
+            report_file.write("""<img src="figs/country_roles.png" >""")
             report_file.write("</center></p>")
             report_file.write("</body> </html>")
 
