@@ -23,7 +23,9 @@ def import_nutrients_and_products(
     return products, nutrition
 
 
-def compute_total_nutrients(products: pd.DataFrame, nutrition: pd.DataFrame):
+def compute_total_nutrients(
+    products: pd.DataFrame, nutrition: pd.DataFrame
+) -> pd.DataFrame:
     """
     Return the sum of kcals, fat, and protein for the products passed in.
 
@@ -31,7 +33,7 @@ def compute_total_nutrients(products: pd.DataFrame, nutrition: pd.DataFrame):
         products (pandas.DataFrame): A DataFrame containing food products and their values.
 
     Returns:
-        list: A list containing the sum of kcals, fat, and protein for the products passed in.
+        pandas.DataFrame: A dataframe containing the sum of kcals, fat, and protein for all countries.
     """
     # Merge dataframes
     df = pd.merge(left=nutrition, right=products, on="Item")
