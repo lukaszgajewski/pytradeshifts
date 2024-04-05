@@ -30,7 +30,7 @@ def combine_files(ds_dir, ds_files, output_file):
 
 if __name__ == "__main__":
     ds_dir = "intmodel/data/domestic_supply"
-    print("Compbining no scenario domestic supply.")
+    print("Combining no scenario domestic supply.")
     ds_files = [
         f
         for f in listdir(ds_dir)
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     ]
     output_file = "intmodel/data/domestic_supply_combined/domestic_supply_combined.csv"
     combine_files(ds_dir, ds_files, output_file)
-    print("Compbining domestic supply with crop reduction.")
+    print("Combining domestic supply with crop reduction.")
     scenarios = get_scenarios("intmodel/data/scenario_files")
     for scenario in tqdm(scenarios):
         ds_files = [
