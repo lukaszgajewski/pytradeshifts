@@ -14,8 +14,8 @@ In the output of the domestic supply script not all messages like "Almonds, with
 
 # TODO
 - update macros script to add scenarios
-- write a script automating the procedure
 - write docs and instructions on how to use
+- write a script automating the procedure
 - scan repo for TODOs
 - check ds gen output for errors
 - integrate into intmodel repo somehow, write now we use importutilities and create_crop_macro from intmodel which is a bit messy

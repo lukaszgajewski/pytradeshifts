@@ -1,4 +1,6 @@
 import pandas as pd
+from tqdm import tqdm
+from domestic_supply import get_scenarios
 
 
 def import_nutrients_and_products(
@@ -63,12 +65,27 @@ def compute_total_nutrients(
 
 
 if __name__ == "__main__":
+    print("Computing macros for no scenario domestic supply.")
     products, nutrients = import_nutrients_and_products(
         "intmodel/data/ALLFED Food consumption, supplies and balances.xlsx",
-        "intmodel/data/domestic_supply_combined.csv",
+        "intmodel/data/domestic_supply_combined/domestic_supply_combined.csv",
     )
     total_nutrients = compute_total_nutrients(products, nutrients)
     # Fix Eswatini/Swaziland iso3 code
     total_nutrients["iso3"].replace("SWZ", "SWT", inplace=True)
     # Save to file
-    total_nutrients.to_csv("intmodel/data/macros_csv.csv", index=False)
+    total_nutrients.to_csv("intmodel/data/macros/macros_csv.csv", index=False)
+    print("Computing domestic supply macros for all scenarios.")
+    scenarios = get_scenarios("intmodel/data/scenario_files")
+    for scenario in tqdm(scenarios):
+        products, nutrients = import_nutrients_and_products(
+            "intmodel/data/ALLFED Food consumption, supplies and balances.xlsx",
+            f"intmodel/data/domestic_supply_combined/{scenario}",
+        )
+        total_nutrients = compute_total_nutrients(products, nutrients)
+        # Fix Eswatini/Swaziland iso3 code
+        total_nutrients["iso3"].replace("SWZ", "SWT", inplace=True)
+        # Save to file
+        total_nutrients.to_csv(
+            f"intmodel/data/macros/{scenario}_macros_csv.csv", index=False
+        )

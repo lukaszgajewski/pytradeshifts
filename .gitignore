@@ -137,3 +137,4 @@ intmodel/data/ALLFED Food consumption, supplies and balances.xlsx
 intmodel/data/scenario_files/*
 intmodel/ds_gen_out.txt
 intmodel/data/domestic_supply_combined/*
+intmodel/data/macros/*
