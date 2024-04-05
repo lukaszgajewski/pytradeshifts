@@ -4,6 +4,7 @@ import numpy as np
 from tqdm import tqdm
 from src.model import PyTradeShifts
 from read_nutrition_data import read_nutrition_data
+import country_converter as coco
 
 
 class DomesticSupply(PyTradeShifts):
@@ -12,8 +13,17 @@ class DomesticSupply(PyTradeShifts):
         item: str,
         base_year: int,
         region="Global",
+        scenario_name=None,
+        scenario_file_name=None,
     ) -> None:
-        super().__init__(item, base_year, region=region, testing=True)
+        super().__init__(
+            item,
+            base_year,
+            region=region,
+            scenario_name=scenario_name,
+            scenario_file_name=scenario_file_name,
+            testing=True,
+        )
         # Read in the data
         self.load_data()
         # Remove countries with all zeroes in trade and production
@@ -102,14 +112,117 @@ class DomesticSupply(PyTradeShifts):
         )
         return ds.squeeze()
 
+    def apply_scenario(self) -> None:
+        """
+        Loads the scenario files unifies the names and applies the scenario to the trade matrix.
+        by multiplying the trade matrix with the scenario scalar.
+
+        This assumes that the scenario file consists of a csv file with the country names
+        as the index and the changes in production as the only column.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        assert self.scenario_name is not None
+        assert self.scenario_file_name is not None
+        assert self.scenario_run is False
+        self.scenario_run = True
+
+        # Read in the scenario data
+        scenario_data = pd.read_csv(
+            self.scenario_file_name,
+            index_col=0,
+        ).squeeze()
+        # Cast all the values to float
+        scenario_data = pd.to_numeric(scenario_data, errors="raise")
+
+        # make sure that this only contains numbers
+        assert scenario_data.dtype == float
+
+        assert isinstance(scenario_data, pd.Series)
+
+        # Make sure that all the values are above -100, as this is a percentage change
+        assert scenario_data.min() >= -100
+
+        # Convert the percentage change to a scalar, so we can multiply the trade matrix with it
+        scenario_data = 1 + scenario_data / 100
+
+        # Make sure that all the values are above 0, as yield cannot become negative
+        assert scenario_data.min() >= 0
+
+        # Drop all NaNs
+        scenario_data = scenario_data.dropna()
+
+        cc = coco.CountryConverter()
+        # Convert the country names to the same format as in the trade matrix
+        scenario_data.index = cc.pandas_convert(
+            pd.Series(scenario_data.index), to="name_short"
+        )
+
+        if self.only_keep_scenario_countries:
+            # Only keep the countries that are in the trade matrix index, trade matrix columns and
+            # the scenario data
+            countries = np.intersect1d(
+                np.intersect1d(self.trade_matrix.index, self.trade_matrix.columns),
+                scenario_data.index,
+            )
+            self.trade_matrix = self.trade_matrix.loc[countries, countries]
+            scenario_data = scenario_data.loc[countries]
+
+            # Sort the indices
+            self.trade_matrix = self.trade_matrix.sort_index(axis=0).sort_index(axis=1)
+            scenario_data = scenario_data.sort_index()
+
+            # Make sure the indices + columns are the same
+            assert self.trade_matrix.index.equals(self.trade_matrix.columns)
+            assert self.trade_matrix.index.equals(scenario_data.index)
+
+            # Multiply all the columns with the scenario data
+            self.trade_matrix = self.trade_matrix.mul(scenario_data.values, axis=0)
+        else:
+            # Multiply the trade matrix with the scenario data, but only for the countries
+            # that are in the scenario data. Still keep all the countries in the trade matrix.
+            # But first remove that are in the scenario data but not in the trade matrix, as
+            # we are not interested in them.
+
+            # Filter scenario data to include only countries present in the trade matrix
+            scenario_data = scenario_data[
+                scenario_data.index.isin(self.trade_matrix.index)
+            ]
+            # Add all the countries that are in the trade matrix but not in the scenario data
+            # to the scenario data with a scalar of 1 (which means their production does not change)
+            scenario_data = scenario_data.reindex(self.trade_matrix.index, fill_value=1)
+
+            # Update trade matrix values based on scenario data (masking for missing values)
+            self.trade_matrix = self.trade_matrix.mul(scenario_data, axis=0)
+
+            # Assert index consistency
+            assert self.trade_matrix.index.equals(self.trade_matrix.columns)
+
+        print(f"Applied scenario {self.scenario_name}.")
+
 
 def get_allowed_items():
     nd = read_nutrition_data()
     return nd.index
 
 
+def get_scenarios(scenarios_dir):
+    scenario_files = [
+        f
+        for f in os.listdir(scenarios_dir)
+        if os.path.isfile(os.path.join(scenarios_dir, f))
+    ]
+    return scenario_files
+
+
 if __name__ == "__main__":
-    for item in tqdm(get_allowed_items()):
+    allowed_items = get_allowed_items()
+    print("Computing domestic supply with no scenario.")
+    for item in tqdm(allowed_items):
         ds_fname = f"intmodel/data/domestic_supply{os.sep}{item}_2020_Global_supply.csv"
         if os.path.isfile(ds_fname):
             print(f"{item} domestic supply file already exists, skipping.")
@@ -129,3 +242,36 @@ if __name__ == "__main__":
             print(f"{item} seems result in a single value:", ds)
             print("Domestic supply file shall not be made.")
             continue
+    print("Computing domestic supply with crop reduction.")
+    scenarios_dir = "intmodel/data/scenario_files"
+    scenarios = get_scenarios(scenarios_dir)
+    for item in tqdm(allowed_items):
+        for scenario in scenarios:
+            ds_fname = f"intmodel/data/domestic_supply{os.sep}{item}_2020_Global_supply_{scenario}"
+            if os.path.isfile(ds_fname):
+                print(f"{item} domestic supply file already exists, skipping.")
+                continue
+            try:
+                DS = DomesticSupply(
+                    item,
+                    2020,
+                    scenario_name=scenario,
+                    scenario_file_name=os.path.join(scenarios_dir, scenario),
+                )
+            except FileNotFoundError:
+                print(
+                    f"{item} production/trade or {scenario} data not found, skipping."
+                )
+                continue
+            except (np.linalg.LinAlgError, np.core._exceptions._UFuncInputCastingError):
+                print(
+                    f"{item} in scenario:{scenario}, has a singular matrix problem, skipping."
+                )
+                continue
+            ds = DS.get_domestic_supply()
+            try:
+                ds.to_csv(ds_fname)
+            except AttributeError:
+                print(f"{item} seems result in a single value:", ds)
+                print("Domestic supply file shall not be made.")
+                continue

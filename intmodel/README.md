@@ -2,9 +2,13 @@
 
 Considering the amount of data they are ```.gitingored```. 
 
-Running preprocessing will produce them (warning: takes several hours and a lot of RAM).
+Running preprocessing will produce them (warning: takes several hours [2-3] and a lot of RAM).
 
-Generating domesctic supply is pretty quick (seconds).
+Other steps are pretty quick (seconds).
+
+2.5hrs for scenarios, this is FAO food items times number of months times number of countries of operations.
+Some of it is vectorised but not all so it takes a while.
+It ends up being around 20 thousand files that we then also have to combine.
 
 # TODO
 - write code for generating domestic supply in a scenario (basic functionality is there, only handling file names is left to do)
@@ -13,6 +17,8 @@ Generating domesctic supply is pretty quick (seconds).
 - scan repo for TODOs
 - check ds gen output for errors
 - integrate into intmodel repo somehow, write now we use importutilities and create_crop_macro from intmodel which is a bit messy
+- crop_reduction_by_month.csv is not correct right now it is a placeholder file.
+- nutrition data needs verification
 
 # Running
 
