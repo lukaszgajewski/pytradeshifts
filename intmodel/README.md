@@ -13,9 +13,8 @@ It ends up being around 20 thousand files that we then also have to combine.
 In the output of the domestic supply script not all messages like "Almonds, with shell production/trade or crop_reduction_month_74.csv data not found, skipping." are errors. Almonds, with shell are simply no longer in the FAO data (now it is "in shell"), so such logs need careful considerations.
 
 # TODO
-- update macros script to add scenarios
-- write docs and instructions on how to use
 - write a script automating the procedure
+- write docs and instructions on how to use
 - scan repo for TODOs
 - check ds gen output for errors
 - integrate into intmodel repo somehow, write now we use importutilities and create_crop_macro from intmodel which is a bit messy
