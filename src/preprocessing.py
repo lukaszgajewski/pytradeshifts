@@ -106,12 +106,12 @@ def _prep_trade_matrix(
     """
     trad = pd.read_pickle(trade_pkl)
     print("Filter trade matrix")
+    trad = trad[["Reporter Country Code (M49)", "Partner Country Code (M49)", "Item", "Unit", "Element", year]]
     trad = trad[
         (
             (trad["Item"] == item)
             & (trad["Unit"] == unit)
             & (trad["Element"] == element)
-            & (~trad[year].isna())
         )
     ]
     trad = trad[["Reporter Country Code (M49)", "Partner Country Code (M49)", year]]
