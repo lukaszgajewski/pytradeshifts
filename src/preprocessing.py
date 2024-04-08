@@ -160,6 +160,10 @@ def _prep_production_vector(
         item = "Rice"
 
     prod = pd.read_pickle(production_pkl)
+    # Make sure that we are not trying to filter for a unit or item which is not in the data
+    # This can happen because the FAO data is not consistent across all datasets
+    assert unit in prod["Unit"].unique(), f"unit {unit} not in {prod['Unit'].unique()}"
+    assert item in prod["Item"].unique(), f"item {item} not in {prod['Item'].unique()}"
     print("Filter production vector")
     prod = prod[
         ((prod["Item"] == item) & (prod["Unit"] == unit) & (~prod[year].isna()))
