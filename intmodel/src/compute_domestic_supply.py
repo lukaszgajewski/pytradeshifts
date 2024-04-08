@@ -46,6 +46,7 @@ convert_reduction_to_scenarios()
 # It ends up being around 20 *thousand* files with 10 years of nuclear winter
 # that we then also have to combine (next step).
 # The files wil lbe in intmodel/data/domestic_supply directory.
+# TODO: For now, this assumes "All_Data" and "Y2020" was passed in Step 1.
 compute_domestic_supply()
 
 # Step 4.
