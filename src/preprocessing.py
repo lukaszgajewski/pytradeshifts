@@ -84,7 +84,7 @@ def serialise_faostat_bulk(faostat_zip: str) -> None:
 
 
 def _prep_trade_matrix(
-    trade_pkl: str, item: str, unit="tonnes", element="Export Quantity", year="Y2018"
+    trade_pkl: str, item: str, unit="t", element="Export Quantity", year="Y2018"
 ) -> pd.DataFrame:
     """
     Return properly formatted trade matrix.
@@ -105,13 +105,18 @@ def _prep_trade_matrix(
         in another.
     """
     trad = pd.read_pickle(trade_pkl)
+    # Make sure that we are not trying to filter for a unit, element or item which is not in the data
+    # This can happen because the FAO data is not consistent across all datasets
+    assert unit in trad["Unit"].unique(), f"unit {unit} not in {trad['Unit'].unique()}"
+    assert element in trad["Element"].unique(), f"element {element} not in {trad['Element'].unique()}"
+    assert item in trad["Item"].unique(), f"item {item} not in {trad['Item'].unique()}"
     print("Filter trade matrix")
-    trad = trad[["Reporter Country Code (M49)", "Partner Country Code (M49)", "Item", "Unit", "Element", year]]
     trad = trad[
         (
             (trad["Item"] == item)
             & (trad["Unit"] == unit)
             & (trad["Element"] == element)
+            & (~trad[year].isna())
         )
     ]
     trad = trad[["Reporter Country Code (M49)", "Partner Country Code (M49)", year]]
@@ -203,7 +208,7 @@ def format_prod_trad_data(
     trade_pkl: str,
     item: str,
     production_unit="t",
-    trade_unit="tonnes",
+    trade_unit="t",
     element="Export Quantity",
     year="Y2018",
 ) -> tuple[pd.Series, pd.DataFrame]:
@@ -363,7 +368,7 @@ def main(
     region: str,
     item: str,
     production_unit="t",
-    trade_unit="tonnes",
+    trade_unit="t",
     element="Export Quantity",
     year="Y2018",
 ) -> None:
