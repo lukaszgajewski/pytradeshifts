@@ -4,7 +4,7 @@ Albania,441.0
 Algeria,0.0
 Angola,37961.0
 Azerbaijan,29.48
-Argentina,48796661.0
+Argentina,48780407.0
 Australia,17323.0
 Austria,204860.0
 Bahamas,0.0
@@ -17,16 +17,16 @@ Bhutan,233.6
 Bolivia,2829356.0
 Bosnia and Herzegovina,37202.0
 Botswana,0.0
-Brazil,121797712.0
+Brazil,121820949.0
 Belize,13670.0
 Solomon Islands,0.0
 Brunei Darussalam,0.0
 Bulgaria,6200.0
 Myanmar,135132.0
-Burundi,2540.04
+Burundi,2498.36
 Belarus,0.0
-Cambodia,180000.0
-Cameroon,21180.07
+Cambodia,47497.45
+Cameroon,93192.0
 Canada,6358500.0
 Cabo Verde,0.0
 Sri Lanka,7879.1
@@ -51,10 +51,10 @@ Ethiopia,208676.39
 Estonia,0.0
 Faroe Islands,0.0
 Finland,0.0
-France,406670.0
+France,406810.0
 French Polynesia,0.0
 Djibouti,0.0
-Gabon,4182.37
+Gabon,3936.19
 Georgia,4000.0
 Gambia,0.0
 Germany,90500.0
@@ -66,14 +66,14 @@ Guatemala,41000.0
 Guinea,0.0
 Guyana,0.0
 Haiti,0.0
-Honduras,1610.13
+Honduras,1623.34
 Hong Kong,0.0
 Hungary,165760.0
 Iceland,0.0
 India,11225850.0
-Indonesia,273000.0
+Indonesia,291000.0
 Iran,190000.0
-Iraq,31.86
+Iraq,33.42
 Ireland,0.0
 Israel,0.0
 Italy,1005630.0
@@ -87,16 +87,16 @@ North Korea,229892.3
 South Korea,80926.0
 Kuwait,0.0
 Kyrgyz Republic,2371.2
-Laos,14535.69
+Laos,14594.44
 Lebanon,0.0
 Lesotho,0.0
 Latvia,0.0
-Liberia,3345.51
+Liberia,3361.9
 Libya,0.0
 Lithuania,2560.0
 Luxembourg,30.0
 Macau,0.0
-Madagascar,46.1
+Madagascar,46.6
 Malawi,210000.0
 Malaysia,0.0
 Maldives,0.0
@@ -116,11 +116,12 @@ Netherlands,0.0
 New Caledonia,0.0
 New Zealand,0.0
 Nicaragua,10000.0
-Nigeria,900000.0
+Niger,0.0
+Nigeria,1262280.0
 Norway,0.0
 Marshall Islands,0.0
-Pakistan,152.0
-Panama,100.03
+Pakistan,201.0
+Panama,98.2
 Papua New Guinea,0.0
 Paraguay,11024460.0
 Peru,1533.76
@@ -128,7 +129,7 @@ Philippines,554.45
 Poland,15960.0
 Portugal,0.0
 Guinea-Bissau,0.0
-Timor-Leste,855.85
+Timor-Leste,852.07
 Qatar,0.0
 Romania,340820.0
 Russia,4307593.2
@@ -155,9 +156,9 @@ Eswatini,0.0
 Sweden,0.0
 Switzerland,5247.0
 Syria,6227.0
-Tajikistan,21.15
-Thailand,29231.03
-Togo,1797.01
+Tajikistan,20.41
+Thailand,22800.0
+Togo,154545.0
 Tonga,0.0
 Trinidad and Tobago,0.0
 United Arab Emirates,0.0
@@ -166,10 +167,10 @@ Türkiye,155225.0
 Turkmenistan,0.0
 Uganda,160000.0
 Ukraine,2797670.0
-North Macedonia,123.57
+North Macedonia,50.0
 Egypt,36420.0
 United Kingdom,0.0
-Tanzania,22341.0
+Tanzania,45000.0
 United States,114748940.0
 Burkina Faso,98513.0
 Uruguay,1990000.0
