@@ -219,7 +219,7 @@ def get_scenarios(scenarios_dir):
     return scenario_files
 
 
-if __name__ == "__main__":
+def main():
     allowed_items = get_allowed_items()
     print("Computing domestic supply with no scenario.")
     for item in tqdm(allowed_items):
@@ -275,3 +275,7 @@ if __name__ == "__main__":
                 print(f"{item} seems result in a single value:", ds)
                 print("Domestic supply file shall not be made.")
                 continue
+
+
+if __name__ == "__main__":
+    main()

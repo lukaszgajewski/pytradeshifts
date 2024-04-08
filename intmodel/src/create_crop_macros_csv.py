@@ -64,7 +64,7 @@ def compute_total_nutrients(
     return df
 
 
-if __name__ == "__main__":
+def main():
     print("Computing macros for no scenario domestic supply.")
     products, nutrients = import_nutrients_and_products(
         "intmodel/data/ALLFED Food consumption, supplies and balances.xlsx",
@@ -89,3 +89,7 @@ if __name__ == "__main__":
         total_nutrients.to_csv(
             f"intmodel/data/macros/{scenario}_macros_csv.csv", index=False
         )
+
+
+if __name__ == "__main__":
+    main()

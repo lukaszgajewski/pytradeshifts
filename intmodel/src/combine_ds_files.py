@@ -28,7 +28,7 @@ def combine_files(ds_dir, ds_files, output_file):
     df.to_csv(output_file)
 
 
-if __name__ == "__main__":
+def main():
     ds_dir = "intmodel/data/domestic_supply"
     print("Combining no scenario domestic supply.")
     ds_files = [
@@ -47,3 +47,7 @@ if __name__ == "__main__":
         combine_files(
             ds_dir, ds_files, f"intmodel/data/domestic_supply_combined/{scenario}"
         )
+
+
+if __name__ == "__main__":
+    main()
