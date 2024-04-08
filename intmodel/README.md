@@ -15,6 +15,11 @@ Put this in ```intmodel/data``` directory.
 
 An example is provided: ```intmodel/data/crop_reduction_by_month.csv```.
 
+3) Nutrition information for each product in the FAO data.
+
+The assumed format is an ```*.xlsx``` file with a sheet titled "Nutrition data from FAOSTAT" in which columns "A:E" contain the item name, amount of Calories, protein, and fat (per kg) and whether it is an outdoor growing crop or not (a 0/1 boolean; 1=outdoor growing crop).
+Put that in ```intmodel/data```. Currently we do not provide this file but this should be subject to change once we're out of the prototype phase.
+
 
 The output is going to be a lot of files you don't need to worry about unless
 something goes wrong, and ```intmodel/data/macros_csv.csv``` which is the main result that we will then want to use in the [integrated model](https://github.com/allfed/allfed-integrated-model).
