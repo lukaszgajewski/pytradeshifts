@@ -41,6 +41,13 @@ For example, "Almonds, with shell production/trade or crop_reduction_month_74.cs
 Make sure you follow the main README first. 
 You will need your environment set up correctly such that you can use PyTradeShifts.
 
+Create these directories:
+- ```intmodel/data/domestic_supply```
+- ```intmodel/data/domestic_supply_combined```
+- ```intmodel/data/macros```
+- ```intmodel/data/prod_trade```
+- ```intmodel/data/scenario_files```
+
 Then, the simplest way is to run ```python inmodel/src/compute_domestic_supply.py```,
 but be warned: this can take 6+ hours.
 
