@@ -48,7 +48,10 @@ Create these directories:
 - ```intmodel/data/prod_trade```
 - ```intmodel/data/scenario_files```
 
-Then, the simplest way is to run ```python inmodel/src/compute_domestic_supply.py```,
+Then, the simplest way is to run :
+
+```python inmodel/src/compute_domestic_supply.py```,
+
 but be warned: this can take 6+ hours.
 
 See the script to learn more, it has each computation stage described, and you can just comment out the parts you've already done or simply want to skip.
