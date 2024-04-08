@@ -20,6 +20,7 @@ from create_scenario_files import main as convert_reduction_to_scenarios
 from domestic_supply import main as compute_domestic_supply
 from combine_ds_files import main as combine_domestic_supply_files
 from create_crop_macros_csv import main as create_macros_csv
+from combine_macros import main as combine_macros_files
 
 # Step 1.
 # WARNING: takes 2-3 hours; uses over 16GB of RAM
@@ -55,7 +56,13 @@ compute_domestic_supply()
 combine_domestic_supply_files()
 
 # Step 5.
-# The final stage (also quick), from the combined DS files we now create a csv
-# with columns: iso3, country name, kcals, fat, protein, kcals_month1, fat_month1
-# and so on for all months, and each row is a country.
+# This should also be rather fast; from the combined DS files we now create a csv
+# with columns: iso3, country name, kcals, fat, protein and each row is a country.
+# There will be one file per each scenario (+ base / no scenario case) in the
+# intmodel/data/macros directory
 create_macros_csv()
+
+# Step 6.
+# The final stage (also quick); this combines all the files from the macros directory
+# into one.
+combine_macros_files()
