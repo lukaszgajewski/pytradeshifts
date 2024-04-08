@@ -4,16 +4,17 @@ from domestic_supply import get_scenarios
 
 
 def import_nutrients_and_products(
-    nutrition_xls, domestic_supply_csv
+    nutrition_xls: str, domestic_supply_csv: str
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Return nutrition and production data from Excel and CSV files respectively.
 
     Arguments:
-        None
+        nutrition_xls (str): path to the nutrition Excel file.
+        domstic_supply_csv (str): path to the domestic supply CSV file.
 
     Returns:
-        tuple: a tuple containing two dataframes: products and nutrition
+        tuple: a tuple containing two dataframes: products (domestic supply) and nutrition
     """
     nutrition = pd.read_excel(
         nutrition_xls,
@@ -32,7 +33,8 @@ def compute_total_nutrients(
     Return the sum of kcals, fat, and protein for the products passed in.
 
     Arguments:
-        products (pandas.DataFrame): A DataFrame containing food products and their values.
+        products (pandas.DataFrame): A DataFrame containing domestic supply of products.
+        nutrition (pandas.DataFrame): A DataFrame containing nutritional data.
 
     Returns:
         pandas.DataFrame: A dataframe containing the sum of kcals, fat, and protein for all countries.
