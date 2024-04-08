@@ -10,6 +10,12 @@ Put those in data/data_raw directory.
 2) Crop reduction data due to nuclear winter (or whatever other scenario),
 an example is given in: intmodel/data/crop_reduction_by_month.csv
 Put this in intmodel/data/ directory.
+3) Nutrition information for each product in the FAO data.
+The assumed format is an ```*.xlsx``` file with a sheet titled 
+"Nutrition data from FAOSTAT" in which columns "A:E" contain the item name, 
+amount of Calories, protein, and fat (per kg) and whether it is an 
+outdoor growing crop or not (a 0/1 boolean; 1=outdoor growing crop).
+Put that in ```intmodel/data```. 
 
 The output is going to be a lot of files you don't need to worry about unless
 something goes wrong and intmodel/data/macros_csv.csv which is the main result.
