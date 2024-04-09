@@ -26,7 +26,7 @@ import seaborn as sb
 from scipy import stats
 import os
 from pathlib import Path
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 
 
 plt.style.use(
@@ -1893,7 +1893,7 @@ class Postprocessing:
         Returns:
             None
         """
-        time_now = datetime.now(UTC) if utc else datetime.now()
+        time_now = datetime.now(timezone.utc) if utc else datetime.now()
         time_now = time_now.strftime("%Y-%m-%d_%H:%M:%S")
         utc_label = "UTC" if utc else ""
         report_folder = f"{path}{os.sep}report_{time_now}"

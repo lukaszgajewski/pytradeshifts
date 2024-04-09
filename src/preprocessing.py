@@ -431,15 +431,9 @@ def main(
 
     # Make sure that production index and trade matrix index/columns are the same
     # and print out the difference if there is any
-    assert trade_matrix.index.equals(trade_matrix.columns), f"difference: {trade_matrix.index.difference(
-        trade_matrix.columns
-    )}"
-    assert production.index.equals(trade_matrix.index), f"difference: {production.index.difference(
-        trade_matrix.index
-    )}"
-    assert production.index.equals(trade_matrix.columns), f"difference: {production.index.difference(
-        trade_matrix.columns
-    )}"
+    assert trade_matrix.index.equals(trade_matrix.columns), f"difference: {trade_matrix.index.difference(trade_matrix.columns)}"
+    assert production.index.equals(trade_matrix.index), f"difference: {production.index.difference(trade_matrix.index)}"
+    assert production.index.equals(trade_matrix.columns), f"difference: {production.index.difference(trade_matrix.columns)}"
 
     # Replace "All_Data" with "global" for readability
     if region == "All_Data":
@@ -458,10 +452,11 @@ if __name__ == "__main__":
     # Define values
     year = "Y2018"
     items_trade = ["Maize (corn)", "Wheat", "Rice, paddy (rice milled equivalent)"]
+    # items_trade = ["Wheat"]
     # Define regions for which the data is processed
     # "Oceania" is used for testing, as it has the least amount of countries
     # to run with all data use: "All_Data" for region
-    region = "All_Data"
+    region = "Oceania"
     print("\n")
     for item in items_trade:
         main(
