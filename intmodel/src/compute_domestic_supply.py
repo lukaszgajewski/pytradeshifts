@@ -1,6 +1,6 @@
 """This is a convenience script that runs all stages of the computation.
 The goal is to produce a table of combined domestic supply of macronutrients
-from all food items for each country before nuclear winter and every month during the winter.
+from all food items for each country before nuclear winter and every year during the winter.
 
 The necessary input is:
 1) Production and trade data from FAO ("All Data Normalized"):
@@ -8,12 +8,12 @@ https://www.fao.org/faostat/en/#data/QCL
 https://www.fao.org/faostat/en/#data/TM
 Put those in data/data_raw directory.
 2) Crop reduction data due to nuclear winter (or whatever other scenario),
-an example is given in: intmodel/data/crop_reduction_by_month.csv
+an example is given in: intmodel/data/crop_reduction_by_year.csv
 Put this in intmodel/data/ directory.
 3) Nutrition information for each product in the FAO data.
-The assumed format is an ```*.xlsx``` file with a sheet titled 
-"Nutrition data from FAOSTAT" in which columns "A:E" contain the item name, 
-amount of Calories, protein, and fat (per kg) and whether it is an 
+The assumed format is an ```*.xlsx``` file with a sheet titled
+"Nutrition data from FAOSTAT" in which columns "A:E" contain the item name,
+amount of Calories, protein, and fat (per kg) and whether it is an
 outdoor growing crop or not (a 0/1 boolean; 1=outdoor growing crop).
 Put that in ```intmodel/data```.
 
@@ -27,6 +27,7 @@ from domestic_supply import main as compute_domestic_supply
 from combine_ds_files import main as combine_domestic_supply_files
 from create_crop_macros_csv import main as create_macros_csv
 from combine_macros import main as combine_macros_files
+from convert_macros_yearly_to_monthly import main as convert_yearly_to_monthly
 
 # Step 1.
 # WARNING: takes 2-3 hours; uses over 16GB of RAM
@@ -58,7 +59,7 @@ compute_domestic_supply()
 # Step 4.
 # This should be much quicker than previous stages.
 # The result will be a combined domestic supply file for each "time step",
-# i.e., before nuclear winter and at every month of the winter.
+# i.e., before nuclear winter and at every year of the winter.
 # The files will be in intmodel/data/domesti_supply_combined directory
 combine_domestic_supply_files()
 
@@ -76,3 +77,9 @@ create_macros_csv()
 # so, e.g., in case of monthly data in this script replace all "year_" with
 # "month_" and it should work. Other steps are agnostic to this.
 combine_macros_files()
+
+# Step 7. Optional.
+# This will convert yearly data to monthly by simply dividing the values by 12
+# and propagating columns such that instead of 10+1 columns we have 120+1
+# (+1 is for the before scenario columns)
+convert_yearly_to_monthly()

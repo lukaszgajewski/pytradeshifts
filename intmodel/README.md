@@ -13,7 +13,7 @@ Put those in data/data_raw directory (note: *not here*, the main ```data``` fold
 
 Put this in ```intmodel/data``` directory.
 
-An example is provided: ```intmodel/data/crop_reduction_by_month.csv```.
+An example is provided: ```intmodel/data/crop_reduction_by_year.csv```.
 
 3) Nutrition information for each product in the FAO data.
 
@@ -26,7 +26,7 @@ something goes wrong, and ```intmodel/data/macros_csv.csv``` which is the main r
 
 Considering the amount of data they are mostly #```.gitingored```. 
 
-The whole procedures takes 6+ hours on Intel Xeon E3-1200 and takes 16+ GB RAM, and about 0.5GB of disk space.
+The whole procedures takes around 3.5 hours on Intel Xeon E3-1200 and takes 16+ GB RAM, and about 0.5GB of disk space.
 It also produces tens of thousands of intermidiary files so there's quite a lot of IO happening.
 If you don't have an SSD it will take longer.
 We use IO instead of putting everything into RAM for two reasons:
@@ -52,7 +52,7 @@ Then, the simplest way is to run :
 
 ```python inmodel/src/compute_domestic_supply.py```,
 
-but be warned: this can take 6+ hours.
+but be warned: this can take 3+ hours.
 
 See the script to learn more, it has each computation stage described, and you can just comment out the parts you've already done or simply want to skip.
 
