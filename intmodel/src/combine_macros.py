@@ -9,7 +9,9 @@ def main():
     macros_dir = "intmodel/data/macros"
     # get only the scenario files
     macros_files = [
-        f for f in listdir(macros_dir) if isfile(join(macros_dir, f)) and "month" in f
+        f
+        for f in listdir(macros_dir)
+        if isfile(join(macros_dir, f)) and "crop_reduction" in f
     ]
     # get the base / no scenario file
     df = pd.read_csv(macros_dir + "/" + "macros_csv.csv", index_col=0)
@@ -22,7 +24,7 @@ def main():
             how="outer",
             suffixes=[
                 None,
-                "_" + mf[mf.find("month_") : mf.find(".")],
+                "_" + mf[mf.find("year_") : mf.find(".")],
             ],
         )
     # this is just rearranging columns to my liking
@@ -31,7 +33,7 @@ def main():
         first_columns
         + sorted(
             [c for c in df.columns if c not in first_columns],
-            key=lambda c: (int(c[c.find("month_") + len("month_") :])),
+            key=lambda c: (int(c[c.find("year_") + len("year_") :])),
         )
     ]
     df = df.reset_index()

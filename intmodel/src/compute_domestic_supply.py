@@ -46,10 +46,10 @@ format_production_trade(
 convert_reduction_to_scenarios()
 
 # Step 3.
-# WARNING: another 2-3 hours
-# this is "the number of FAO food items times number of months times number of countries"
+# Note: takes ~15 min.
+# this is "the number of FAO food items times number of years times number of countries"
 # of operations. Some of it is vectorised but not all so it takes a while.
-# It ends up being around 20 *thousand* files with 10 years of nuclear winter
+# It ends up being around *thousands* of files with 10 years of nuclear winter
 # that we then also have to combine (next step).
 # The files wil lbe in intmodel/data/domestic_supply directory.
 # TODO: For now, this assumes "All_Data" and "Y2020" was passed in Step 1.
@@ -72,4 +72,7 @@ create_macros_csv()
 # Step 6.
 # The final stage (also quick); this combines all the files from the macros directory
 # into one.
+# WARNING: This assumes that the data is "yearly" as it does name filtering,
+# so, e.g., in case of monthly data in this script replace all "year_" with
+# "month_" and it should work. Other steps are agnostic to this.
 combine_macros_files()
