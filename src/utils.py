@@ -589,7 +589,7 @@ def get_percolation_threshold(
 
 
 def fill_sector_by_colour(
-    ax: Axes, z_threshold: float, p_thresholds: list[float], alpha: float, labels=None
+    ax: Axes, z_threshold: float, p_thresholds: list[float], alpha: float, labels=True, fontsize=7
 ):
     """
     This is a helper function to colour the background in the z-score, participation
@@ -613,19 +613,17 @@ def fill_sector_by_colour(
             thresholds).
         alpha (float): transparency level of the background colouring,
             showing the sectors defined by the above thresholds.
-        labels (list[str] | None, optional): labels for the aforementioned
-            sectors, if provided a legend shall be displayed explaining
-            the colours, otherwise no legend shall be shown.
+        labels (bool | True): labels for the aforementioned
+            sectors, if true, they will be shown in the plot
+        fontsize (int, optional): font size for the labels in the plot.
 
     Returns:
         None
     """
     x_low, x_high = (0, 1)  # valid range for p
-    y_low, y_high = ax.get_ylim()  # z can be any value technically
-    color_cycle = rcParams["axes.prop_cycle"].by_key()["color"]
+    y_low, y_high = (-2, 6)  # z can be any value technically
+    color_cycle = ["purple", "red", "blue", "green", "orange", "gold", "brown"]
     assert len(p_thresholds) >= 2
-    if labels:
-        assert len(labels) == len(p_thresholds) + 2
     # left edge panels
     ii = 0
     ax.fill(
@@ -637,7 +635,6 @@ def fill_sector_by_colour(
             "y": [y_low, y_low, z_threshold, z_threshold],
         },
         alpha=alpha,
-        label=labels[ii] if labels else None,
     )
     ii += 1
     ax.fill(
@@ -649,7 +646,6 @@ def fill_sector_by_colour(
             "y": [z_threshold, z_threshold, y_high, y_high],
         },
         alpha=alpha,
-        label=labels[ii] if labels else None,
     )
     # middle panels
     while ii < len(p_thresholds) - 1:
@@ -672,7 +668,6 @@ def fill_sector_by_colour(
                 ),
             },
             alpha=alpha,
-            label=labels[ii] if labels else None,
         )
     # right edge panels
     ax.fill(
@@ -689,7 +684,6 @@ def fill_sector_by_colour(
             "y": [z_threshold, z_threshold, y_high, y_high],
         },
         alpha=alpha,
-        label=labels[ii + 1] if labels else None,
     )
     ax.fill(
         "x",
@@ -705,5 +699,15 @@ def fill_sector_by_colour(
             "y": [y_low, y_low, z_threshold, z_threshold],
         },
         alpha=alpha,
-        label=labels[ii + 2] if labels else None,
     )
+    if labels:
+        ax.text(0.01, 5.5, 'Provincial hub', fontsize=fontsize, color='red', alpha=0.5)
+        ax.text(0.31, 5.5, 'Connector hub', fontsize=fontsize, color='green', alpha=0.5)
+        ax.text(0.76, 5.5, 'Kinless hub', fontsize=fontsize, color='gold', alpha=1)
+        ax.text(0.001, -1.8, 'Ultra\nperi-\npheral\nnon\nhub', fontsize=fontsize, color='purple', alpha=0.5)
+        ax.text(0.06, -1.8, 'Peripheral non-hub', fontsize=fontsize, color='blue', alpha=0.5)
+        ax.text(0.63, -1.8, 'Connector non-hub', fontsize=fontsize, color='orange', alpha=1)
+        ax.text(0.81, -1.8, 'Kinless non-hub', fontsize=fontsize, color='brown', alpha=1)
+
+
+

@@ -1138,7 +1138,8 @@ class Postprocessing:
         z_threshold=1.0,
         p_thresholds=[0.05, 0.3, 0.62, 0.75, 0.8],
         alpha=0.3,
-        sector_labels: list[str] | None = None,
+        labels=True,
+        fontsize=7,
         figsize: tuple[float, float] | None = None,
         file_path: str | None = None,
         file_format="png",
@@ -1163,9 +1164,8 @@ class Postprocessing:
                 thresholds).
             alpha (float, optional): transparency level of the background colouring,
                 showing the sectors defined by the above thresholds.
-            sector_labels (list[str] | None, optional): labels for the aforementioned
-                sectors, if provided a legend shall be displayed explaining
-                the colours, otherwise no legend shall be shown.
+            labels (bool, optional): whether to plot labels in the plot.
+            fontsize (int, optional): font size of the labels.
             figsize (tuple[float, float] | None, optional): the composite figure
                 size as expected by the matplotlib subplots routine.
             shrink (float, optional): Colour bar shrink parameter.
@@ -1185,7 +1185,7 @@ class Postprocessing:
             1,
             sharex=True,
             tight_layout=True,
-            figsize=(5, len(self.scenarios) * 2.5) if figsize is None else figsize,
+            figsize=(7.5, len(self.scenarios) * 2.5) if figsize is None else figsize,
         )
         # if there is only one scenario axs will be just an ax object
         # convert to a list to comply with other cases
@@ -1193,10 +1193,9 @@ class Postprocessing:
             len(axs)
         except TypeError:
             axs = [axs]
-        legend_plotted = False
         for ax, (idx, scenario) in zip(axs, enumerate(self.scenarios)):
             ax.scatter(
-                self.participation[idx].values(), self.zscores[idx].values(), **kwargs
+                self.participation[idx].values(), self.zscores[idx].values(), zorder=5, color="black", alpha=0.8, **kwargs
             )
             ax.set_title(
                 f"Country roles for {scenario.crop} with base year {scenario.base_year[1:]}"
@@ -1206,16 +1205,11 @@ class Postprocessing:
                     else "\n(no scenario)"
                 )
             )
-            fill_sector_by_colour(ax, z_threshold, p_thresholds, alpha, sector_labels)
+            fill_sector_by_colour(ax, z_threshold, p_thresholds, alpha, labels, fontsize)
             ax.set_xlabel("Participation coefficient")
             ax.set_ylabel("Within community degree")
-            if sector_labels and not legend_plotted:
-                ax.legend(
-                    loc="upper center",
-                    bbox_to_anchor=(0.5, -0.1),
-                    ncol=2,
-                )
-                legend_plotted = True
+            # Turn off the grid
+            ax.grid(False)
 
         if file_path:
             plt.savefig(
