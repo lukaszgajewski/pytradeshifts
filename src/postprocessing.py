@@ -1128,7 +1128,7 @@ class Postprocessing:
                         for community in scenario.trade_communities
                     ]  # we sum up the squares of the number of edges to each community
                 )
-                / total_degree[country] ** 2  # we divide by total degree squared
+                / (total_degree[country] ** 2 if total_degree[country] != 0 else 1)  # Avoid division by zero
                 for country in undirected_trade_graph  # for each country
             }
             self.participation.append(coefficients)
