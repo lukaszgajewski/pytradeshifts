@@ -8,7 +8,14 @@ def main():
     )  # divide to get monthly values
 
     for item in ["kcals", "fat", "protein"]:
-        for year in range(0, 10):
+        # we start in May so year 1 has only 8 months
+        for month in range(1, 9):
+            # split year one into 8 months
+            macro_data[f"crop_{item}_month_{month}"] = macro_data[
+                f"crop_{item}_year_1"
+            ]
+        macro_data = macro_data.drop(columns=f"crop_{item}_year_{year+1}")
+        for year in range(1, 10):
             for month in range(1, 13):
                 # split each year into 12 months
                 macro_data[f"crop_{item}_month_{month+12*year}"] = macro_data[

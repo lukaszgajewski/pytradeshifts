@@ -80,6 +80,9 @@ combine_macros_files()
 
 # Step 7. Optional.
 # This will convert yearly data to monthly by simply dividing the values by 12
-# and propagating columns such that instead of 10+1 columns we have 120+1
-# (+1 is for the before scenario columns)
+# and propagating columns such that instead of 10+1 columns we have 8+108+1
+# +1 is for the before scenario columns, 8 is because we assume the
+# bomb gets dropped on May 1st so there are 8 months left in year 1
+# and 108 because 9 [years remaining] * 12 [months/yeat]
+# note: this does mean that month_1 is May and month_9 is January of year 2
 convert_yearly_to_monthly()
