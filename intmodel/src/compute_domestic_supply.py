@@ -75,7 +75,7 @@ create_macros_csv()
 # into one.
 # WARNING: This assumes that the data is "yearly" as it does name filtering,
 # so, e.g., in case of monthly data in this script replace all "year_" with
-# "month_" and it should work. Other steps are agnostic to this.
+# "month_" and it should work. Other steps are somewhat agnostic to this.
 combine_macros_files()
 
 # Step 7. Optional.
@@ -85,4 +85,7 @@ combine_macros_files()
 # bomb gets dropped on May 1st so there are 8 months left in year 1
 # and 108 because 9 [years remaining] * 12 [months/yeat]
 # note: this does mean that month_1 is May and month_9 is January of year 2
-convert_yearly_to_monthly()
+# this also additonally uses monthly seasonality data to adjust crop yields
+# depending on the time of year (e.g., not much wheat grows in December in Poland)
+# TODO: this is not implemented correctly yet
+# convert_yearly_to_monthly()

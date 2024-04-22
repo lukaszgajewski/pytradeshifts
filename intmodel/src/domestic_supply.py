@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 from src.model import PyTradeShifts
-from read_nutrition_data import read_nutrition_data
 import country_converter as coco
 
 
@@ -206,8 +205,9 @@ class DomesticSupply(PyTradeShifts):
 
 
 def get_allowed_items():
-    nd = read_nutrition_data()
-    return nd.index
+    nd = pd.read_csv("intmodel/data/primary_crop_nutritional_data.csv")
+    assert nd["Item"].is_unique
+    return nd["Item"].values
 
 
 def get_scenarios(scenarios_dir):

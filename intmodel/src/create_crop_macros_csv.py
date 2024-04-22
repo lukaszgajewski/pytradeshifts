@@ -4,24 +4,19 @@ from domestic_supply import get_scenarios
 
 
 def import_nutrients_and_products(
-    nutrition_xls: str, domestic_supply_csv: str
+    nutrition_csv: str, domestic_supply_csv: str
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Return nutrition and production data from Excel and CSV files respectively.
 
     Arguments:
-        nutrition_xls (str): path to the nutrition Excel file.
+        nutrition_csv (str): path to the nutrition CSV file.
         domstic_supply_csv (str): path to the domestic supply CSV file.
 
     Returns:
         tuple: a tuple containing two dataframes: products (domestic supply) and nutrition
     """
-    nutrition = pd.read_excel(
-        nutrition_xls,
-        sheet_name="Nutrition data from FAOSTAT",
-        usecols="A:E",
-        skiprows=1,
-    )
+    nutrition = pd.read_csv("intmodel/data/primary_crop_nutritional_data.csv")
     products = pd.read_csv(domestic_supply_csv, index_col=0)
     return products, nutrition
 
@@ -69,7 +64,7 @@ def compute_total_nutrients(
 def main():
     print("Computing macros for no scenario domestic supply.")
     products, nutrients = import_nutrients_and_products(
-        "intmodel/data/ALLFED Food consumption, supplies and balances.xlsx",
+        "intmodel/data/primary_crop_nutritional_data.csv",
         "intmodel/data/domestic_supply_combined/domestic_supply_combined.csv",
     )
     total_nutrients = compute_total_nutrients(products, nutrients)
@@ -81,7 +76,7 @@ def main():
     scenarios = get_scenarios("intmodel/data/scenario_files")
     for scenario in tqdm(scenarios):
         products, nutrients = import_nutrients_and_products(
-            "intmodel/data/ALLFED Food consumption, supplies and balances.xlsx",
+            "intmodel/data/primary_crop_nutritional_data.csv",
             f"intmodel/data/domestic_supply_combined/{scenario}",
         )
         total_nutrients = compute_total_nutrients(products, nutrients)
