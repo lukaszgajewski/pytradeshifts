@@ -31,8 +31,6 @@ def rename_item(item: str) -> str:
         str: The renamed item name.
     """
     item_renames = {
-        # "Maize (corn)": "Maize",
-        # "Rice, paddy (rice milled equivalent)": "Rice",
         "Swine / pigs": "Pig",
     }
     return item_renames.get(item, item)
@@ -367,6 +365,7 @@ def main(
         trade_pkl = (
             f"data{os.sep}temp_files{os.sep}Trade_DetailedTradeMatrix_E_{region}.pkl"
         )
+        items = get_all_item_names(production_pkl)
     except FileNotFoundError:
         print(f"Pickled Data in {region} not found. Reading zip to create pickle.")
         production_zip = (
@@ -380,11 +379,14 @@ def main(
         print("Serialisation complete. Run the script again.")
         return
 
-    items = get_all_item_names(production_pkl)
     # Replace "All_Data" with "global" for readability
     region_label = "Global" if region == "All_Data" else region
 
     for item in tqdm(items):
+        og_item = item
+        print("Processing", item, "...")
+        if "/" in item:
+            item = rename_item(item)
         p_f_name = f"intmodel{os.sep}data{os.sep}prod_trade{os.sep}{item}_{year}_{region_label}_production.csv"
         t_f_name = f"intmodel{os.sep}data{os.sep}prod_trade{os.sep}{item}_{year}_{region_label}_trade.csv"
         if os.path.isfile(p_f_name) and os.path.isfile(t_f_name):
@@ -393,7 +395,7 @@ def main(
         production, trade_matrix = format_prod_trad_data(
             production_pkl,
             trade_pkl,
-            item,
+            og_item,
             production_unit,
             trade_unit,
             element,
@@ -408,20 +410,16 @@ def main(
                 production, region, "Production_Crops_Livestock_E"
             )
         except AttributeError as AE:
-            # TODO: this happens for Tallowtree, Jojoba seed
-            # reason is: only China, Mexico produces it, and nobody buys it
-            # needs to be resolved manually later on
+            # this happens for Tallowtree seeds, and Jojoba seeds
+            # reason is: only China, Mexico (respectively)
+            # seem to produce it, and nobody buys it ?
+            # looks like a mismatch between QCL and TM data from FAO
+            # Tallowtree or Jojoba seeds are simply not present in TM data
             print(item)
             print(production)
             print(trade_matrix)
             print(AE)
             continue
-
-        # Rename the item for readability
-        if "/" in item:
-            item = rename_item(item)
-            p_f_name = f"intmodel{os.sep}data{os.sep}prod_trade{os.sep}{item}_{year}_{region_label}_production.csv"
-            t_f_name = f"intmodel{os.sep}data{os.sep}prod_trade{os.sep}{item}_{year}_{region_label}_trade.csv"
 
         # Make sure that production index and trade matrix index/columns are the same
         if not production.index.equals(trade_matrix.index):
