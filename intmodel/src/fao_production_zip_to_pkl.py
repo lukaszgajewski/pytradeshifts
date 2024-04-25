@@ -19,11 +19,11 @@ def convert_to_ISO3(FAO_data, country_codes_path="data/data_raw/country_codes.cs
     country_codes = pd.read_csv(country_codes_path)
     country_codes = country_codes[["Country Code", "ISO3 Code"]]
     country_codes = country_codes.set_index("Country Code").to_dict()["ISO3 Code"]
-    FAO_data["iso3"] = [
+    FAO_data["ISO3"] = [
         country_codes[c] if c in country_codes else "not found"
         for c in FAO_data["Area Code"]
     ]
-    FAO_data["iso3"].replace("SWZ", "SWT", inplace=True)
+    FAO_data["ISO3"].replace("SWZ", "SWT", inplace=True)
     return FAO_data
 
 
@@ -34,13 +34,13 @@ def remove_unwanted_entries(
 ):
     # keep only the countries that we have nuclear winter data for
     countries_of_interest = pd.read_csv(nuclear_winter_data_path, index_col=0).index
-    FAO_data = FAO_data[FAO_data["iso3"].isin(countries_of_interest)]
+    FAO_data = FAO_data[FAO_data["ISO3"].isin(countries_of_interest)]
 
     # all we need is production
     FAO_data = FAO_data[FAO_data["Element"] == "Production"]
 
     # keep only the columns we care about
-    FAO_data = FAO_data[["iso3", "Item", "Y2020"]]
+    FAO_data = FAO_data[["ISO3", "Item", "Y2020"]]
 
     # drop NAs
     FAO_data = FAO_data.dropna()
