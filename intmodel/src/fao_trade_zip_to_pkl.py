@@ -27,6 +27,8 @@ def convert_to_ISO3(FAO_data, country_codes_path="data/data_raw/country_codes.cs
         country_codes[c] if c in country_codes else "not found"
         for c in FAO_data["Partner Country Code"]
     ]
+    FAO_data["Reporter ISO3"].replace("SWZ", "SWT", inplace=True)
+    FAO_data["Partner ISO3"].replace("SWZ", "SWT", inplace=True)
     return FAO_data
 
 

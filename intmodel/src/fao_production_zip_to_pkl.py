@@ -23,6 +23,7 @@ def convert_to_ISO3(FAO_data, country_codes_path="data/data_raw/country_codes.cs
         country_codes[c] if c in country_codes else "not found"
         for c in FAO_data["Area Code"]
     ]
+    FAO_data["iso3"].replace("SWZ", "SWT", inplace=True)
     return FAO_data
 
 
@@ -63,6 +64,4 @@ def main():
 
 
 if __name__ == "__main__":
-    t = time()
     main()
-    print(time() - t)
