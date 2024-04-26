@@ -217,6 +217,17 @@ class TestPostprocessing:
             ]
         )
 
+    def test_compute_imports(self, postprocessing_object) -> None:
+        assert postprocessing_object.imports is not None
+        assert len(postprocessing_object.imports) == len(postprocessing_object.scenarios)
+        assert all(
+            [
+                isinstance(v, float)
+                for sc in postprocessing_object.imports
+                for v in sc.values()
+            ]
+        )
+
 
 def test_find_new_order() -> None:
     """
