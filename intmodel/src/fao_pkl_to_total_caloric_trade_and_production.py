@@ -205,35 +205,9 @@ def main():
             c,
         )
         total_t += t_matrix
-    print(total_t)
+    total_t.to_csv("intmodel/data/total_caloric_trade.csv")
+    total_p.to_csv("intmodel/data/total_caloric_production.csv")
 
 
 if __name__ == "__main__":
     main()
-
-# code sketch:
-# TODO: remove
-# for it, grt in t.groupby("Item"):
-#     # format
-# pr = p[p["Item"] == it]
-#     pr = p[p["Item"] == it].set_index("iso3")["ItemCal"].squeeze()
-#     grt = grt.pivot(values="ItemCal", index="Reporter ISO3", columns="Partner ISO3")
-#     grt = grt.reindex(index=country_list, columns=country_list).fillna(0)
-#     pr = pr.reindex(index=country_list).fillna(0).squeeze()
-#     print(it)
-#     print(pr)
-#     print(grt)
-
-#     # reexport
-
-#     # sum up
-
-#     # scenario
-
-#     # ds
-#     ds = (
-#         production_data
-#         + trade_matrix.sum(axis=0)  # total import
-#         - trade_matrix.sum(axis=1)  # total export
-#     )
-#     break
