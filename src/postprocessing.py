@@ -980,8 +980,10 @@ class Postprocessing:
         """
         self.community_satisfaction_difference = [
             {
-                country: satisfaction - self.community_satisfaction[0][country]
-                for country, satisfaction in community_satisfaction.items()
+            country: satisfaction - self.community_satisfaction[0][country]
+            if country in self.community_satisfaction[0]
+            else (print(f"Warning: {country} not found in the base scenario.") or np.nan)
+            for country, satisfaction in community_satisfaction.items()
             }
             for community_satisfaction in self.community_satisfaction[1:]
         ]
@@ -1417,9 +1419,11 @@ class Postprocessing:
         """
         self.node_stability_difference = [
             {
-                country: (stability - self.node_stability[0][country])
-                / self.node_stability[0][country]
-                for country, stability in node_stability.items()
+            country: (stability - self.node_stability[0][country])
+            / self.node_stability[0][country]
+            if country in self.node_stability[0]
+            else (print(f"Warning: {country} not found in the base scenario."), np.nan)
+            for country, stability in node_stability.items()
             }
             for node_stability in self.node_stability[1:]
         ]
