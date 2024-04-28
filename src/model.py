@@ -168,11 +168,11 @@ class PyTradeShifts:
         if exiting is not None:
             print(exiting)
             return
+        if self.scenario_name is not None:
+            self.apply_scenario()
         # apply the distance cost only if beta != 0
         # for beta==0 there is no change in values
         # so there's no point in computing them
-        if self.scenario_name is not None:
-            self.apply_scenario()
         if not isclose(self.beta, 0):
             self.apply_distance_cost()
         # Build the graph
@@ -280,6 +280,8 @@ class PyTradeShifts:
         assert self.no_trade_removed is False
         self.no_trade_removed = True
 
+        countries_before = self.trade_matrix.index
+
         shape_before = self.trade_matrix.shape[0]
 
         # b_ signifies boolean here, these are filtering masks
@@ -296,6 +298,12 @@ class PyTradeShifts:
         print(
             f"Removed {shape_before - self.trade_matrix.shape[0]} "
             f"countries with no trade or production."
+        )
+        # print the names of the countries removed
+        print(
+            f"Removed countries: {countries_before[~b_filter].to_list()}"
+            if not b_filter.all()
+            else "No countries removed."
         )
 
     def prebalance(self, precision=10**-3) -> None:
@@ -559,6 +567,9 @@ class PyTradeShifts:
         assert self.scenario_run is False
         self.scenario_run = True
 
+        shape_before = self.trade_matrix.shape
+        index_before = self.trade_matrix.index
+
         # Read in the scenario data
         scenario_data = pd.read_csv(
             "."
@@ -635,6 +646,10 @@ class PyTradeShifts:
 
             # Assert index consistency
             assert self.trade_matrix.index.equals(self.trade_matrix.columns)
+
+        # Should be the same as before
+        assert shape_before == self.trade_matrix.shape
+        assert index_before.equals(self.trade_matrix.index)
 
         print(f"Applied scenario {self.scenario_name}.")
 

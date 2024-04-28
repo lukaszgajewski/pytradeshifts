@@ -179,12 +179,16 @@ class Postprocessing:
         for imports in self.imports[1:]:
             imports_difference = {}
             for country in imports:
-                if self.imports[0][country] == 0:
-                    imports_difference[country] = 0
+                if country not in self.imports[0]:
+                    print(f"Warning: {country} not found in the base scenario.")
+                    imports_difference[country] = np.nan
                 else:
-                    imports_difference[country] = (
-                        (imports[country] - self.imports[0][country]) / self.imports[0][country]
-                    ) * 100
+                    if self.imports[0][country] == 0:
+                        imports_difference[country] = 0
+                    else:
+                        imports_difference[country] = (
+                            (imports[country] - self.imports[0][country]) / self.imports[0][country]
+                        ) * 100
             self.imports_difference.append(imports_difference)
 
     def plot_imports_difference(
