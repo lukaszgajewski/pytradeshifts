@@ -5,7 +5,6 @@ def load_data(
     total_caloric_trade_path="intmodel/data/total_caloric_trade.csv",
     total_caloric_production_path="intmodel/data/total_caloric_production.csv",
     yearly_reduction_path="intmodel/data/nuclear_winter_csv.csv",
-    monthly_seasonality_path="intmodel/data/seasonality_csv.csv",
 ):
     total_t = pd.read_csv(total_caloric_trade_path, index_col=0)
     total_p = pd.read_csv(total_caloric_production_path, index_col=0).squeeze()
@@ -15,10 +14,7 @@ def load_data(
     n = n + 1  # make it a fraction
     n[n < 0] = 0  # ensure we don't get negative yield
     n = n.sort_index()
-    m = pd.read_csv(monthly_seasonality_path, index_col=0)
-    m.index.name = "ISO3"
-    m = m[m.columns[1:]]
-    return total_t, total_p, n, m
+    return total_t, total_p, n
 
 
 def compute_domestic_supply(trade_matrix, production_series):
@@ -39,7 +35,7 @@ def compute_reduced_supply_yearly(total_t, total_p, n):
 
 
 def main():
-    t, p, n, m = load_data()
+    t, p, n = load_data()
     yearly_domestic_supply = (
         compute_domestic_supply(t, p)
         .to_frame(name="crop_kcals_baseline_domestic_supply")
