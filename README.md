@@ -1,4 +1,5 @@
 # TBD.
+Runs in under 100[s] on a Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz with 16GB of RAM
 
 ## Data
 ### Input
@@ -23,7 +24,6 @@
 tbd.
 
 ## TODO
-- main
 - refactor code to be more readable
 - docs
 - env/req files
