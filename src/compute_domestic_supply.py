@@ -2,9 +2,9 @@ import pandas as pd
 
 
 def load_data(
-    total_caloric_trade_path="intmodel/data/total_caloric_trade.csv",
-    total_caloric_production_path="intmodel/data/total_caloric_production.csv",
-    yearly_reduction_path="intmodel/data/nuclear_winter_csv.csv",
+    total_caloric_trade_path="data/intermediary/total_caloric_trade.csv",
+    total_caloric_production_path="data/intermediary/total_caloric_production.csv",
+    yearly_reduction_path="data/input/nuclear_winter_csv.csv",
 ):
     total_t = pd.read_csv(total_caloric_trade_path, index_col=0)
     total_p = pd.read_csv(total_caloric_production_path, index_col=0).squeeze()
@@ -41,7 +41,7 @@ def main():
         .to_frame(name="crop_kcals_baseline_domestic_supply")
         .join(compute_reduced_supply_yearly(t, p, n))
     )
-    yearly_domestic_supply.to_csv("intmodel/data/domestic_supply_kcals.csv")
+    yearly_domestic_supply.to_csv("data/output/domestic_supply_kcals.csv")
 
 
 if __name__ == "__main__":

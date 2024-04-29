@@ -2,8 +2,8 @@ import pandas as pd
 
 
 def load_data():
-    monthly_seasonality_path = "intmodel/data/seasonality_csv.csv"
-    yearly_domestic_supply = pd.read_csv("intmodel/data/domestic_supply_kcals.csv")
+    monthly_seasonality_path = "data/input/seasonality_csv.csv"
+    yearly_domestic_supply = pd.read_csv("data/output/domestic_supply_kcals.csv")
     monthly_domestic_supply = (
         yearly_domestic_supply.set_index("ISO3") / 12
     )  # divide to get monthly values
@@ -44,7 +44,7 @@ def main():
     )
     monthly_domestic_supply = monthly_domestic_supply.reset_index()
     monthly_domestic_supply.to_csv(
-        "intmodel/data/domestic_supply_kcals_monthly.csv", index=False
+        "data/output/domestic_supply_kcals_monthly.csv", index=False
     )
 
 

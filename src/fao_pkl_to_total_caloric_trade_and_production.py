@@ -4,9 +4,9 @@ from tqdm import tqdm
 
 
 def load_country_data(
-    trade_pkl_path="trade_data.pkl",
-    production_pkl_path="production_data.pkl",
-    nuclear_winter_data_path="intmodel/data/nuclear_winter_csv.csv",
+    trade_pkl_path="data/intermediary/trade_data.pkl",
+    production_pkl_path="data/intermediary/production_data.pkl",
+    nuclear_winter_data_path="data/input/nuclear_winter_csv.csv",
 ):
     trade_data = pd.read_pickle(trade_pkl_path)
     production_data = pd.read_pickle(production_pkl_path)
@@ -22,7 +22,7 @@ def load_country_data(
 def compute_calories(
     trade_data,
     production_data,
-    nutrition_data_path="intmodel/data/primary_crop_nutritional_data.csv",
+    nutrition_data_path="data/input/primary_crop_nutritional_data.csv",
 ):
     nutrition_data = (
         pd.read_csv(nutrition_data_path)[["Item", "Calories"]]
@@ -205,8 +205,8 @@ def main():
             c,
         )
         total_t += t_matrix
-    total_t.to_csv("intmodel/data/total_caloric_trade.csv")
-    total_p.to_csv("intmodel/data/total_caloric_production.csv")
+    total_t.to_csv("data/intermediary/total_caloric_trade.csv")
+    total_p.to_csv("data/intermediary/total_caloric_production.csv")
 
 
 if __name__ == "__main__":
