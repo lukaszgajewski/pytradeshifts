@@ -1,5 +1,5 @@
 # TBD.
-Runs in under 100[s] on a Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz with 16GB of RAM
+Runs in under 100[s] on an Intel Core i7-8550U @ 1.80GHz with 16GB of RAM
 
 ## Data
 ### Input
