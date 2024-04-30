@@ -1,29 +1,10 @@
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
+from input_output import data
 
 
-def load_country_data(
-    trade_pkl_path="data/intermediary/trade_data.pkl",
-    production_pkl_path="data/intermediary/production_data.pkl",
-    nuclear_winter_data_path="data/input/nuclear_winter_csv.csv",
-):
-    trade_data = pd.read_pickle(trade_pkl_path)
-    production_data = pd.read_pickle(production_pkl_path)
-    country_set = set(pd.read_csv(nuclear_winter_data_path)["iso3"].values)
-    assert (
-        (set(trade_data["Reporter ISO3"]) | set(trade_data["Partner ISO3"]))
-        == country_set
-        == set(production_data["ISO3"])
-    )
-    return trade_data, production_data, sorted(country_set)
-
-
-def compute_calories(
-    trade_data,
-    production_data,
-    nutrition_data_path="data/input/primary_crop_nutritional_data.csv",
-):
+def compute_calories(trade_data, production_data, nutrition_data_path):
     nutrition_data = (
         pd.read_csv(nutrition_data_path)[["Item", "Calories"]]
         .set_index("Item", drop=True)
@@ -31,7 +12,10 @@ def compute_calories(
     )
     trade_data["Dry Caloric Tonnes"] = (
         trade_data["Item"].map(nutrition_data) * trade_data["Y2020"] * 1000 / 4e6
-    )  # 1000 is tonnes to kg, 4e6 is Cal to dry caloric tonne
+    )
+    # 1000 is tonnes to kg, 4e6 is Cal (a.k.a. kcal) to dry caloric tonne
+    # yes, it is a bit redundant since 1e3 cancels out
+    # but I want it here like this for clarity
     production_data["Dry Caloric Tonnes"] = (
         production_data["Item"].map(nutrition_data)
         * production_data["Y2020"]
@@ -186,27 +170,41 @@ def correct_reexports(trade_matrix, production_series, precision=1e-3, n_tries=1
 
 
 def main():
-    t, p, c = load_country_data()
-    t, p = compute_calories(t, p)
-    total_t, total_p = reindex_trade_and_production(
-        pd.DataFrame(np.zeros((len(c), len(c))), index=c, columns=c),
-        p.groupby(["ISO3"]).sum(numeric_only=True).squeeze(),
-        c,
+    country_list = sorted(
+        set(pd.read_csv(data["input"]["nuclear_winter"])["iso3"].values)
     )
-    longest_item_name = len(max(p["Item"], key=len))
-    for item, t_data in (pbar := tqdm(t.groupby("Item"))):
+    caloric_trade, caloric_production = compute_calories(
+        pd.read_pickle(data["intermidiary"]["trade"]),
+        pd.read_pickle(data["intermidiary"]["production"]),
+        data["input"]["nutrition"],
+    )
+    total_trade, total_production = reindex_trade_and_production(
+        pd.DataFrame(
+            np.zeros((len(country_list), len(country_list))),
+            index=country_list,
+            columns=country_list,
+        ),
+        caloric_production.groupby(["ISO3"]).sum(numeric_only=True).squeeze(),
+        country_list,
+    )
+    longest_item_name = len(max(caloric_production["Item"], key=len))
+    for item, trade_data in (pbar := tqdm(caloric_trade.groupby("Item"))):
         pbar.set_description(item + " " * (longest_item_name - len(item)))
-        t_matrix, _ = reindex_trade_and_production(
+        trade_matrix, _ = reindex_trade_and_production(
             *correct_reexports(
                 *prebalance(
-                    *format_trade_and_production(t_data, p[p["Item"] == item], c)
+                    *format_trade_and_production(
+                        trade_data,
+                        caloric_production[caloric_production["Item"] == item],
+                        country_list,
+                    )
                 )
             ),
-            c,
+            country_list,
         )
-        total_t += t_matrix
-    total_t.to_csv("data/intermediary/total_caloric_trade.csv")
-    total_p.to_csv("data/intermediary/total_caloric_production.csv")
+        total_trade += trade_matrix
+    total_trade.to_csv(data["intermidiary"]["caloric_trade"])
+    total_production.to_csv(data["intermidiary"]["caloric_production"])
 
 
 if __name__ == "__main__":
