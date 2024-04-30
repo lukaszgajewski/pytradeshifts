@@ -1,47 +1,59 @@
 import pandas as pd
+from input_output import data
 
 
 def load_data(
-    total_caloric_trade_path="data/intermediary/total_caloric_trade.csv",
-    total_caloric_production_path="data/intermediary/total_caloric_production.csv",
-    yearly_reduction_path="data/input/nuclear_winter_csv.csv",
+    total_caloric_trade_path, total_caloric_production_path, yearly_reduction_path
 ):
-    total_t = pd.read_csv(total_caloric_trade_path, index_col=0)
-    total_p = pd.read_csv(total_caloric_production_path, index_col=0).squeeze()
-    n = pd.read_csv(yearly_reduction_path, index_col=0)
-    n.index.name = "ISO3"
-    n = n[[c for c in n.columns if "crop_reduction_year" in c]]
-    n = n + 1  # make it a fraction
-    n[n < 0] = 0  # ensure we don't get negative yield
-    n = n.sort_index()
-    return total_t, total_p, n
+    total_trade = pd.read_csv(total_caloric_trade_path, index_col=0)
+    total_production = pd.read_csv(total_caloric_production_path, index_col=0).squeeze()
+    yield_reduction = pd.read_csv(yearly_reduction_path, index_col=0)
+    yield_reduction.index.name = "ISO3"
+    yield_reduction = yield_reduction[
+        [col for col in yield_reduction.columns if "crop_reduction_year" in col]
+    ]
+    yield_reduction = yield_reduction + 1  # make it a fraction
+    yield_reduction[yield_reduction < 0] = 0  # ensure we don't get negative yield
+    yield_reduction = yield_reduction.sort_index()
+    return total_trade, total_production, yield_reduction
 
 
 def compute_domestic_supply(trade_matrix, production_series):
     return production_series + trade_matrix.sum(axis=0) - trade_matrix.sum(axis=1)
 
 
-def compute_reduced_supply_yearly(total_t, total_p, n):
-    r = [
-        compute_domestic_supply(
-            total_t.mul(cc, axis=0), total_p.mul(cc, axis=0)
-        ).rename(
-            "crop_kcals_baseline_domestic_supply_year_"
-            + c[len("crop_reduction_year") :]
-        )
-        for c, cc in n.items()
-    ]
-    return pd.concat(r, axis=1)
+def compute_reduced_supply_yearly(total_trade, total_production, yield_reduction):
+    return pd.concat(
+        [
+            compute_domestic_supply(
+                total_trade.mul(yield_reduction_vector, axis=0),
+                total_production.mul(yield_reduction_vector, axis=0),
+            ).rename(
+                "crop_kcals_baseline_domestic_supply_year_"
+                + vector_label[len("crop_reduction_year") :]
+            )
+            for vector_label, yield_reduction_vector in yield_reduction.items()
+        ],
+        axis=1,
+    )
 
 
 def main():
-    t, p, n = load_data()
-    yearly_domestic_supply = (
-        compute_domestic_supply(t, p)
-        .to_frame(name="crop_kcals_baseline_domestic_supply")
-        .join(compute_reduced_supply_yearly(t, p, n))
+    total_trade, total_production, yield_reduction = load_data(
+        data["intermidiary"]["trade"],
+        data["intermidiary"]["production"],
+        data["input"]["nuclear_winter"],
     )
-    yearly_domestic_supply.to_csv("data/output/domestic_supply_kcals.csv")
+    yearly_domestic_supply = (
+        compute_domestic_supply(total_trade, total_production)
+        .to_frame(name="crop_kcals_baseline_domestic_supply")
+        .join(
+            compute_reduced_supply_yearly(
+                total_trade, total_production, yield_reduction
+            )
+        )
+    )
+    yearly_domestic_supply.to_csv(data["output"]["yearly"])
 
 
 if __name__ == "__main__":

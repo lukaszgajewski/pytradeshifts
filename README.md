@@ -25,6 +25,7 @@ tbd.
 
 ## TODO
 - refactor code to be more readable
+- parametrise mains for inputs
 - docs
 - env/req files
 - tests
