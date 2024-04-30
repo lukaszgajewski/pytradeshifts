@@ -26,6 +26,8 @@ tbd.
 ## TODO
 - refactor code to be more readable
 - parametrise mains for inputs
+- add preprocessing step to unify country codes, e.g., MNE is in seasonality but not in nuclear
 - docs
+- scan for TODOs
 - env/req files
 - tests
