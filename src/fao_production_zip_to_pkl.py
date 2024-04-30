@@ -1,5 +1,5 @@
 import pandas as pd
-from input_output import data, load_fao_zip, serialise_fao_data
+from input_output import data, load_fao_zip
 
 
 def convert_to_ISO3(FAO_data, country_codes_path):
@@ -32,21 +32,20 @@ def filter_data(FAO_data, nutrition_data_path, nuclear_winter_data_path):
     nutritional_data_items = pd.read_csv(nutrition_data_path)["Item"]
     FAO_data = FAO_data[FAO_data["Item"].isin(nutritional_data_items)]
 
+    FAO_data = FAO_data.reset_index(drop=True)
+
     return FAO_data
 
 
 def main():
-    serialise_fao_data(
-        filter_data(
-            convert_to_ISO3(
-                load_fao_zip(data["input"]["production"]),
-                data["input"]["country_codes"],
-            ),
-            data["input"]["nutrition"],
-            data["input"]["nuclear_winter"],
+    filter_data(
+        convert_to_ISO3(
+            load_fao_zip(data["input"]["production"]),
+            data["input"]["country_codes"],
         ),
-        data["intermidiary"]["production"],
-    )
+        data["input"]["nutrition"],
+        data["input"]["nuclear_winter"],
+    ).to_pickle(data["intermidiary"]["production"])
 
 
 if __name__ == "__main__":

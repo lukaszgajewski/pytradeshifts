@@ -2,7 +2,7 @@ import pandas as pd
 from zipfile import ZipFile
 
 
-def load_fao_zip(FAO_zip_path="data/input/Trade_DetailedTradeMatrix_E_All_Data.zip"):
+def load_fao_zip(FAO_zip_path):
     zip_file = ZipFile(FAO_zip_path)
     FAO_data = pd.read_csv(
         zip_file.open(
@@ -12,13 +12,6 @@ def load_fao_zip(FAO_zip_path="data/input/Trade_DetailedTradeMatrix_E_All_Data.z
         low_memory=False,
     )
     return FAO_data
-
-
-def serialise_fao_data(FAO_data, output_file_path):
-    FAO_data = FAO_data.reset_index(drop=True)
-
-    # serialise
-    FAO_data.to_pickle(output_file_path)
 
 
 data = {
@@ -41,3 +34,6 @@ data = {
         "monthly": "data/output/domestic_supply_kcals_monthly.csv",
     },
 }
+
+if __name__ == "__main__":
+    pass
