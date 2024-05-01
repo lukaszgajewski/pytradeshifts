@@ -11,7 +11,7 @@ Azerbaijan,-19.91
 Bangladesh,14.89
 Belarus,32.05
 Belgium,-2.88
-Belize,71.91
+Belize,50.0
 Bhutan,-42.17
 Bolivia,-0.09
 Bosnia and Herzegovina,18.41
@@ -42,7 +42,7 @@ Georgia,-4.77
 Germany,-15.78
 Greece,4.07
 Guatemala,16.02
-Guernsey,52.2
+Guernsey,50.0
 Hungary,-9.4
 Iceland,-100.0
 India,-2.96
@@ -53,7 +53,7 @@ Isle of Man,-28.33
 Israel,3.77
 Italy,-9.96
 Japan,-43.52
-Jersey,57.44
+Jersey,50.0
 Jordan,1.72
 Kazakhstan,-20.28
 Kenya,-54.08
@@ -64,7 +64,7 @@ Laos,-52.26
 Latvia,2.21
 Lebanon,-5.84
 Lesotho,1.86
-Libya,53.32
+Libya,50.0
 Lithuania,30.65
 Luxembourg,-16.45
 Macedonia,9.43
@@ -90,17 +90,18 @@ Pakistan,4.62
 Paraguay,-1.86
 Peru,-12.46
 Poland,1.03
-Portugal,60.61
+Portugal,50.0
 Romania,6.57
 Russia,-49.23
 Saudi Arabia,-7.15
 Serbia,12.81
 Slovakia,-12.23
 Slovenia,0.35
+Somalia,50.0
 South Africa,-3.68
 South Korea,-42.03
 South Sudan,-0.17
-Spain,53.32
+Spain,50.0
 Sudan,27.34
 Swaziland,7.68
 Sweden,-83.91
