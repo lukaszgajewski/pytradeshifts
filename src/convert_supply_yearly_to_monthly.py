@@ -2,23 +2,54 @@ import pandas as pd
 from input_output import data
 
 
-def load_data(yearly_domestic_supply_path, monthly_seasonality_path):
-    yearly_domestic_supply = pd.read_csv(yearly_domestic_supply_path)
-    monthly_domestic_supply = (
-        yearly_domestic_supply.set_index("ISO3") / 12
-    )  # divide to get monthly values
+def load_data(
+    yearly_domestic_supply_path: str, monthly_seasonality_path: str
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Read yearly domestic supply and monthly seasonality data; return them as
+    pandas DataFrames.
 
+    Arguments:
+        yearly_domestic_supply_path (str): path to file containing domestic supply
+            yearly. This file is a result of running `src/compute_domestic_supply.py`.
+        monthly_seasonality_path (str): path to file containing seasonality data
+            for each country. A sample file is provided in `data/input/seasonality_csv.csv`.
+
+    Returns:
+        tuple[pd.DataFrame, pd.DataFrame]: DataFrames containing yearly domestic supply,
+            and monthly seasonality for each country.
+    """
+    yearly_domestic_supply = pd.read_csv(yearly_domestic_supply_path)
+    # divide by 12 to get monthly values
+    # this is a crude oversimplification but we simply have no access
+    # to monthly data on countries' agrocultural import/exports as of right now
+    # so we assume that its proportional to the seasonality values
+    monthly_domestic_supply = yearly_domestic_supply.set_index("ISO3") / 12
+    # get the seasonality and rename the index to match domestic supply data
     monthly_seasonality = pd.read_csv(monthly_seasonality_path, index_col=0)
     monthly_seasonality = monthly_seasonality.sort_index()
     monthly_seasonality.index.name = "ISO3"
+    # make sure that the indices match
     pd.testing.assert_index_equal(
         monthly_domestic_supply.index, monthly_seasonality.index
     )
-    monthly_seasonality = monthly_seasonality[monthly_seasonality.columns[1:]]
+    # we do not need the country names column
+    monthly_seasonality = monthly_seasonality.drop(columns="country")
     return monthly_domestic_supply, monthly_seasonality
 
 
 def main():
+    """
+    Convert yearly caloric domestic supply to monthly, using the specified
+    seasonality data.
+    Data input/output paths are specified in the `src/input_output.py` file.
+
+    Arguments:
+        None.
+
+    Returns:
+        None.
+    """
     monthly_domestic_supply, monthly_seasonality = load_data(
         data["output"]["yearly"], data["input"]["seasonality"]
     )
@@ -29,21 +60,27 @@ def main():
         .rename(f"crop_kcals_baseline_domestic_supply_month_{month}")
         for month in range(1, 9)
     ]
+    # other years we treat normally, i.e., splitting them into 12 months
     other_years = [
         monthly_domestic_supply[f"crop_kcals_baseline_domestic_supply_year_{year}"]
         .mul(monthly_seasonality[f"seasonality_m{month}"], axis=0)
         .rename(
             f"crop_kcals_baseline_domestic_supply_month_{((year - 1) * 12) + month + (8 - 12)}"
-        )
+        )  # yes, I know 8-12 is -4; this is for clarity
+        # since there are 8 months in year one
+        # one could argue that it is more intuitive to think of it as
+        # starting after 4 months (-4), so ¯\_(ツ)_/¯ ...
         for year in range(2, 11)
         for month in range(1, 13)
     ]
+    # combine into one DataFrame
     monthly_domestic_supply = pd.concat(
         [monthly_domestic_supply["crop_kcals_baseline_domestic_supply"]]
         + year_one
         + other_years,
         axis=1,
     )
+    # save to file
     monthly_domestic_supply = monthly_domestic_supply.reset_index()
     monthly_domestic_supply.to_csv(data["output"]["monthly"], index=False)
 
