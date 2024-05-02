@@ -24,7 +24,6 @@ Runs in under 100[s] on an Intel Core i7-8550U @ 1.80GHz with 16GB of RAM
 tbd.
 
 ## TODO
-- docs
 - replace "Y2020" with something smarter
 - scan for TODOs
 - env/req files

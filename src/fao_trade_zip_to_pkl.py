@@ -69,7 +69,9 @@ def filter_data(
     FAO_data = FAO_data[FAO_data["Element"] == "Export Quantity"]
 
     # keep only the columns we care about
-    FAO_data = FAO_data[["Reporter ISO3", "Partner ISO3", "Item", "Y2020"]]
+    FAO_data = FAO_data[
+        ["Reporter ISO3", "Partner ISO3", "Item", data["input"]["year_flag"]]
+    ]
 
     # drop NAs
     FAO_data = FAO_data.dropna()

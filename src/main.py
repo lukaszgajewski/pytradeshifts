@@ -15,7 +15,7 @@ def main():
     serialise_trade_data()
     print("Serialising production data...")
     serialise_production_data()
-    print("Computing total trade and production...")
+    print("Computing total caloric trade and production...")
     compute_total_trade_and_production()
     print("Computing domestic supply yearly...")
     compute_yearly_domestic_supply()

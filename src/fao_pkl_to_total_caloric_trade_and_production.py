@@ -30,7 +30,10 @@ def compute_calories(
     )
     # compute the calories
     trade_data["Dry Caloric Tonnes"] = (
-        trade_data["Item"].map(nutrition_data) * trade_data["Y2020"] * 1000 / 4e6
+        trade_data["Item"].map(nutrition_data)
+        * trade_data[data["input"]["year_flag"]]
+        * 1000
+        / 4e6
     )
     # 1000 is tonnes to kg, 4e6 is Cal (a.k.a. kcal) to dry caloric tonne
     # yes, it is a bit redundant since 1e3 cancels out
@@ -39,7 +42,7 @@ def compute_calories(
     # and this data is post-filtering so speed should not be a concern anymore
     production_data["Dry Caloric Tonnes"] = (
         production_data["Item"].map(nutrition_data)
-        * production_data["Y2020"]
+        * production_data[data["input"]["year_flag"]]
         * 1000
         / 4e6
     )
