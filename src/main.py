@@ -10,10 +10,6 @@ from convert_supply_yearly_to_monthly import main as compute_monthly_domestic_su
 
 
 def main():
-    pass
-
-
-if __name__ == "__main__":
     t = time()
     print("Serialising trade data...")
     serialise_trade_data()
@@ -26,3 +22,7 @@ if __name__ == "__main__":
     print("Computing domestic supply monthly...")
     compute_monthly_domestic_supply()
     print("Fin. Elapsed time [s]: ", time() - t)
+
+
+if __name__ == "__main__":
+    main()
