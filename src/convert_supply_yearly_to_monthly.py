@@ -10,11 +10,10 @@ def load_data(yearly_domestic_supply_path, monthly_seasonality_path):
 
     monthly_seasonality = pd.read_csv(monthly_seasonality_path, index_col=0)
     monthly_seasonality = monthly_seasonality.sort_index()
-    monthly_seasonality = monthly_seasonality.loc[
-        monthly_domestic_supply.index, :
-    ]  # no MNE entry in nuclear winter data so we remove it from here
-    # TODO: unify data sets earlier than this
     monthly_seasonality.index.name = "ISO3"
+    pd.testing.assert_index_equal(
+        monthly_domestic_supply.index, monthly_seasonality.index
+    )
     monthly_seasonality = monthly_seasonality[monthly_seasonality.columns[1:]]
     return monthly_domestic_supply, monthly_seasonality
 
