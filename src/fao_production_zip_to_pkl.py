@@ -14,9 +14,9 @@ def convert_to_ISO3(FAO_data, country_codes_path):
     return FAO_data
 
 
-def filter_data(FAO_data, nutrition_data_path, nuclear_winter_data_path):
+def filter_data(FAO_data, nutrition_data_path, yield_reduction_data_path):
     # keep only the countries that we have nuclear winter data for
-    countries_of_interest = pd.read_csv(nuclear_winter_data_path, index_col=0).index
+    countries_of_interest = pd.read_csv(yield_reduction_data_path, index_col=0).index
     FAO_data = FAO_data[FAO_data["ISO3"].isin(countries_of_interest)]
 
     # all we need is production
