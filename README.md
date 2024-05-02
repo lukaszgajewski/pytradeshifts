@@ -25,7 +25,6 @@ tbd.
 
 ## TODO
 - docs
-- change data[input][nuclear] to [yield_reduction]
 - replace "Y2020" with something smarter
 - scan for TODOs
 - env/req files

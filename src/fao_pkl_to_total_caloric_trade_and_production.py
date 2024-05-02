@@ -14,7 +14,8 @@ def compute_calories(
         trade_data (pd.DataFrame): FAO trading data in a pandas DataFrame.
         production_data (pd.DataFrame): FAO production data in a pandas DataFrame.
         nutrition_data_path (str): path to a CSV with nutrional data;
-            must have "Item" and "Calories" columns.
+            must have "Item" and "Calories" columns. A sample file is provieded in:
+            `data/input/primary_crop_nutritional_data.csv`
 
     Returns:
         tuple[pd.DataFrame, pd.DataFrame]: trade and production DataFrames with
@@ -237,7 +238,7 @@ def main():
     # read the "ground truth" country list, we assume this is the countries
     # for which we have the yield reduction data
     country_list = sorted(
-        set(pd.read_csv(data["input"]["nuclear_winter"])["iso3"].values)
+        set(pd.read_csv(data["input"]["yield_reduction"])["iso3"].values)
     )
     # convert food items to their caloric values
     caloric_trade, caloric_production = compute_calories(

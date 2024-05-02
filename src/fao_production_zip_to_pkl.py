@@ -74,7 +74,7 @@ def main():
             data["input"]["country_codes"],
         ),
         data["input"]["nutrition"],
-        data["input"]["nuclear_winter"],
+        data["input"]["yield_reduction"],
     ).to_pickle(data["intermidiary"]["production"])
 
 

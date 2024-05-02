@@ -20,7 +20,7 @@ data = {
         "production": "data/input/Production_Crops_Livestock_E_All_Data.zip",
         "country_codes": "data/input/country_codes.csv",
         "nutrition": "data/input/primary_crop_nutritional_data.csv",
-        "nuclear_winter": "data/input/nuclear_winter_csv.csv",
+        "yield_reduction": "data/input/nuclear_winter_csv.csv",
         "seasonality": "data/input/seasonality_csv.csv",
     },
     "intermidiary": {
