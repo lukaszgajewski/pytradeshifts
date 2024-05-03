@@ -1,6 +1,9 @@
 # Caloric domestic supply
 Code in this repo computes the domestic supply of calories, with potential for other nutrients, for a list of countries, food items, and in a specified yield reduction scenario.
 
+This is for the purposes of the ALLFED integrated model and will eventually get absorbed into that repostitory. 
+While this is using core ideas of the pytradeshifts project it is not part of it, and this branch shall be deleted in the future. 
+
 Runs in under 100[s] on an Intel Core i7-8550U @ 1.80GHz with 16GB of RAM
 
 ## Data
