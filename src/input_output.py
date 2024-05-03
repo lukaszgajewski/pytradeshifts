@@ -34,13 +34,15 @@ data = {
         "country_codes": "data/input/country_codes.csv",
         # this is a list of food items and their nutritional value per kg
         # the list provided in this repo is thanks to the hard work of Mike Hinge
-        # TODO: add sources
+        # Based on FAO nutrition data:
+        # https://web.archive.org/web/20190215000000*/https://www.fao.org/3/X9892E/X9892e05.htm
         "nutrition": "data/input/primary_crop_nutritional_data.csv",
         # yield reduction data; here we consider a nuclear winter scenario
-        # the data is from TODO: add source
+        # the data is from https://www.nature.com/articles/s43016-022-00573-0
         "yield_reduction": "data/input/nuclear_winter_csv.csv",
         # the fraction of yield per country at each month, also the result of the
-        # hard work of Mike Hinge TODO: add sources
+        # hard work of Mike Hinge; based on data from:
+        # https://apps.fas.usda.gov/psdonline/app/index.html#/app/home
         "seasonality": "data/input/seasonality_csv.csv",
     },
     # these are intermidiary files created during running the whole procedure
