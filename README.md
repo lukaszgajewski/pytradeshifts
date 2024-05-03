@@ -35,14 +35,14 @@ The final output files, i.e., domestic supply of dry caloric tonnes per country 
 - ```src/convert_supply_yearly_to_monthly.py```, from the above, computes the domestic supply of dry coloric tonnes monthly, in the context of the specified seasonality data.
 - ```src/main.py```; runs all of the above scripts in the proper order.
 
-# Launch
+## Launch
 All data in the ```input``` subsection must be put in the right places (see Data section).
 
 Then, run ```python src/main.py```. 
 
 That's it. The results will be in ```data/output/```.
 
-# Requirements
+## Requirements
 - pandas
 - tqdm
 - pytests
