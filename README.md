@@ -51,4 +51,3 @@ That's it. The results will be in ```data/output/```.
 - env/req files
 - update this readme with installation instructions
 - tests
-- scan for TODOs
