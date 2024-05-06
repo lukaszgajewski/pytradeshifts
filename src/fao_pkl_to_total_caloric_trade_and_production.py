@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
-from input_output import data
+from src.input_output import data
 
 
 def compute_calories(

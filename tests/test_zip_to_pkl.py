@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
+import pytest
 from src.input_output import load_fao_zip, data
 from src import fao_trade_zip_to_pkl, fao_production_zip_to_pkl
-import pytest
 
 
 @pytest.fixture
@@ -18,12 +18,12 @@ def oceania_dataset_with_iso3() -> tuple[pd.DataFrame, pd.DataFrame]:
 
 def test_load_zip():
     trade_data = load_fao_zip("data/testing/Trade_DetailedTradeMatrix_E_Oceania.zip")
-    assert isinstance(trade_data, pd.core.frame.DataFrame)
+    assert isinstance(trade_data, pd.DataFrame)
     assert not trade_data.empty
     production_data = load_fao_zip(
         "data/testing/Production_Crops_Livestock_E_Oceania.zip"
     )
-    assert isinstance(production_data, pd.core.frame.DataFrame)
+    assert isinstance(production_data, pd.DataFrame)
     assert not production_data.empty
 
 
@@ -47,11 +47,11 @@ def test_data_filtering(oceania_dataset_with_iso3):
     assert (og_trade_shape >= trade_data.shape).all()
     assert len(trade_data.columns) == 4
     assert ~trade_data.isna().any(axis=None)
-    assert isinstance(trade_data.index, pd.core.indexes.range.RangeIndex)
+    assert isinstance(trade_data.index, pd.RangeIndex)
     production_data = fao_production_zip_to_pkl.filter_data(
         production_data, data["input"]["nutrition"], data["input"]["yield_reduction"]
     )
     assert (og_production_shape >= production_data.shape).all()
     assert len(production_data.columns) == 3
     assert ~production_data.isna().any(axis=None)
-    assert isinstance(production_data.index, pd.core.indexes.range.RangeIndex)
+    assert isinstance(production_data.index, pd.RangeIndex)
