@@ -2,7 +2,16 @@ import pandas as pd
 from zipfile import ZipFile
 
 
-def load_fao_zip(FAO_zip_path):
+def load_fao_zip(FAO_zip_path: str) -> pd.DataFrame:
+    """
+    Extract the FAO data CSV file from a bulk download ZIP file.
+
+    Arguments:
+        FAO_zip_path (str): path to the ZIP file.
+
+    Returns:
+        pd.DataFrame: a DataFrame containing the data.
+    """
     zip_file = ZipFile(FAO_zip_path)
     FAO_data = pd.read_csv(
         zip_file.open(

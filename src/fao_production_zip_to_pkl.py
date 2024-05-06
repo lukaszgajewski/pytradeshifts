@@ -1,5 +1,5 @@
 import pandas as pd
-from input_output import data, load_fao_zip
+from src.input_output import data, load_fao_zip
 
 
 def convert_to_ISO3(FAO_data: pd.DataFrame, country_codes_path: str) -> pd.DataFrame:
@@ -34,6 +34,23 @@ def convert_to_ISO3(FAO_data: pd.DataFrame, country_codes_path: str) -> pd.DataF
 def filter_data(
     FAO_data: pd.DataFrame, nutrition_data_path: str, yield_reduction_data_path: str
 ) -> pd.DataFrame:
+    """
+    Filter out unnecessary information from a pandas DataFrame containing FAO
+    production data.
+
+    Arguments:
+        FAO_data (pd.DataFrame): pandas DataFrame containing the production data from FAO,
+            with an ISO3 column (see convert_to_ISO3()).
+        nutrition_data_path (str): path to a CSV containing nutritional information
+            of food items. Here we only use a column labelled "Item" to filter out
+            products we are not interested in.
+        yield_reduction_data_path (str): path to a CSV containing yield reduction data
+            per country. Here we only use the index (assumed to be the first column)
+            to filter out countries we are not interested in.
+
+    Returns:
+        pd.DataFrame: the filtered pandas DataFrame.
+    """
     # keep only the countries that we have nuclear winter data for
     countries_of_interest = pd.read_csv(yield_reduction_data_path, index_col=0).index
     FAO_data = FAO_data[FAO_data["ISO3"].isin(countries_of_interest)]

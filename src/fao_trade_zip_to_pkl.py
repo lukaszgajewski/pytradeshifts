@@ -1,5 +1,5 @@
 import pandas as pd
-from input_output import data, load_fao_zip
+from src.input_output import data, load_fao_zip
 
 
 def convert_to_ISO3(FAO_data: pd.DataFrame, country_codes_path: str) -> pd.DataFrame:
@@ -45,7 +45,8 @@ def filter_data(
     trading data.
 
     Arguments:
-        FAO_data (pd.DataFrame): pandas DataFrame containing the trading data from FAO.
+        FAO_data (pd.DataFrame): pandas DataFrame containing the trading data from FAO,
+            with ISO3 columns (see convert_to_ISO3()).
         nutrition_data_path (str): path to a CSV containing nutritional information
             of food items. Here we only use a column labelled "Item" to filter out
             products we are not interested in.
