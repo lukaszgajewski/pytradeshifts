@@ -26,7 +26,7 @@ import seaborn as sb
 from scipy import stats
 import os
 from pathlib import Path
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 
 
 plt.style.use(
@@ -120,6 +120,8 @@ class Postprocessing:
         ]
         if self.anchor_countries:
             self._arrange_communities()
+        self._compute_imports()
+        self._compute_imports_difference()
         self._add_weight_reciprocals()
         self._find_community_difference()
         self._compute_frobenius_distance()
@@ -141,6 +143,115 @@ class Postprocessing:
         self._compute_network_stability()
         self._compute_entropic_out_degree()
         self._compute_percolation_threshold()
+
+    def _compute_imports(self) -> None:
+        """
+        Calculates how much imports each country receives from each other country.
+        This is done for each scenario.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        self.imports = []
+        for scenario in self.scenarios:
+            imports = {}
+            # Go through all columns in the trade matrix. Each column represents the imports of a country.
+            for country in scenario.trade_matrix.columns:
+                # Sum the imports from all other countries
+                imports[country] = scenario.trade_matrix[country].sum()
+            self.imports.append(imports)
+
+    def _compute_imports_difference(self) -> None:
+        """
+        Computes the decrease in imports for each country in each scenario in percentage.
+        The decrease is calculated relative to the base scenario.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        self.imports_difference = []
+        for imports in self.imports[1:]:
+            imports_difference = {}
+            for country in imports:
+                if country not in self.imports[0]:
+                    print(f"Warning: {country} not found in the base scenario.")
+                    imports_difference[country] = np.nan
+                else:
+                    if self.imports[0][country] == 0:
+                        imports_difference[country] = 0
+                    else:
+                        imports_difference[country] = (
+                            (imports[country] - self.imports[0][country]) / self.imports[0][country]
+                        ) * 100
+            self.imports_difference.append(imports_difference)
+
+    def plot_imports_difference(
+        self,
+        figsize: tuple[float, float] | None = None,
+        shrink=1.0,
+        file_path: str | None = None,
+        file_format="png",
+        dpi=300,
+        **kwargs,
+    ) -> None:
+        """
+        Plots the imports difference for each scenario on a world map with the countries
+        coloured by the decrease in imports in percentage.
+
+        Arguments:
+            figsize (tuple[float, float] | None, optional): The composite figure
+                size as expected by the matplotlib subplots routine.
+            shrink (float, optional): Colour bar shrink parameter.
+            file_path (str | None, optional): Path to where the image file
+                should be saved to. If `None` no file shall be produced.
+            file_format (str, optional): File extension to use when
+                saving plot to file.
+            dpi (int, optional): DPI of the saved image file.
+            **kwargs (optional): Any additional keyworded arguments recognised
+                by geopandas plot function.
+
+        Returns:
+            None
+        """
+        assert len(self.scenarios) > 1
+        _, axs = plt.subplots(
+            len(self.scenarios) - 1,
+            1,
+            sharex=True,
+            tight_layout=True,
+            figsize=(
+                (5, (len(self.scenarios) - 1) * 2.5) if figsize is None else figsize
+            ),
+        )
+        # if there are only two scenarios axs will be just an ax object
+        # convert to a list to comply with other cases
+        try:
+            len(axs)
+        except TypeError:
+            axs = [axs]
+        for ax, (idx, scenario) in zip(axs, enumerate(self.scenarios[1:])):
+            plot_node_metric_map(
+                ax,
+                scenario,
+                self.imports_difference[idx],
+                "Import relative difference",
+                shrink=shrink,
+                **kwargs,
+            )
+        if file_path:
+            plt.savefig(
+                f"{file_path}{os.sep}import_diff.{file_format}",
+                dpi=dpi,
+                bbox_inches="tight",
+            )
+        else:
+            plt.show()
 
     def _add_weight_reciprocals(self) -> None:
         """
@@ -869,8 +980,10 @@ class Postprocessing:
         """
         self.community_satisfaction_difference = [
             {
-                country: satisfaction - self.community_satisfaction[0][country]
-                for country, satisfaction in community_satisfaction.items()
+            country: satisfaction - self.community_satisfaction[0][country]
+            if country in self.community_satisfaction[0]
+            else (print(f"Warning: {country} not found in the base scenario.") or np.nan)
+            for country, satisfaction in community_satisfaction.items()
             }
             for community_satisfaction in self.community_satisfaction[1:]
         ]
@@ -1128,7 +1241,7 @@ class Postprocessing:
                         for community in scenario.trade_communities
                     ]  # we sum up the squares of the number of edges to each community
                 )
-                / total_degree[country] ** 2  # we divide by total degree squared
+                / (total_degree[country] ** 2 if total_degree[country] != 0 else 1)  # Avoid division by zero
                 for country in undirected_trade_graph  # for each country
             }
             self.participation.append(coefficients)
@@ -1138,7 +1251,8 @@ class Postprocessing:
         z_threshold=1.0,
         p_thresholds=[0.05, 0.3, 0.62, 0.75, 0.8],
         alpha=0.3,
-        sector_labels: list[str] | None = None,
+        labels=True,
+        fontsize=7,
         figsize: tuple[float, float] | None = None,
         file_path: str | None = None,
         file_format="png",
@@ -1163,9 +1277,8 @@ class Postprocessing:
                 thresholds).
             alpha (float, optional): transparency level of the background colouring,
                 showing the sectors defined by the above thresholds.
-            sector_labels (list[str] | None, optional): labels for the aforementioned
-                sectors, if provided a legend shall be displayed explaining
-                the colours, otherwise no legend shall be shown.
+            labels (bool, optional): whether to plot labels in the plot.
+            fontsize (int, optional): font size of the labels.
             figsize (tuple[float, float] | None, optional): the composite figure
                 size as expected by the matplotlib subplots routine.
             shrink (float, optional): Colour bar shrink parameter.
@@ -1185,7 +1298,7 @@ class Postprocessing:
             1,
             sharex=True,
             tight_layout=True,
-            figsize=(5, len(self.scenarios) * 2.5) if figsize is None else figsize,
+            figsize=(7.5, len(self.scenarios) * 2.5) if figsize is None else figsize,
         )
         # if there is only one scenario axs will be just an ax object
         # convert to a list to comply with other cases
@@ -1193,10 +1306,9 @@ class Postprocessing:
             len(axs)
         except TypeError:
             axs = [axs]
-        legend_plotted = False
         for ax, (idx, scenario) in zip(axs, enumerate(self.scenarios)):
             ax.scatter(
-                self.participation[idx].values(), self.zscores[idx].values(), **kwargs
+                self.participation[idx].values(), self.zscores[idx].values(), zorder=5, color="black", alpha=0.8, **kwargs
             )
             ax.set_title(
                 f"Country roles for {scenario.crop} with base year {scenario.base_year[1:]}"
@@ -1206,16 +1318,11 @@ class Postprocessing:
                     else "\n(no scenario)"
                 )
             )
-            fill_sector_by_colour(ax, z_threshold, p_thresholds, alpha, sector_labels)
+            fill_sector_by_colour(ax, z_threshold, p_thresholds, alpha, labels, fontsize)
             ax.set_xlabel("Participation coefficient")
             ax.set_ylabel("Within community degree")
-            if sector_labels and not legend_plotted:
-                ax.legend(
-                    loc="upper center",
-                    bbox_to_anchor=(0.5, -0.1),
-                    ncol=2,
-                )
-                legend_plotted = True
+            # Turn off the grid
+            ax.grid(False)
 
         if file_path:
             plt.savefig(
@@ -1312,9 +1419,11 @@ class Postprocessing:
         """
         self.node_stability_difference = [
             {
-                country: (stability - self.node_stability[0][country])
-                / self.node_stability[0][country]
-                for country, stability in node_stability.items()
+            country: (stability - self.node_stability[0][country])
+            / self.node_stability[0][country]
+            if country in self.node_stability[0]
+            else (print(f"Warning: {country} not found in the base scenario."), np.nan)
+            for country, stability in node_stability.items()
             }
             for node_stability in self.node_stability[1:]
         ]
@@ -1514,7 +1623,7 @@ class Postprocessing:
         Analysis of structural vulnerabilities in power transmission grids.
         International Journal of Critical Infrastructure Protection, 2(1-2), 5-12.
         https://www.sciencedirect.com/science/article/abs/pii/S1874548209000031.
-        This metric uses the idea of entropy to calculate an importance of a node.
+        This metric uses the idea of entropy to calculnode staate an importance of a node.
 
         Arguments:
             None
@@ -1893,7 +2002,7 @@ class Postprocessing:
         Returns:
             None
         """
-        time_now = datetime.now(UTC) if utc else datetime.now()
+        time_now = datetime.now(timezone.utc) if utc else datetime.now()
         time_now = time_now.strftime("%Y-%m-%d_%H:%M:%S")
         utc_label = "UTC" if utc else ""
         report_folder = f"{path}{os.sep}report_{time_now}"

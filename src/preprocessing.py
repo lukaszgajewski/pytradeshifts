@@ -84,7 +84,7 @@ def serialise_faostat_bulk(faostat_zip: str) -> None:
 
 
 def _prep_trade_matrix(
-    trade_pkl: str, item: str, unit="tonnes", element="Export Quantity", year="Y2018"
+    trade_pkl: str, item: str, unit="t", element="Export Quantity", year="Y2018"
 ) -> pd.DataFrame:
     """
     Return properly formatted trade matrix.
@@ -105,6 +105,11 @@ def _prep_trade_matrix(
         in another.
     """
     trad = pd.read_pickle(trade_pkl)
+    # Make sure that we are not trying to filter for a unit, element or item which is not in the data
+    # This can happen because the FAO data is not consistent across all datasets
+    assert unit in trad["Unit"].unique(), f"unit {unit} not in {trad['Unit'].unique()}"
+    assert element in trad["Element"].unique(), f"element {element} not in {trad['Element'].unique()}"
+    assert item in trad["Item"].unique(), f"item {item} not in {trad['Item'].unique()}"
     print("Filter trade matrix")
     trad = trad[
         (
@@ -150,7 +155,15 @@ def _prep_production_vector(
         depend on particular datasets. E.g., unit can be "tonnes" in one file and "t"
         in another.
     """
+    # Fix the different naming for rice and maize
+    if item == "Rice, paddy (rice milled equivalent)":
+        item = "Rice"
+
     prod = pd.read_pickle(production_pkl)
+    # Make sure that we are not trying to filter for a unit or item which is not in the data
+    # This can happen because the FAO data is not consistent across all datasets
+    assert unit in prod["Unit"].unique(), f"unit {unit} not in {prod['Unit'].unique()}"
+    assert item in prod["Item"].unique(), f"item {item} not in {prod['Item'].unique()}"
     print("Filter production vector")
     prod = prod[
         ((prod["Item"] == item) & (prod["Unit"] == unit) & (~prod[year].isna()))
@@ -199,7 +212,7 @@ def format_prod_trad_data(
     trade_pkl: str,
     item: str,
     production_unit="t",
-    trade_unit="tonnes",
+    trade_unit="t",
     element="Export Quantity",
     year="Y2018",
 ) -> tuple[pd.Series, pd.DataFrame]:
@@ -263,13 +276,18 @@ def rename_countries(
         encoding="latin1",
         low_memory=False,
     )
-    # Also rename China; Taiwan Province of to Taiwan, so we don't run into
-    # problems later on with the country names
+    # Rename a bunch of countries which cause trouble, because they map onto
+    # different states now
+    # rename China; Taiwan Province of to Taiwan
     codes.loc[codes["Area"] == "China; Taiwan Province of", "Area"] = "Taiwan"
+    codes.loc[codes["Area"] == 'Serbia and Montenegro', "Area"] = "Serbia"
+    codes.loc[codes["Area"] == 'Belgium-Luxembourg', "Area"] = "Belgium"
 
     # Create a dictionary with the country codes as keys and country names as values
     cc = coco.CountryConverter()
-    codes_area_short = cc.pandas_convert(pd.Series(codes["Area"]), to="name_short")
+    codes_area_short = cc.pandas_convert(
+        pd.Series(codes["Area"]), to="name_short", not_found=None
+    )
 
     codes_dict = dict(zip(codes[code_type], codes_area_short))
 
@@ -325,6 +343,7 @@ def remove_entries_from_data(
         "Eastern Europe": "'151",
         "Northern Europe": "'154",
         "Western Europe": "'155",
+        "Caribbean": "'029",
         # Groups of countries by property
         "Least Developed Countries": "'199",
         "Land Locked Developing Countries": "'432",
@@ -334,6 +353,11 @@ def remove_entries_from_data(
         # We want to look at China and Taiwan seperately, so this is not needed
         # as 159 refers to China incl. Taiwan
         "China": "'159",
+        # There a bunch of very small countries and islands which only are present in very
+        # few years and usually have no trade data. As this gives our preprocessing a hard time
+        # we remove them here
+        "Midway Island": "'488",
+        "Monaco": "'492",
     }
 
     # Remove the entries
@@ -348,7 +372,7 @@ def main(
     region: str,
     item: str,
     production_unit="t",
-    trade_unit="tonnes",
+    trade_unit="t",
     element="Export Quantity",
     year="Y2018",
 ) -> None:
@@ -406,8 +430,10 @@ def main(
     item = rename_item(item)
 
     # Make sure that production index and trade matrix index/columns are the same
-    assert production.index.equals(trade_matrix.index)
-    assert production.index.equals(trade_matrix.columns)
+    # and print out the difference if there is any
+    assert trade_matrix.index.equals(trade_matrix.columns), f"difference: {trade_matrix.index.difference(trade_matrix.columns)}"
+    assert production.index.equals(trade_matrix.index), f"difference: {production.index.difference(trade_matrix.index)}"
+    assert production.index.equals(trade_matrix.columns), f"difference: {production.index.difference(trade_matrix.columns)}"
 
     # Replace "All_Data" with "global" for readability
     if region == "All_Data":
@@ -426,10 +452,11 @@ if __name__ == "__main__":
     # Define values
     year = "Y2018"
     items_trade = ["Maize (corn)", "Wheat", "Rice, paddy (rice milled equivalent)"]
+    # items_trade = ["Wheat"]
     # Define regions for which the data is processed
     # "Oceania" is used for testing, as it has the least amount of countries
     # to run with all data use: "All_Data" for region
-    region = "All_Data"
+    region = "Oceania"
     print("\n")
     for item in items_trade:
         main(
