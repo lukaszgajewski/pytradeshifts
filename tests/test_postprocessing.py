@@ -219,7 +219,9 @@ class TestPostprocessing:
 
     def test_compute_imports(self, postprocessing_object) -> None:
         assert postprocessing_object.imports is not None
-        assert len(postprocessing_object.imports) == len(postprocessing_object.scenarios)
+        assert len(postprocessing_object.imports) == len(
+            postprocessing_object.scenarios
+        )
         assert all(
             [
                 isinstance(v, float)

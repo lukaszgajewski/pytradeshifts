@@ -187,7 +187,8 @@ class Postprocessing:
                         imports_difference[country] = 0
                     else:
                         imports_difference[country] = (
-                            (imports[country] - self.imports[0][country]) / self.imports[0][country]
+                            (imports[country] - self.imports[0][country])
+                            / self.imports[0][country]
                         ) * 100
             self.imports_difference.append(imports_difference)
 
@@ -980,10 +981,15 @@ class Postprocessing:
         """
         self.community_satisfaction_difference = [
             {
-            country: satisfaction - self.community_satisfaction[0][country]
-            if country in self.community_satisfaction[0]
-            else (print(f"Warning: {country} not found in the base scenario.") or np.nan)
-            for country, satisfaction in community_satisfaction.items()
+                country: (
+                    satisfaction - self.community_satisfaction[0][country]
+                    if country in self.community_satisfaction[0]
+                    else (
+                        print(f"Warning: {country} not found in the base scenario.")
+                        or np.nan
+                    )
+                )
+                for country, satisfaction in community_satisfaction.items()
             }
             for community_satisfaction in self.community_satisfaction[1:]
         ]
@@ -1241,7 +1247,9 @@ class Postprocessing:
                         for community in scenario.trade_communities
                     ]  # we sum up the squares of the number of edges to each community
                 )
-                / (total_degree[country] ** 2 if total_degree[country] != 0 else 1)  # Avoid division by zero
+                / (
+                    total_degree[country] ** 2 if total_degree[country] != 0 else 1
+                )  # Avoid division by zero
                 for country in undirected_trade_graph  # for each country
             }
             self.participation.append(coefficients)
@@ -1308,7 +1316,12 @@ class Postprocessing:
             axs = [axs]
         for ax, (idx, scenario) in zip(axs, enumerate(self.scenarios)):
             ax.scatter(
-                self.participation[idx].values(), self.zscores[idx].values(), zorder=5, color="black", alpha=0.8, **kwargs
+                self.participation[idx].values(),
+                self.zscores[idx].values(),
+                zorder=5,
+                color="black",
+                alpha=0.8,
+                **kwargs,
             )
             ax.set_title(
                 f"Country roles for {scenario.crop} with base year {scenario.base_year[1:]}"
@@ -1318,7 +1331,9 @@ class Postprocessing:
                     else "\n(no scenario)"
                 )
             )
-            fill_sector_by_colour(ax, z_threshold, p_thresholds, alpha, labels, fontsize)
+            fill_sector_by_colour(
+                ax, z_threshold, p_thresholds, alpha, labels, fontsize
+            )
             ax.set_xlabel("Participation coefficient")
             ax.set_ylabel("Within community degree")
             # Turn off the grid
@@ -1419,11 +1434,16 @@ class Postprocessing:
         """
         self.node_stability_difference = [
             {
-            country: (stability - self.node_stability[0][country])
-            / self.node_stability[0][country]
-            if country in self.node_stability[0]
-            else (print(f"Warning: {country} not found in the base scenario."), np.nan)
-            for country, stability in node_stability.items()
+                country: (
+                    (stability - self.node_stability[0][country])
+                    / self.node_stability[0][country]
+                    if country in self.node_stability[0]
+                    else (
+                        print(f"Warning: {country} not found in the base scenario."),
+                        np.nan,
+                    )
+                )
+                for country, stability in node_stability.items()
             }
             for node_stability in self.node_stability[1:]
         ]
