@@ -82,12 +82,12 @@ def format_trade_and_production(
     trade_data: pd.DataFrame, production_data: pd.DataFrame, country_list: list[str]
 ) -> tuple[pd.DataFrame, pd.Series]:
     """
-    Convert trading and production data into a format appropriate for the
-    prebalancing and re-export correction algorithms.
+    Convert trading and production data of a single product into a format
+    appropriate for the prebalancing and re-export correction algorithms.
 
     Arguments:
-        trade_data (pd.DataFrame): the FAO trading data.
-        production (pd.DataFrame): the FAO production data.
+        trade_data (pd.DataFrame): the FAO trading data (of a single product).
+        production (pd.DataFrame): the FAO production data (of a single product).
         country_list (list[str]): the "ground truth" country list to which we
             shall conform the indices.
 

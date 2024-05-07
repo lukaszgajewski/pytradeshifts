@@ -6,6 +6,7 @@ from src import fao_trade_zip_to_pkl, fao_production_zip_to_pkl
 from src.fao_pkl_to_total_caloric_trade_and_production import (
     compute_calories,
     reindex_trade_and_production,
+    format_trade_and_production,
 )
 
 
@@ -58,6 +59,28 @@ def test_reindex(oceania_dataset_filtered):
         ),
         production_data.groupby(["ISO3"]).sum(numeric_only=True).squeeze(),
         country_list,
+    )
+    assert isinstance(trade_data, pd.DataFrame)
+    assert trade_data.shape == (len(country_list), len(country_list))
+    assert trade_data.columns.equals(trade_data.index)
+    assert trade_data.columns.equals(pd.Index(country_list))
+    assert ~trade_data.isna().any(axis=None)
+    assert isinstance(production_data, pd.Series)
+    assert len(production_data) == len(country_list)
+    assert production_data.index.equals(trade_data.index)
+    assert ~production_data.isna().any(axis=None)
+
+
+def test_format(oceania_dataset_filtered):
+    trade_data, production_data = oceania_dataset_filtered
+    country_list = ["AUS", "NZL", "PNG", "FJI"]
+    trade_data, production_data = compute_calories(
+        trade_data, production_data, data["input"]["nutrition"]
+    )
+    trade_data = trade_data[trade_data["Item"] == "Apples"]
+    production_data = production_data[production_data["Item"] == "Apples"]
+    trade_data, production_data = format_trade_and_production(
+        trade_data, production_data, country_list
     )
     assert isinstance(trade_data, pd.DataFrame)
     assert trade_data.shape == (len(country_list), len(country_list))
