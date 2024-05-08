@@ -1,5 +1,5 @@
 import pandas as pd
-from input_output import data
+from src.input_output import data
 
 
 def load_data(
@@ -108,8 +108,8 @@ def main():
         None.
     """
     total_trade, total_production, yield_reduction = load_data(
-        data["intermidiary"]["trade"],
-        data["intermidiary"]["production"],
+        data["intermidiary"]["caloric_trade"],
+        data["intermidiary"]["caloric_production"],
         data["input"]["yield_reduction"],
     )
     yearly_domestic_supply = (
