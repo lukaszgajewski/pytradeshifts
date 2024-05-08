@@ -52,6 +52,7 @@ That's it. The results will be in ```data/output/```.
 
 ## TODO
 - tests
+- update readme to include test dirs description
 - investigate mushrooms
 - optional? We're moving all of this to integrated model later anyway:
     - env/req files
