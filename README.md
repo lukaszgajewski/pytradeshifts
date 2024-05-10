@@ -29,6 +29,9 @@ The final output files, i.e., domestic supply of dry caloric tonnes per country 
 - ```data/output/domestic_supply_kcals.csv```
 - ```data/output/domestic_supply_kcals_monthly.csv```
 
+### Testing
+Data files used for testing only.
+
 ## Code
 - ```src/input_output.py```; controls data paths and loading the zips.
 - ```src/fao_trade_zip_to_pkl.py```; reads in the FAO zip trade file and serialises it to a pickle.
@@ -37,6 +40,7 @@ The final output files, i.e., domestic supply of dry caloric tonnes per country 
 - ```src/compute_domestic_supply.py```; from the above, computes the domestic supply of dry caloric tonnes for each country yearly, in the context of the specified yield reduction scenario.
 - ```src/convert_supply_yearly_to_monthly.py```, from the above, computes the domestic supply of dry coloric tonnes monthly, in the context of the specified seasonality data.
 - ```src/main.py```; runs all of the above scripts in the proper order.
+- ```tests/``` contains the testing suite.
 
 ## Launch
 All data in the ```input``` subsection must be put in the right places (see Data section).
@@ -51,9 +55,6 @@ That's it. The results will be in ```data/output/```.
 - pytests
 
 ## TODO
-- add correction to year one from Morgan
-- ask Morgan whether col 1 should be yearly or yearly/12
-- update readme to include test dirs description
 - investigate mushrooms
 - optional? We're moving all of this to integrated model later anyway:
     - env/req files
