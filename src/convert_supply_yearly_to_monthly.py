@@ -38,7 +38,22 @@ def load_data(
     return monthly_domestic_supply, monthly_seasonality
 
 
-def compute_year_one(monthly_domestic_supply, monthly_seasonality):
+def compute_year_one(
+    monthly_domestic_supply: pd.DataFrame, monthly_seasonality: pd.DataFrame
+) -> list[pd.Series]:
+    """
+    Compute domestic supply per month in year one. We're assuming the yield
+    reduction scenario initial event happens May 1st.
+
+    Arguments:
+        monthly_domestic_supply (pd.DataFrame): domestic supply average per month.
+        monthly_seasonality (pd.DataFrame): data indicating the seasonality of
+            the domestic supply for each country, month.
+
+    Returns:
+        list[pd.Series]: list of domestic supply vectors (indexed by country),
+            one vector per month (May-December).
+    """
     return [
         monthly_domestic_supply["crop_kcals_baseline_domestic_supply_year_1"]
         .mul(monthly_seasonality[f"seasonality_m{month+4}"], axis=0)
@@ -47,7 +62,21 @@ def compute_year_one(monthly_domestic_supply, monthly_seasonality):
     ]
 
 
-def compute_other_years(monthly_domestic_supply, monthly_seasonality):
+def compute_other_years(monthly_domestic_supply, monthly_seasonality, total_years=10):
+    """
+    Compute domestic supply per month in years following year one (so, year two onwards).
+
+    Arguments:
+        monthly_domestic_supply (pd.DataFrame): domestic supply average per month.
+        monthly_seasonality (pd.DataFrame): data indicating the seasonality of
+            the domestic supply for each country, month.
+        total_years (int, optional): total number of years, inclusive with year one,
+            in which yield reduction scenario initial event occurs.
+
+    Returns:
+        list[pd.Series]: list of domestic supply vectors (indexed by country),
+            one vector per month (January-December x # of years less one).
+    """
     return [
         monthly_domestic_supply[f"crop_kcals_baseline_domestic_supply_year_{year}"]
         .mul(monthly_seasonality[f"seasonality_m{month}"], axis=0)
@@ -58,7 +87,7 @@ def compute_other_years(monthly_domestic_supply, monthly_seasonality):
         # since there are 8 months in year one;
         # one could argue that it is more intuitive to think of it as
         # starting after 4 months (-4), so ¯\_(ツ)_/¯ ...
-        for year in range(2, 11)
+        for year in range(2, total_years + 1)
         for month in range(1, 13)
     ]
 
