@@ -26,6 +26,10 @@ def load_fao_zip(FAO_zip_path: str) -> pd.DataFrame:
 data = {
     # these files are raw inputs that must be provided for the code to work
     "input": {
+        # this controls whether to use raw input (FAO zip files) -- True
+        # or the precomputed pickles -- False
+        # (specified further on in the intermidiary section)
+        "from_raw": True,
         # this is the data from: https://www.fao.org/faostat/en/#data/TM
         # bulk download -> all data
         "trade": "data/input/Trade_DetailedTradeMatrix_E_All_Data.zip",

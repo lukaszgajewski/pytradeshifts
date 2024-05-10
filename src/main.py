@@ -1,5 +1,6 @@
 from time import time
 
+from src.input_output import data
 from fao_trade_zip_to_pkl import main as serialise_trade_data
 from fao_production_zip_to_pkl import main as serialise_production_data
 from fao_pkl_to_total_caloric_trade_and_production import (
@@ -11,10 +12,11 @@ from convert_supply_yearly_to_monthly import main as compute_monthly_domestic_su
 
 def main():
     t = time()
-    print("Serialising trade data...")
-    serialise_trade_data()
-    print("Serialising production data...")
-    serialise_production_data()
+    if data["input"]["from_raw"]:
+        print("Serialising trade data...")
+        serialise_trade_data()
+        print("Serialising production data...")
+        serialise_production_data()
     print("Computing total caloric trade and production...")
     compute_total_trade_and_production()
     print("Computing domestic supply yearly...")
