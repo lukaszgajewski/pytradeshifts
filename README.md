@@ -53,6 +53,7 @@ That's it. The results will be in ```data/output/```.
 ## TODO
 - tests (TODO: convert yearly to monthly, input_output assert files exist)
 - add correction to year one from Morgan
+- ask Morgan whether col 1 should be yearly or yearly/12
 - update readme to include test dirs description
 - investigate mushrooms
 - optional? We're moving all of this to integrated model later anyway:

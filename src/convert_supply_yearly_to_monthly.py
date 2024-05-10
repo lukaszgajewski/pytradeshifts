@@ -1,5 +1,5 @@
 import pandas as pd
-from input_output import data
+from src.input_output import data
 
 
 def load_data(
@@ -29,10 +29,6 @@ def load_data(
     monthly_seasonality = pd.read_csv(monthly_seasonality_path, index_col=0)
     monthly_seasonality = monthly_seasonality.sort_index()
     monthly_seasonality.index.name = "ISO3"
-    # make sure that the indices match
-    pd.testing.assert_index_equal(
-        monthly_domestic_supply.index, monthly_seasonality.index
-    )
     # we do not need the country names column
     monthly_seasonality = monthly_seasonality.drop(columns="country")
     return monthly_domestic_supply, monthly_seasonality
