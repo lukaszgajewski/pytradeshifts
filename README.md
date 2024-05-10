@@ -51,7 +51,8 @@ That's it. The results will be in ```data/output/```.
 - pytests
 
 ## TODO
-- tests
+- tests (TODO: convert yearly to monthly, input_output assert files exist)
+- add correction to year one from Morgan
 - update readme to include test dirs description
 - investigate mushrooms
 - optional? We're moving all of this to integrated model later anyway:

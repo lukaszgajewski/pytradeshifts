@@ -38,6 +38,31 @@ def load_data(
     return monthly_domestic_supply, monthly_seasonality
 
 
+def compute_year_one(monthly_domestic_supply, monthly_seasonality):
+    return [
+        monthly_domestic_supply["crop_kcals_baseline_domestic_supply_year_1"]
+        .mul(monthly_seasonality[f"seasonality_m{month+4}"], axis=0)
+        .rename(f"crop_kcals_baseline_domestic_supply_month_{month}")
+        for month in range(1, 9)
+    ]
+
+
+def compute_other_years(monthly_domestic_supply, monthly_seasonality):
+    return [
+        monthly_domestic_supply[f"crop_kcals_baseline_domestic_supply_year_{year}"]
+        .mul(monthly_seasonality[f"seasonality_m{month}"], axis=0)
+        .rename(
+            f"crop_kcals_baseline_domestic_supply_month_{((year - 1) * 12) + month + (8 - 12)}"
+        )
+        # yes, I know 8-12 is -4; this is for clarity
+        # since there are 8 months in year one;
+        # one could argue that it is more intuitive to think of it as
+        # starting after 4 months (-4), so ¯\_(ツ)_/¯ ...
+        for year in range(2, 11)
+        for month in range(1, 13)
+    ]
+
+
 def main():
     """
     Convert yearly caloric domestic supply to monthly, using the specified
@@ -54,25 +79,9 @@ def main():
         data["output"]["yearly"], data["input"]["seasonality"]
     )
     # bomb drops May 1st so we split year one into 8 months
-    year_one = [
-        monthly_domestic_supply["crop_kcals_baseline_domestic_supply_year_1"]
-        .mul(monthly_seasonality[f"seasonality_m{month+4}"], axis=0)
-        .rename(f"crop_kcals_baseline_domestic_supply_month_{month}")
-        for month in range(1, 9)
-    ]
+    year_one = compute_year_one(monthly_domestic_supply, monthly_seasonality)
     # other years we treat normally, i.e., splitting them into 12 months
-    other_years = [
-        monthly_domestic_supply[f"crop_kcals_baseline_domestic_supply_year_{year}"]
-        .mul(monthly_seasonality[f"seasonality_m{month}"], axis=0)
-        .rename(
-            f"crop_kcals_baseline_domestic_supply_month_{((year - 1) * 12) + month + (8 - 12)}"
-        )  # yes, I know 8-12 is -4; this is for clarity
-        # since there are 8 months in year one
-        # one could argue that it is more intuitive to think of it as
-        # starting after 4 months (-4), so ¯\_(ツ)_/¯ ...
-        for year in range(2, 11)
-        for month in range(1, 13)
-    ]
+    other_years = compute_other_years(monthly_domestic_supply, monthly_seasonality)
     # combine into one DataFrame
     monthly_domestic_supply = pd.concat(
         [monthly_domestic_supply["crop_kcals_baseline_domestic_supply"]]
