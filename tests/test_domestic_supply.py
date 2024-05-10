@@ -11,6 +11,7 @@ def dataset():
         data["intermidiary"]["caloric_trade"],
         data["intermidiary"]["caloric_production"],
         data["input"]["yield_reduction"],
+        data["input"]["seasonality"],
     )
 
 

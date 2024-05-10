@@ -1,11 +1,13 @@
 import pandas as pd
 from src.input_output import data
+from src.year_one_correction import update_yield_reduction_for_first_year
 
 
 def load_data(
     total_caloric_trade_path: str,
     total_caloric_production_path: str,
     yearly_reduction_path: str,
+    monthly_seasonality_path: str,
 ) -> tuple[pd.DataFrame, pd.Series, pd.DataFrame]:
     """
     Read total caloric trade, production data and yield reduction values;
@@ -21,6 +23,10 @@ def load_data(
         yearly_reduction_path (str): path to a CSV containing yield reduction data,
             e.g., in a nuclear winter scenario. A sample file is provided in:
             `data/input/nuclear_winter_csv.csv`.
+        monthly_seasonality_path (str): path to file containing seasonality data
+            for each country. A sample file is provided in `data/input/seasonality_csv.csv`.
+            Here we use it only to correct the first year yield values, see
+            `src/year_one_correction.py`.
 
     Returns:
         tuple[pd.DataFrame, pd.Series, pd.DataFrame]: caloric trade matrix,
@@ -41,6 +47,18 @@ def load_data(
     # ensure we don't get negative yield
     yield_reduction[yield_reduction < 0] = 0
     yield_reduction = yield_reduction.sort_index()
+
+    # (adding so that reduction in first year may-december are calculated accurately
+    monthly_seasonality = pd.read_csv(monthly_seasonality_path, index_col=0)
+    monthly_seasonality = monthly_seasonality.sort_index()
+    monthly_seasonality.index.name = "ISO3"
+    # we do not need the country names column
+    monthly_seasonality = monthly_seasonality.drop(columns="country")
+
+    yield_reduction = update_yield_reduction_for_first_year(
+        yield_reduction, monthly_seasonality
+    )
+
     return total_trade, total_production, yield_reduction
 
 
@@ -111,6 +129,7 @@ def main():
         data["intermidiary"]["caloric_trade"],
         data["intermidiary"]["caloric_production"],
         data["input"]["yield_reduction"],
+        data["input"]["seasonality"],
     )
     yearly_domestic_supply = (
         compute_domestic_supply(total_trade, total_production)

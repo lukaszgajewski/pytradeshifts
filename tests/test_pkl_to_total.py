@@ -70,14 +70,14 @@ def test_compute_calories(oceania_dataset_filtered):
     assert isinstance(trade_data, pd.DataFrame)
     assert len(trade_data.columns) == 4
     assert "Dry Caloric Tonnes" in trade_data.columns
-    trade_data.replace([np.inf, -np.inf], np.nan, inplace=True)
+    trade_data = trade_data.replace([np.inf, -np.inf], np.nan)
     assert ~trade_data.isna().any(axis=None)
     assert trade_data.dtypes["Dry Caloric Tonnes"] == np.dtype("float64")
     assert (trade_data["Dry Caloric Tonnes"] >= 0).all(axis=None)
     assert isinstance(production_data, pd.DataFrame)
     assert len(production_data.columns) == 3
     assert "Dry Caloric Tonnes" in production_data.columns
-    production_data.replace([np.inf, -np.inf], np.nan, inplace=True)
+    production_data = production_data.replace([np.inf, -np.inf], np.nan)
     assert ~production_data.isna().any(axis=None)
     assert production_data.dtypes["Dry Caloric Tonnes"] == np.dtype("float64")
     assert (production_data["Dry Caloric Tonnes"] >= 0).all(axis=None)
