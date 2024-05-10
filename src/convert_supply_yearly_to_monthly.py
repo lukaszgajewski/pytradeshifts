@@ -62,7 +62,11 @@ def compute_year_one(
     ]
 
 
-def compute_other_years(monthly_domestic_supply, monthly_seasonality, total_years=10):
+def compute_other_years(
+    monthly_domestic_supply: pd.DataFrame,
+    monthly_seasonality: pd.DataFrame,
+    total_years=10,
+) -> list[pd.Series]:
     """
     Compute domestic supply per month in years following year one (so, year two onwards).
 
