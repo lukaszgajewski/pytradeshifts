@@ -108,7 +108,9 @@ def _prep_trade_matrix(
     # Make sure that we are not trying to filter for a unit, element or item which is not in the data
     # This can happen because the FAO data is not consistent across all datasets
     assert unit in trad["Unit"].unique(), f"unit {unit} not in {trad['Unit'].unique()}"
-    assert element in trad["Element"].unique(), f"element {element} not in {trad['Element'].unique()}"
+    assert (
+        element in trad["Element"].unique()
+    ), f"element {element} not in {trad['Element'].unique()}"
     assert item in trad["Item"].unique(), f"item {item} not in {trad['Item'].unique()}"
     print("Filter trade matrix")
     trad = trad[
@@ -280,8 +282,8 @@ def rename_countries(
     # different states now
     # rename China; Taiwan Province of to Taiwan
     codes.loc[codes["Area"] == "China; Taiwan Province of", "Area"] = "Taiwan"
-    codes.loc[codes["Area"] == 'Serbia and Montenegro', "Area"] = "Serbia"
-    codes.loc[codes["Area"] == 'Belgium-Luxembourg', "Area"] = "Belgium"
+    codes.loc[codes["Area"] == "Serbia and Montenegro", "Area"] = "Serbia"
+    codes.loc[codes["Area"] == "Belgium-Luxembourg", "Area"] = "Belgium"
 
     # Create a dictionary with the country codes as keys and country names as values
     cc = coco.CountryConverter()
@@ -431,9 +433,15 @@ def main(
 
     # Make sure that production index and trade matrix index/columns are the same
     # and print out the difference if there is any
-    assert trade_matrix.index.equals(trade_matrix.columns), f"difference: {trade_matrix.index.difference(trade_matrix.columns)}"
-    assert production.index.equals(trade_matrix.index), f"difference: {production.index.difference(trade_matrix.index)}"
-    assert production.index.equals(trade_matrix.columns), f"difference: {production.index.difference(trade_matrix.columns)}"
+    assert trade_matrix.index.equals(
+        trade_matrix.columns
+    ), f"difference: {trade_matrix.index.difference(trade_matrix.columns)}"
+    assert production.index.equals(
+        trade_matrix.index
+    ), f"difference: {production.index.difference(trade_matrix.index)}"
+    assert production.index.equals(
+        trade_matrix.columns
+    ), f"difference: {production.index.difference(trade_matrix.columns)}"
 
     # Replace "All_Data" with "global" for readability
     if region == "All_Data":

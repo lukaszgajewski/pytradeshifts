@@ -589,7 +589,12 @@ def get_percolation_threshold(
 
 
 def fill_sector_by_colour(
-    ax: Axes, z_threshold: float, p_thresholds: list[float], alpha: float, labels=True, fontsize=7
+    ax: Axes,
+    z_threshold: float,
+    p_thresholds: list[float],
+    alpha: float,
+    labels=True,
+    fontsize=7,
 ):
     """
     This is a helper function to colour the background in the z-score, participation
@@ -701,13 +706,23 @@ def fill_sector_by_colour(
         alpha=alpha,
     )
     if labels:
-        ax.text(0.01, 5.5, 'Provincial hub', fontsize=fontsize, color='red', alpha=0.5)
-        ax.text(0.31, 5.5, 'Connector hub', fontsize=fontsize, color='green', alpha=0.5)
-        ax.text(0.76, 5.5, 'Kinless hub', fontsize=fontsize, color='gold', alpha=1)
-        ax.text(0.001, -1.8, 'Ultra\nperi-\npheral\nnon\nhub', fontsize=fontsize, color='purple', alpha=0.5)
-        ax.text(0.06, -1.8, 'Peripheral non-hub', fontsize=fontsize, color='blue', alpha=0.5)
-        ax.text(0.63, -1.8, 'Connector non-hub', fontsize=fontsize, color='orange', alpha=1)
-        ax.text(0.81, -1.8, 'Kinless non-hub', fontsize=fontsize, color='brown', alpha=1)
-
-
-
+        ax.text(0.01, 5.5, "Provincial hub", fontsize=fontsize, color="red", alpha=0.5)
+        ax.text(0.31, 5.5, "Connector hub", fontsize=fontsize, color="green", alpha=0.5)
+        ax.text(0.76, 5.5, "Kinless hub", fontsize=fontsize, color="gold", alpha=1)
+        ax.text(
+            0.001,
+            -1.8,
+            "Ultra\nperi-\npheral\nnon\nhub",
+            fontsize=fontsize,
+            color="purple",
+            alpha=0.5,
+        )
+        ax.text(
+            0.06, -1.8, "Peripheral non-hub", fontsize=fontsize, color="blue", alpha=0.5
+        )
+        ax.text(
+            0.63, -1.8, "Connector non-hub", fontsize=fontsize, color="orange", alpha=1
+        )
+        ax.text(
+            0.81, -1.8, "Kinless non-hub", fontsize=fontsize, color="brown", alpha=1
+        )
