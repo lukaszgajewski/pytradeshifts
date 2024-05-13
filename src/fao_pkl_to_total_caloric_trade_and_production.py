@@ -8,7 +8,7 @@ def compute_calories(
     trade_data: pd.DataFrame, production_data: pd.DataFrame, nutrition_data_path: str
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Convert food items to their respective caloric value (in "dry caloric tonnes").
+    Convert food items to their respective caloric value (in "Calories").
 
     Arguments:
         trade_data (pd.DataFrame): FAO trading data in a pandas DataFrame.
@@ -19,7 +19,7 @@ def compute_calories(
 
     Returns:
         tuple[pd.DataFrame, pd.DataFrame]: trade and production DataFrames with
-            "Dry Caloric Tonnes" column added.
+            "Calories" column added.
     """
     # get the nutritional table and convert it to a dict
     # mapping food items to their caloric value
@@ -29,26 +29,22 @@ def compute_calories(
         .to_dict()["Calories"]
     )
     # compute the calories
-    trade_data["Dry Caloric Tonnes"] = (
+    trade_data["Calories"] = (
         trade_data["Item"].map(nutrition_data)
         * trade_data[data["input"]["year_flag"]]
         * 1000
-        / 4e6
     )
-    # 1000 is tonnes to kg, 4e6 is Cal (a.k.a. kcal) to dry caloric tonne
-    # yes, it is a bit redundant since 1e3 cancels out
-    # but I want it here like this for clarity
-    # Additional note: we sue map here which can ve slow but it is convenient
+    # 1000 is tonnes to kg
+    # Additional note: we use map here which can be slow but it is convenient
     # and this data is post-filtering so speed should not be a concern anymore
-    production_data["Dry Caloric Tonnes"] = (
+    production_data["Calories"] = (
         production_data["Item"].map(nutrition_data)
         * production_data[data["input"]["year_flag"]]
         * 1000
-        / 4e6
     )
     return (
-        trade_data[["Reporter ISO3", "Partner ISO3", "Item", "Dry Caloric Tonnes"]],
-        production_data[["ISO3", "Item", "Dry Caloric Tonnes"]],
+        trade_data[["Reporter ISO3", "Partner ISO3", "Item", "Calories"]],
+        production_data[["ISO3", "Item", "Calories"]],
     )
 
 
@@ -95,11 +91,9 @@ def format_trade_and_production(
         tuple[pd.DataFrame, pd.Series]: a trading marix (pivoted table) and,
             a production Series (a vector).
     """
-    production_series = production_data.set_index("ISO3")[
-        "Dry Caloric Tonnes"
-    ].squeeze()
+    production_series = production_data.set_index("ISO3")["Calories"].squeeze()
     trade_matrix = trade_data.pivot(
-        values="Dry Caloric Tonnes", index="Reporter ISO3", columns="Partner ISO3"
+        values="Calories", index="Reporter ISO3", columns="Partner ISO3"
     )
     return reindex_trade_and_production(trade_matrix, production_series, country_list)
 
@@ -286,6 +280,14 @@ def main():
         # add up
         total_trade += trade_matrix
     # save results to file
+    total_trade = total_trade / 4e6
+    total_production = total_production / 4e6
+    # 4e6 is Cal (a.k.a. kcal) to dry caloric tonne
+    # we do this here instead of right away in compute_calories()
+    # because of the floating point precision issues
+    # essentially the re-export algorithm will fail in matrix inversion
+    # if values are close too close to zero, so we keep them large there
+    # and convert to dry caloric tonnes here
     total_trade.to_csv(data["intermidiary"]["caloric_trade"])
     total_production.to_csv(data["intermidiary"]["caloric_production"])
 
