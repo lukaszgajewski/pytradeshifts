@@ -282,6 +282,7 @@ def main():
     # save results to file
     total_trade = total_trade / 4e6
     total_production = total_production / 4e6
+    total_production = total_production.rename("Dry Caloric Tonnes")
     # 4e6 is Cal (a.k.a. kcal) to dry caloric tonne
     # we do this here instead of right away in compute_calories()
     # because of the floating point precision issues
